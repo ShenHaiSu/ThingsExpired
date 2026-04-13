@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"things-expired/internal/handler"
 	"things-expired/pkg/middleware"
+	"things-expired/pkg/utils"
 )
 
 // NewRouter 创建并配置路由
@@ -12,12 +13,15 @@ func NewRouter(
 	categoryHandler *handler.CategoryHandler,
 	itemHandler *handler.ItemHandler,
 	authMiddleware *middleware.AuthMiddleware,
+	logger *utils.Logger,
 ) *gin.Engine {
 	r := gin.New()
 
 	// 注册全局中间件
-	r.Use(gin.Logger())
-	r.Use(gin.Recovery())
+	r.Use(middleware.RequestIDMiddleware())
+	r.Use(middleware.RecoveryMiddleware(logger))
+	r.Use(middleware.LoggerMiddleware(logger))
+	r.Use(middleware.CorsMiddleware())
 
 	// API 路由组（所有 API 必须以 /api 开头）
 	api := r.Group("/api")

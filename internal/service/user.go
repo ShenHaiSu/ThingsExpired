@@ -8,6 +8,7 @@ import (
 	"things-expired/internal/model/vo"
 	"things-expired/internal/repository"
 	"things-expired/pkg/errors"
+	"things-expired/pkg/utils"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -22,11 +23,15 @@ type IUserService interface {
 // UserService 用户服务实现
 type UserService struct {
 	userRepo repository.IUserRepository
+	jwtUtil  *utils.JWTUtil
 }
 
 // NewUserService 创建用户服务
-func NewUserService(userRepo repository.IUserRepository) IUserService {
-	return &UserService{userRepo: userRepo}
+func NewUserService(userRepo repository.IUserRepository, jwtUtil *utils.JWTUtil) IUserService {
+	return &UserService{
+		userRepo: userRepo,
+		jwtUtil:  jwtUtil,
+	}
 }
 
 func (s *UserService) Register(ctx context.Context, req *dto.RegisterRequest) (*vo.UserVO, error) {
@@ -84,12 +89,16 @@ func (s *UserService) Login(ctx context.Context, req *dto.LoginRequest) (*vo.Log
 		return nil, errors.ErrPasswordWrong
 	}
 
-	// TODO: 生成 JWT Token，后续阶段实现
+	// 生成 JWT Token
+	token, expireTime, err := s.jwtUtil.GenerateToken(user.ID, user.Username, user.Email)
+	if err != nil {
+		return nil, errors.NewWithCause(errors.CodeInternalError, "生成Token失败", err)
+	}
 
 	return &vo.LoginVO{
-		UserID: user.ID,
-		Token:  "placeholder-token", // 后续实现
-		Expired: "",
+		UserID:  user.ID,
+		Token:   token,
+		Expired: expireTime.Format("2006-01-02 15:04:05"),
 	}, nil
 }
 

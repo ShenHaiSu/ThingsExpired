@@ -6,15 +6,19 @@ import (
 	"github.com/gin-gonic/gin"
 	"things-expired/internal/handler"
 	"things-expired/pkg/errors"
+	"things-expired/pkg/utils"
 )
 
 // AuthMiddleware 认证中间件
 type AuthMiddleware struct {
+	jwtUtil *utils.JWTUtil
 }
 
 // NewAuthMiddleware 创建认证中间件
-func NewAuthMiddleware() *AuthMiddleware {
-	return &AuthMiddleware{}
+func NewAuthMiddleware(jwtUtil *utils.JWTUtil) *AuthMiddleware {
+	return &AuthMiddleware{
+		jwtUtil: jwtUtil,
+	}
 }
 
 // Handle 处理认证逻辑
@@ -36,8 +40,18 @@ func (m *AuthMiddleware) Handle() gin.HandlerFunc {
 			return
 		}
 
-		// TODO: 验证 JWT token
-		// 这里先做简单的占位处理，后续阶段会实现完整的 JWT 验证
+		// 验证 JWT token
+		claims, err := m.jwtUtil.ValidateToken(token)
+		if err != nil {
+			handler.FailWithCode(c, errors.CodeUnauthorized, "invalid token")
+			c.Abort()
+			return
+		}
+
+		// 将用户信息存入 Context
+		c.Set("user_id", claims.UserID)
+		c.Set("username", claims.Username)
+		c.Set("email", claims.Email)
 
 		c.Next()
 	}

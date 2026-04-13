@@ -13,6 +13,7 @@ import (
 	"things-expired/internal/router"
 	"things-expired/internal/service"
 	"things-expired/pkg/middleware"
+	"things-expired/pkg/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -35,6 +36,11 @@ func main() {
 			return &cfg.Database
 		}),
 
+		// JWT 配置
+		fx.Provide(func(cfg *config.Config) *config.JWTConfig {
+			return &cfg.JWT
+		}),
+
 		// 数据库
 		fx.Provide(repository.NewDB),
 
@@ -42,6 +48,12 @@ func main() {
 		fx.Provide(repository.NewUserRepository),
 		fx.Provide(repository.NewCategoryRepository),
 		fx.Provide(repository.NewItemRepository),
+
+		// Utils
+		fx.Provide(utils.NewJWTUtil),
+		fx.Provide(func(cfg *config.Config) (*utils.Logger, error) {
+			return utils.NewLogger(cfg.App.Mode)
+		}),
 
 		// Service
 		fx.Provide(service.NewUserService),
