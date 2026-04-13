@@ -1,0 +1,31 @@
+[Unit]
+Description=ThingsExpired API Server
+Documentation=https://github.com/your-org/things-expired
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/things-expired
+ExecStart=/opt/things-expired/server /opt/things-expired/config/config.yaml
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+# 环境配置
+Environment="TZ=Asia/Shanghai"
+
+# 安全配置
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/things-expired/data /opt/things-expired/uploads
+
+# 资源限制
+LimitNOFILE=65536
+LimitNPROC=4096
+
+[Install]
+WantedBy=multi-user.target
