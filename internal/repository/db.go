@@ -19,10 +19,10 @@ func NewDB(cfg *config.DatabaseConfig) (*gorm.DB, error) {
 		return nil, err
 	}
 
-	// 检查数据库文件是否存在
-	dbExists := true
-	if _, err := os.Stat(absPath); os.IsNotExist(err) {
-		dbExists = false
+	// 确保目录存在
+	dir := filepath.Dir(absPath)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return nil, err
 	}
 
 	db, err := gorm.Open(sqlite.Open(cfg.Path), &gorm.Config{
@@ -40,14 +40,8 @@ func NewDB(cfg *config.DatabaseConfig) (*gorm.DB, error) {
 	sqlDB.SetMaxIdleConns(cfg.MaxIdleConns)
 	sqlDB.SetMaxOpenConns(cfg.MaxOpenConns)
 
-	// 如果数据库文件不存在，则自动创建表
-	if !dbExists {
-		// 确保目录存在
-		dir := filepath.Dir(absPath)
-		if err := os.MkdirAll(dir, 0755); err != nil {
-			return nil, err
-		}
-
+	// 检查 users 表是否存在，如果不存在则自动创建所有表
+	if !db.Migrator().HasTable(&model.User{}) {
 		// 自动迁移创建表
 		if err := db.AutoMigrate(&model.User{}, &model.Category{}, &model.Item{}); err != nil {
 			return nil, err
