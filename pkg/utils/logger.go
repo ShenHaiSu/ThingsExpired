@@ -1,7 +1,13 @@
 package utils
 
 import (
+	"fmt"
 	"os"
+	"path/filepath"
+	"strings"
+	"time"
+
+	"things-expired/config"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -12,34 +18,121 @@ type Logger struct {
 	zap *zap.Logger
 }
 
-// NewLogger 创建日志器
+// NewLogger 创建日志器（兼容旧接口）
 func NewLogger(mode string) (*Logger, error) {
-	var config zap.Config
+	return NewLoggerWithConfig(&config.LogConfig{
+		Level:      mode,
+		Path:       "./log",
+		MaxSizeMB:  10,
+		MaxBackups: 30,
+		MaxAgeDays: 90,
+		Compress:   true,
+	})
+}
 
-	switch mode {
-	case "release":
-		config = zap.NewProductionConfig()
-		config.EncoderConfig.TimeKey = "timestamp"
-		config.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
-	case "test":
-		config = zap.NewDevelopmentConfig()
-		config.Level = zap.NewAtomicLevelAt(zap.WarnLevel)
-	default: // debug
-		config = zap.NewDevelopmentConfig()
-		config.Level = zap.NewAtomicLevelAt(zap.DebugLevel)
-		config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
+// NewLoggerWithConfig 根据配置创建日志器
+func NewLoggerWithConfig(cfg *config.LogConfig) (*Logger, error) {
+	// 确保日志目录存在
+	if err := ensureLogDir(cfg.Path); err != nil {
+		return nil, fmt.Errorf("创建日志目录失败: %w", err)
 	}
 
-	// 设置输出
-	config.OutputPaths = []string{"stdout"}
-	config.ErrorOutputPaths = []string{"stderr"}
+	// 解析日志级别
+	level := parseLevel(cfg.Level)
 
-	zapLogger, err := config.Build()
-	if err != nil {
-		return nil, err
+	// 创建编码器配置
+	encoderConfig := zapcore.EncoderConfig{
+		TimeKey:        "timestamp",
+		LevelKey:       "level",
+		NameKey:        "logger",
+		CallerKey:      "caller",
+		MessageKey:     "msg",
+		StacktraceKey:  "stacktrace",
+		LineEnding:     zapcore.DefaultLineEnding,
+		EncodeLevel:    zapcore.CapitalLevelEncoder,
+		EncodeTime:     timeEncoder,
+		EncodeDuration: zapcore.SecondsDurationEncoder,
+		EncodeCaller:   zapcore.ShortCallerEncoder,
 	}
+
+	// 创建编码器
+	encoder := zapcore.NewJSONEncoder(encoderConfig)
+
+	// 创建文件写入器
+	fileWriter := createFileWriter(cfg)
+
+	// 创建控制台写入器（debug 模式输出到控制台）
+	var consoleWriter zapcore.WriteSyncer
+	if cfg.Level == "debug" {
+		consoleWriter = zapcore.AddSync(os.Stdout)
+	}
+
+	// 创建写入器链
+	var writeSyncer zapcore.WriteSyncer
+	if consoleWriter != nil {
+		writeSyncer = zapcore.NewMultiWriteSyncer(consoleWriter, fileWriter)
+	} else {
+		writeSyncer = fileWriter
+	}
+
+	// 创建核心
+	core := zapcore.NewCore(
+		encoder,
+		writeSyncer,
+		level,
+	)
+
+	// 创建 logger
+	zapLogger := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1))
 
 	return &Logger{zap: zapLogger}, nil
+}
+
+// ensureLogDir 确保日志目录存在
+func ensureLogDir(path string) error {
+	if path == "" {
+		path = "./log"
+	}
+	return os.MkdirAll(path, 0755)
+}
+
+// createFileWriter 创建文件写入器
+func createFileWriter(cfg *config.LogConfig) zapcore.WriteSyncer {
+	// 生成日志文件名（yyyy-mm-dd.log）
+	fileName := fmt.Sprintf("%s.log", time.Now().Format("2006-01-02"))
+	filePath := filepath.Join(cfg.Path, fileName)
+
+	// 使用 zap 提供的文件写入器（支持日志轮转）
+	// 这里我们使用简单的文件写入，zap 本身不提供日志轮转
+	// 但可以通过自定义 WriteSyncer 实现更复杂的轮转逻辑
+	file, err := os.OpenFile(filePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
+	if err != nil {
+		// 如果打开文件失败，回退到 stderr
+		return zapcore.AddSync(os.Stderr)
+	}
+
+	return zapcore.AddSync(file)
+}
+
+// parseLevel 解析日志级别
+func parseLevel(level string) zapcore.Level {
+	switch strings.ToLower(level) {
+	case "debug":
+		return zapcore.DebugLevel
+	case "info":
+		return zapcore.InfoLevel
+	case "warn", "warning":
+		return zapcore.WarnLevel
+	case "error":
+		return zapcore.ErrorLevel
+	default:
+		return zapcore.InfoLevel
+	}
+}
+
+// timeEncoder 时间编码器
+func timeEncoder(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
+	enc.AppendString(t.Format("2006-01-02 15:04:05"))
 }
 
 // Sync 同步日志
@@ -91,6 +184,22 @@ var GlobalLogger *Logger
 func InitGlobalLogger(mode string) error {
 	var err error
 	GlobalLogger, err = NewLogger(mode)
+	if err != nil {
+		return err
+	}
+
+	// 确保退出时同步日志
+	RegisterOnShutdown(func() {
+		GlobalLogger.Sync()
+	})
+
+	return nil
+}
+
+// InitGlobalLoggerWithConfig 根据配置初始化全局日志器
+func InitGlobalLoggerWithConfig(cfg *config.LogConfig) error {
+	var err error
+	GlobalLogger, err = NewLoggerWithConfig(cfg)
 	if err != nil {
 		return err
 	}

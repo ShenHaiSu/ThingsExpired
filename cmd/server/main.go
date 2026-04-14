@@ -52,8 +52,15 @@ func main() {
 
 		// Utils
 		fx.Provide(utils.NewJWTUtil),
-		fx.Provide(func(cfg *config.Config) (*utils.Logger, error) {
-			return utils.NewLogger(cfg.App.Mode)
+
+		// Log 配置
+		fx.Provide(func(cfg *config.Config) *config.LogConfig {
+			return &cfg.Log
+		}),
+
+		// Logger - 使用配置创建日志器
+		fx.Provide(func(cfg *config.LogConfig) (*utils.Logger, error) {
+			return utils.NewLoggerWithConfig(cfg)
 		}),
 
 		// Security 配置
