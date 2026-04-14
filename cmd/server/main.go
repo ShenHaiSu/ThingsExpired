@@ -46,6 +46,7 @@ func main() {
 
 		// Repository
 		fx.Provide(repository.NewUserRepository),
+		fx.Provide(repository.NewUserSessionRepository),
 		fx.Provide(repository.NewCategoryRepository),
 		fx.Provide(repository.NewItemRepository),
 
@@ -53,6 +54,11 @@ func main() {
 		fx.Provide(utils.NewJWTUtil),
 		fx.Provide(func(cfg *config.Config) (*utils.Logger, error) {
 			return utils.NewLogger(cfg.App.Mode)
+		}),
+
+		// Security 配置
+		fx.Provide(func(cfg *config.Config) (bool, int) {
+			return cfg.Security.AllowMultiLogin, cfg.Security.MaxSessionsPerUser
 		}),
 
 		// Service

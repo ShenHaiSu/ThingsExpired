@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 	"things-expired/config"
 )
 
@@ -13,6 +14,7 @@ type Claims struct {
 	UserID   uint   `json:"user_id"`
 	Username string `json:"username"`
 	Email    string `json:"email"`
+	JTI      string `json:"jti"` // Token 唯一标识
 	jwt.RegisteredClaims
 }
 
@@ -30,18 +32,30 @@ func NewJWTUtil(cfg *config.JWTConfig) *JWTUtil {
 	}
 }
 
-// GenerateToken 生成 JWT Token
+// GenerateToken 生成 JWT Token（兼容旧版本）
 func (j *JWTUtil) GenerateToken(userID uint, username, email string) (string, time.Time, error) {
+	return j.GenerateTokenWithJTI(userID, username, email, "")
+}
+
+// GenerateTokenWithJTI 生成带 JTI 的 JWT Token
+func (j *JWTUtil) GenerateTokenWithJTI(userID uint, username, email, jti string) (string, time.Time, error) {
 	expireTime := time.Now().Add(time.Duration(j.expireHours) * time.Hour)
+
+	// 如果没有提供 JTI，生成一个 UUID
+	if jti == "" {
+		jti = generateJTI()
+	}
 
 	claims := Claims{
 		UserID:   userID,
 		Username: username,
 		Email:    email,
+		JTI:      jti,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expireTime),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			NotBefore: jwt.NewNumericDate(time.Now()),
+			ID:        jti, // 使用 JTI 作为 JWT 的 ID
 		},
 	}
 
@@ -52,6 +66,11 @@ func (j *JWTUtil) GenerateToken(userID uint, username, email string) (string, ti
 	}
 
 	return tokenString, expireTime, nil
+}
+
+// generateJTI 生成唯一的 Token ID
+func generateJTI() string {
+	return uuid.New().String()
 }
 
 // ValidateToken 验证 JWT Token

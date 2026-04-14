@@ -20,3 +20,7 @@ upload:
     - ".png"
     - ".pdf"
   save_path: "./uploads"
+
+security:
+  allow_multi_login: true       # 是否允许多端登录（false: 强制单端登录）
+  max_sessions_per_user: 3      # 每个用户最大会话数

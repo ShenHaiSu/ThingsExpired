@@ -5,19 +5,22 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"things-expired/internal/handler"
+	"things-expired/internal/repository"
 	"things-expired/pkg/errors"
 	"things-expired/pkg/utils"
 )
 
 // AuthMiddleware 认证中间件
 type AuthMiddleware struct {
-	jwtUtil *utils.JWTUtil
+	jwtUtil     *utils.JWTUtil
+	sessionRepo repository.IUserSessionRepository
 }
 
 // NewAuthMiddleware 创建认证中间件
-func NewAuthMiddleware(jwtUtil *utils.JWTUtil) *AuthMiddleware {
+func NewAuthMiddleware(jwtUtil *utils.JWTUtil, sessionRepo repository.IUserSessionRepository) *AuthMiddleware {
 	return &AuthMiddleware{
-		jwtUtil: jwtUtil,
+		jwtUtil:     jwtUtil,
+		sessionRepo: sessionRepo,
 	}
 }
 
@@ -48,10 +51,26 @@ func (m *AuthMiddleware) Handle() gin.HandlerFunc {
 			return
 		}
 
+		// 检查会话是否已被撤销
+		if m.sessionRepo != nil && claims.JTI != "" {
+			session, err := m.sessionRepo.GetByJTI(c.Request.Context(), claims.JTI)
+			if err != nil {
+				handler.FailWithCode(c, errors.CodeInternalError, "session check failed")
+				c.Abort()
+				return
+			}
+			if session == nil || session.IsRevoked {
+				handler.FailWithCode(c, errors.CodeUnauthorized, "session expired or revoked")
+				c.Abort()
+				return
+			}
+		}
+
 		// 将用户信息存入 Context
 		c.Set("user_id", claims.UserID)
 		c.Set("username", claims.Username)
 		c.Set("email", claims.Email)
+		c.Set("session_jti", claims.JTI)
 
 		c.Next()
 	}

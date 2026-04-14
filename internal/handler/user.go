@@ -42,13 +42,93 @@ func (h *UserHandler) Login(c *gin.Context) {
 		return
 	}
 
-	loginVO, err := h.userService.Login(c.Request.Context(), &req)
+	// 获取设备信息和 IP 地址
+	deviceInfo := c.GetHeader("User-Agent")
+	ipAddress := c.ClientIP()
+
+	loginVO, err := h.userService.Login(c.Request.Context(), &req, deviceInfo, ipAddress)
 	if err != nil {
 		Fail(c, err)
 		return
 	}
 
 	Success(c, loginVO)
+}
+
+// Logout 用户登出
+func (h *UserHandler) Logout(c *gin.Context) {
+	userID, exists := c.Get("user_id")
+	if !exists {
+		FailWithCode(c, errors.CodeUnauthorized, "未授权")
+		return
+	}
+
+	sessionJTI, _ := c.Get("session_jti")
+
+	err := h.userService.Logout(c.Request.Context(), userID.(uint), sessionJTI.(string))
+	if err != nil {
+		Fail(c, err)
+		return
+	}
+
+	Success(c, nil)
+}
+
+// GetSessions 获取用户所有会话
+func (h *UserHandler) GetSessions(c *gin.Context) {
+	userID, exists := c.Get("user_id")
+	if !exists {
+		FailWithCode(c, errors.CodeUnauthorized, "未授权")
+		return
+	}
+
+	sessions, err := h.userService.GetSessions(c.Request.Context(), userID.(uint))
+	if err != nil {
+		Fail(c, err)
+		return
+	}
+
+	Success(c, sessions)
+}
+
+// RevokeSession 撤销指定会话
+func (h *UserHandler) RevokeSession(c *gin.Context) {
+	userID, exists := c.Get("user_id")
+	if !exists {
+		FailWithCode(c, errors.CodeUnauthorized, "未授权")
+		return
+	}
+
+	var req dto.RevokeSessionRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		FailWithCode(c, errors.CodeParamInvalid, err.Error())
+		return
+	}
+
+	err := h.userService.RevokeSession(c.Request.Context(), userID.(uint), req.SessionID)
+	if err != nil {
+		Fail(c, err)
+		return
+	}
+
+	Success(c, nil)
+}
+
+// ForceLogout 强制下线（撤销所有会话）
+func (h *UserHandler) ForceLogout(c *gin.Context) {
+	userID, exists := c.Get("user_id")
+	if !exists {
+		FailWithCode(c, errors.CodeUnauthorized, "未授权")
+		return
+	}
+
+	err := h.userService.ForceLogout(c.Request.Context(), userID.(uint))
+	if err != nil {
+		Fail(c, err)
+		return
+	}
+
+	Success(c, nil)
 }
 
 // GetUserInfo 获取用户信息
