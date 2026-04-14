@@ -23,12 +23,16 @@ type IItemService interface {
 
 // ItemService 物品服务实现
 type ItemService struct {
-	itemRepo repository.IItemRepository
+	itemRepo   repository.IItemRepository
+	validator  *ItemRequestValidator
 }
 
 // NewItemService 创建物品服务
 func NewItemService(itemRepo repository.IItemRepository) IItemService {
-	return &ItemService{itemRepo: itemRepo}
+	return &ItemService{
+		itemRepo:   itemRepo,
+		validator:  NewItemRequestValidator(),
+	}
 }
 
 func (s *ItemService) Create(ctx context.Context, userID uint, req *dto.CreateItemRequest) (*vo.ItemVO, error) {
@@ -59,17 +63,12 @@ func (s *ItemService) Create(ctx context.Context, userID uint, req *dto.CreateIt
 }
 
 func (s *ItemService) List(ctx context.Context, userID uint, req *dto.ItemListRequest) (*vo.ItemListVO, error) {
-	page := req.Page
-	pageSize := req.PageSize
-
-	if page <= 0 {
-		page = 1
-	}
-	if pageSize <= 0 {
-		pageSize = 10
+	// 验证可选条件
+	if err := s.validator.ValidateItemListRequest(req); err != nil {
+		return nil, err
 	}
 
-	items, total, err := s.itemRepo.List(ctx, userID, req.CategoryID, page, pageSize)
+	items, total, err := s.itemRepo.List(ctx, userID, req)
 	if err != nil {
 		return nil, err
 	}
@@ -82,7 +81,7 @@ func (s *ItemService) List(ctx context.Context, userID uint, req *dto.ItemListRe
 	return &vo.ItemListVO{
 		List:  list,
 		Total: total,
-		Page:  page,
+		Page:  req.GetPage(),
 	}, nil
 }
 

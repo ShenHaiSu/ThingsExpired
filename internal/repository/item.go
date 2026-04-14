@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"things-expired/internal/model"
+	"things-expired/internal/model/dto"
+
 	"gorm.io/gorm"
 )
 
@@ -12,7 +14,7 @@ import (
 type IItemRepository interface {
 	Create(ctx context.Context, item *model.Item) error
 	GetByID(ctx context.Context, id uint) (*model.Item, error)
-	List(ctx context.Context, userID uint, categoryID uint, page, pageSize int) ([]*model.Item, int64, error)
+	List(ctx context.Context, userID uint, req *dto.ItemListRequest) ([]*model.Item, int64, error)
 	GetExpiring(ctx context.Context, userID uint, days int) ([]*model.Item, error)
 	Update(ctx context.Context, item *model.Item) error
 	Delete(ctx context.Context, id uint) error
@@ -43,26 +45,9 @@ func (r *ItemRepository) GetByID(ctx context.Context, id uint) (*model.Item, err
 	return &item, nil
 }
 
-func (r *ItemRepository) List(ctx context.Context, userID uint, categoryID uint, page, pageSize int) ([]*model.Item, int64, error) {
-	var items []*model.Item
-	var total int64
-
-	query := r.db.WithContext(ctx).Model(&model.Item{}).Where("user_id = ?", userID)
-
-	if categoryID > 0 {
-		query = query.Where("category_id = ?", categoryID)
-	}
-
-	if err := query.Count(&total).Error; err != nil {
-		return nil, 0, err
-	}
-
-	offset := (page - 1) * pageSize
-	if err := query.Offset(offset).Limit(pageSize).Order("expired_at ASC, created_at DESC").Find(&items).Error; err != nil {
-		return nil, 0, err
-	}
-
-	return items, total, nil
+func (r *ItemRepository) List(ctx context.Context, userID uint, req *dto.ItemListRequest) ([]*model.Item, int64, error) {
+	builder := NewItemQueryBuilder(r.db, userID, req)
+	return builder.Build()
 }
 
 func (r *ItemRepository) GetExpiring(ctx context.Context, userID uint, days int) ([]*model.Item, error) {
