@@ -1,3 +1,6 @@
 test-api.ps1
 server.exe
 data/app.db
+main.exe
+config/config.yaml
+logs/2026-04-23.log

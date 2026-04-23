@@ -15,22 +15,38 @@ import (
 // IUserService 用户服务接口
 type IUserService interface {
 	Register(ctx context.Context, req *dto.RegisterRequest) (*vo.UserVO, error)
-	Login(ctx context.Context, req *dto.LoginRequest) (*vo.LoginVO, error)
+	Login(ctx context.Context, req *dto.LoginRequest, deviceInfo, ipAddress string) (*vo.LoginVO, error)
+	Logout(ctx context.Context, userID uint, sessionJTI string) error
 	GetUserInfo(ctx context.Context, userID uint) (*vo.UserVO, error)
 	UpdateUser(ctx context.Context, userID uint, req *dto.UpdateUserRequest) (*vo.UserVO, error)
+	ForceLogout(ctx context.Context, userID uint) error
+	GetSessions(ctx context.Context, userID uint) (*vo.SessionListVO, error)
+	RevokeSession(ctx context.Context, userID uint, sessionID uint) error
 }
 
 // UserService 用户服务实现
 type UserService struct {
-	userRepo repository.IUserRepository
-	jwtUtil  *utils.JWTUtil
+	userRepo        repository.IUserRepository
+	sessionRepo     repository.IUserSessionRepository
+	jwtUtil         *utils.JWTUtil
+	allowMultiLogin bool
+	maxSessions     int
 }
 
 // NewUserService 创建用户服务
-func NewUserService(userRepo repository.IUserRepository, jwtUtil *utils.JWTUtil) IUserService {
+func NewUserService(
+	userRepo repository.IUserRepository,
+	sessionRepo repository.IUserSessionRepository,
+	jwtUtil *utils.JWTUtil,
+	allowMultiLogin bool,
+	maxSessions int,
+) IUserService {
 	return &UserService{
-		userRepo: userRepo,
-		jwtUtil:  jwtUtil,
+		userRepo:        userRepo,
+		sessionRepo:     sessionRepo,
+		jwtUtil:         jwtUtil,
+		allowMultiLogin: allowMultiLogin,
+		maxSessions:     maxSessions,
 	}
 }
 
@@ -74,7 +90,7 @@ func (s *UserService) Register(ctx context.Context, req *dto.RegisterRequest) (*
 	return s.toVO(user), nil
 }
 
-func (s *UserService) Login(ctx context.Context, req *dto.LoginRequest) (*vo.LoginVO, error) {
+func (s *UserService) Login(ctx context.Context, req *dto.LoginRequest, deviceInfo, ipAddress string) (*vo.LoginVO, error) {
 	// 获取用户
 	user, err := s.userRepo.GetByEmail(ctx, req.Email)
 	if err != nil {
@@ -89,10 +105,41 @@ func (s *UserService) Login(ctx context.Context, req *dto.LoginRequest) (*vo.Log
 		return nil, errors.ErrPasswordWrong
 	}
 
-	// 生成 JWT Token
-	token, expireTime, err := s.jwtUtil.GenerateToken(user.ID, user.Username, user.Email)
+	// 生成带 JTI 的 JWT Token
+	token, expireTime, err := s.jwtUtil.GenerateTokenWithJTI(user.ID, user.Username, user.Email, "")
 	if err != nil {
 		return nil, errors.NewWithCause(errors.CodeInternalError, "生成Token失败", err)
+	}
+
+	// 从 Token 中获取 JTI
+	claims, err := s.jwtUtil.ValidateToken(token)
+	if err != nil {
+		return nil, errors.NewWithCause(errors.CodeInternalError, "解析Token失败", err)
+	}
+
+	// 如果不允许多端登录，撤销该用户的所有旧会话
+	if !s.allowMultiLogin {
+		if err := s.sessionRepo.RevokeByUserID(ctx, user.ID); err != nil {
+			return nil, err
+		}
+	}
+
+	// 保存会话记录
+	session := &model.UserSession{
+		UserID:     user.ID,
+		TokenJTI:   claims.JTI,
+		DeviceInfo: deviceInfo,
+		IPAddress:  ipAddress,
+		ExpiresAt:  expireTime,
+		IsRevoked:  false,
+	}
+	if err := s.sessionRepo.Create(ctx, session); err != nil {
+		return nil, err
+	}
+
+	// 如果设置了最大会话数限制，删除多余的旧会话
+	if s.maxSessions > 0 {
+		s.cleanupOldSessions(ctx, user.ID)
 	}
 
 	return &vo.LoginVO{
@@ -100,6 +147,31 @@ func (s *UserService) Login(ctx context.Context, req *dto.LoginRequest) (*vo.Log
 		Token:   token,
 		Expired: expireTime.Format("2006-01-02 15:04:05"),
 	}, nil
+}
+
+// cleanupOldSessions 清理多余的旧会话
+// 保留最新的 maxSessions 个会话，删除最旧的会话
+func (s *UserService) cleanupOldSessions(ctx context.Context, userID uint) {
+	sessions, err := s.sessionRepo.GetActiveSessionsByUserID(ctx, userID)
+	if err != nil || len(sessions) <= s.maxSessions {
+		return
+	}
+
+	// 保留最新的 maxSessions 个会话，删除最旧的会话
+	// sessions 已按 created_at DESC 排序，所以前面的都是最新的
+	// 需要删除的是后面的（索引 >= maxSessions 的）
+	toDelete := len(sessions) - s.maxSessions
+	for i := 0; i < toDelete; i++ {
+		_ = s.sessionRepo.RevokeByID(ctx, sessions[i].ID)
+	}
+}
+
+// Logout 用户登出
+func (s *UserService) Logout(ctx context.Context, userID uint, sessionJTI string) error {
+	if sessionJTI == "" {
+		return nil
+	}
+	return s.sessionRepo.RevokeByJTI(ctx, sessionJTI)
 }
 
 func (s *UserService) GetUserInfo(ctx context.Context, userID uint) (*vo.UserVO, error) {
@@ -142,4 +214,53 @@ func (s *UserService) toVO(user *model.User) *vo.UserVO {
 		Status:    user.Status,
 		CreatedAt: user.CreatedAt.Format("2006-01-02 15:04:05"),
 	}
+}
+
+// ForceLogout 强制下线用户（撤销所有会话）
+func (s *UserService) ForceLogout(ctx context.Context, userID uint) error {
+	return s.sessionRepo.RevokeByUserID(ctx, userID)
+}
+
+// GetSessions 获取用户所有会话
+func (s *UserService) GetSessions(ctx context.Context, userID uint) (*vo.SessionListVO, error) {
+	sessions, err := s.sessionRepo.GetAllSessionsByUserID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	result := &vo.SessionListVO{
+		Sessions: make([]vo.SessionVO, 0, len(sessions)),
+		Total:    len(sessions),
+	}
+
+	for _, session := range sessions {
+		result.Sessions = append(result.Sessions, vo.SessionVO{
+			SessionID:  session.ID,
+			UserID:     session.UserID,
+			DeviceInfo: session.DeviceInfo,
+			IPAddress:  session.IPAddress,
+			CreatedAt:  session.CreatedAt.Format("2006-01-02 15:04:05"),
+			ExpiresAt:  session.ExpiresAt.Format("2006-01-02 15:04:05"),
+			IsRevoked:  session.IsRevoked,
+		})
+	}
+
+	return result, nil
+}
+
+// RevokeSession 撤销指定会话
+func (s *UserService) RevokeSession(ctx context.Context, userID uint, sessionID uint) error {
+	// 验证会话属于该用户
+	session, err := s.sessionRepo.GetByID(ctx, sessionID)
+	if err != nil {
+		return err
+	}
+	if session == nil {
+		return errors.New(2001, "会话不存在")
+	}
+	if session.UserID != userID {
+		return errors.New(1003, "无权限操作该会话")
+	}
+
+	return s.sessionRepo.RevokeByID(ctx, sessionID)
 }

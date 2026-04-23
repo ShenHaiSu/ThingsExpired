@@ -40,6 +40,10 @@ func NewRouter(
 			// 用户相关
 			authenticated.POST("/user/info", userHandler.GetUserInfo)
 			authenticated.POST("/user/update", userHandler.UpdateUser)
+			authenticated.POST("/user/logout", userHandler.Logout)
+			authenticated.POST("/user/sessions", userHandler.GetSessions)
+			authenticated.POST("/user/revoke_session", userHandler.RevokeSession)
+			authenticated.POST("/user/force_logout", userHandler.ForceLogout)
 
 			// 分类相关
 			authenticated.POST("/category/create", categoryHandler.Create)
