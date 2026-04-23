@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 
-	"go.uber.org/fx"
 	"things-expired/config"
 	"things-expired/internal/handler"
 	"things-expired/internal/repository"
@@ -13,6 +12,8 @@ import (
 	"things-expired/internal/service"
 	"things-expired/pkg/middleware"
 	"things-expired/pkg/utils"
+
+	"go.uber.org/fx"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
