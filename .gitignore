@@ -2,3 +2,4 @@ test-api.ps1
 server.exe
 data/app.db
 main.exe
+config/config.yaml

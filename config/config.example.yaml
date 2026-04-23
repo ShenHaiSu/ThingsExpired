@@ -10,7 +10,7 @@ database:
   max_open_conns: 10
 
 jwt:
-  secret: "your-secret-key-change-in-production"
+  secret: "CHANGE_ME_IN_PRODUCTION"  # ⚠️ 生产环境请修改为强密钥
   expire_hours: 24
 
 upload:
