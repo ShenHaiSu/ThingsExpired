@@ -27,7 +27,7 @@ security:
 
 log:
   level: "info"                # 日志级别: debug, info, warn, error
-  path: "./log"                 # 日志文件目录
+  path: "./logs"               # 日志文件目录
   max_size_mb: 10               # 单个日志文件最大大小(MB)
   max_backups: 30               # 保留的旧日志文件最大数量
   max_age_days: 90              # 保留的旧日志文件最大天数

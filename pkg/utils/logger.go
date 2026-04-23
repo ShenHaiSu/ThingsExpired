@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"math"
 	"os"
 	"path/filepath"
 	"strings"
@@ -10,8 +11,86 @@ import (
 	"things-expired/config"
 
 	"go.uber.org/zap"
+	"go.uber.org/zap/buffer"
 	"go.uber.org/zap/zapcore"
 )
+
+// PlainTextEncoder 自定义纯文本日志编码器
+type PlainTextEncoder struct {
+	zapcore.Encoder
+}
+
+// Clone 实现 zapcore.Encoder 接口
+func (e *PlainTextEncoder) Clone() zapcore.Encoder {
+	return &PlainTextEncoder{
+		Encoder: e.Encoder.Clone(),
+	}
+}
+
+// EncodeEntry 编码日志条目为纯文本格式: yyyy-mm-dd hh:mm:ss [LEVEL] msg
+func (e *PlainTextEncoder) EncodeEntry(entry zapcore.Entry, fields []zapcore.Field) (*buffer.Buffer, error) {
+	// 先用内置编码器编码
+	buf, err := e.Encoder.EncodeEntry(entry, fields)
+	if err != nil {
+		return nil, err
+	}
+
+	// 解析并重新格式化为纯文本
+	// 格式: yyyy-mm-dd hh:mm:ss [LEVEL] message
+	var sb strings.Builder
+	timeStr := entry.Time.Format("2006-01-02 15:04:05")
+	levelStr := entry.Level.String()
+	sb.WriteString(timeStr)
+	sb.WriteString(" [")
+	sb.WriteString(levelStr)
+	sb.WriteString("] ")
+	sb.WriteString(entry.Message)
+
+	// 添加字段
+	for _, field := range fields {
+		sb.WriteString(" ")
+		sb.WriteString(field.Key)
+		sb.WriteString("=")
+		sb.WriteString(formatFieldValue(field))
+	}
+
+	sb.WriteString("\n")
+
+	// 释放原始 buffer
+	buf.Free()
+
+	// 创建新的 buffer
+	newBuf := buffer.NewPool().Get()
+	newBuf.WriteString(sb.String())
+	return newBuf, nil
+}
+
+// formatFieldValue 格式化字段值
+func formatFieldValue(field zapcore.Field) string {
+	switch field.Type {
+	case zapcore.StringType:
+		return field.String
+	case zapcore.Int64Type, zapcore.Int32Type, zapcore.Int16Type, zapcore.Int8Type:
+		return fmt.Sprintf("%d", field.Integer)
+	case zapcore.Uint64Type, zapcore.Uint32Type, zapcore.Uint16Type, zapcore.Uint8Type:
+		return fmt.Sprintf("%d", field.Integer)
+	case zapcore.BoolType:
+		if field.Integer == 1 {
+			return "true"
+		}
+		return "false"
+	case zapcore.Float64Type:
+		return fmt.Sprintf("%f", math.Float64frombits(uint64(field.Integer)))
+	case zapcore.Float32Type:
+		return fmt.Sprintf("%f", math.Float32frombits(uint32(field.Integer)))
+	case zapcore.DurationType:
+		return time.Duration(field.Integer).String()
+	case zapcore.TimeType:
+		return time.Unix(0, field.Integer).Format("2006-01-02 15:04:05")
+	default:
+		return fmt.Sprintf("%v", field.Interface)
+	}
+}
 
 // Logger 日志器
 type Logger struct {
@@ -22,7 +101,7 @@ type Logger struct {
 func NewLogger(mode string) (*Logger, error) {
 	return NewLoggerWithConfig(&config.LogConfig{
 		Level:      mode,
-		Path:       "./log",
+		Path:       "./logs",
 		MaxSizeMB:  10,
 		MaxBackups: 30,
 		MaxAgeDays: 90,
@@ -40,23 +119,41 @@ func NewLoggerWithConfig(cfg *config.LogConfig) (*Logger, error) {
 	// 解析日志级别
 	level := parseLevel(cfg.Level)
 
-	// 创建编码器配置
+	// 创建编码器配置（纯文本格式: yyyy-mm-dd hh:mm:ss [LEVEL] msg）
 	encoderConfig := zapcore.EncoderConfig{
-		TimeKey:        "timestamp",
-		LevelKey:       "level",
-		NameKey:        "logger",
-		CallerKey:      "caller",
-		MessageKey:     "msg",
-		StacktraceKey:  "stacktrace",
+		TimeKey:        "T",
+		LevelKey:       "L",
+		NameKey:        "N",
+		CallerKey:      "C",
+		MessageKey:     "M",
+		StacktraceKey:  "S",
 		LineEnding:     zapcore.DefaultLineEnding,
 		EncodeLevel:    zapcore.CapitalLevelEncoder,
-		EncodeTime:     timeEncoder,
+		EncodeTime:     customTimeEncoder,
 		EncodeDuration: zapcore.SecondsDurationEncoder,
 		EncodeCaller:   zapcore.ShortCallerEncoder,
 	}
 
-	// 创建编码器
-	encoder := zapcore.NewJSONEncoder(encoderConfig)
+	// 创建文件编码器（使用自定义纯文本格式: yyyy-mm-dd hh:mm:ss [LEVEL] msg）
+	// 使用 JSON 编码器作为基础，然后转换格式
+	baseEncoder := zapcore.NewJSONEncoder(encoderConfig)
+	fileEncoder := &PlainTextEncoder{Encoder: baseEncoder}
+
+	// 创建控制台编码器（带颜色）
+	consoleEncoderConfig := zapcore.EncoderConfig{
+		TimeKey:        "",
+		LevelKey:       "",
+		NameKey:        "",
+		CallerKey:      "",
+		MessageKey:     "",
+		StacktraceKey:  "",
+		LineEnding:     zapcore.DefaultLineEnding,
+		EncodeLevel:    zapcore.CapitalColorLevelEncoder,
+		EncodeTime:     timeEncoder,
+		EncodeDuration: zapcore.SecondsDurationEncoder,
+		EncodeCaller:   zapcore.ShortCallerEncoder,
+	}
+	consoleEncoder := zapcore.NewConsoleEncoder(consoleEncoderConfig)
 
 	// 创建文件写入器
 	fileWriter := createFileWriter(cfg)
@@ -67,20 +164,17 @@ func NewLoggerWithConfig(cfg *config.LogConfig) (*Logger, error) {
 		consoleWriter = zapcore.AddSync(os.Stdout)
 	}
 
-	// 创建写入器链
-	var writeSyncer zapcore.WriteSyncer
+	// 创建写入器链（使用多编码器）
+	var core zapcore.Core
 	if consoleWriter != nil {
-		writeSyncer = zapcore.NewMultiWriteSyncer(consoleWriter, fileWriter)
+		// 控制台使用 consoleEncoder，文件使用 fileEncoder
+		core = zapcore.NewTee(
+			zapcore.NewCore(consoleEncoder, consoleWriter, level),
+			zapcore.NewCore(fileEncoder, fileWriter, level),
+		)
 	} else {
-		writeSyncer = fileWriter
+		core = zapcore.NewCore(fileEncoder, fileWriter, level)
 	}
-
-	// 创建核心
-	core := zapcore.NewCore(
-		encoder,
-		writeSyncer,
-		level,
-	)
 
 	// 创建 logger
 	zapLogger := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1))
@@ -91,7 +185,7 @@ func NewLoggerWithConfig(cfg *config.LogConfig) (*Logger, error) {
 // ensureLogDir 确保日志目录存在
 func ensureLogDir(path string) error {
 	if path == "" {
-		path = "./log"
+		path = "./logs"
 	}
 	return os.MkdirAll(path, 0755)
 }
@@ -130,8 +224,13 @@ func parseLevel(level string) zapcore.Level {
 	}
 }
 
-// timeEncoder 时间编码器
+// timeEncoder 时间编码器（用于控制台输出）
 func timeEncoder(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
+	enc.AppendString(t.Format("2006-01-02 15:04:05"))
+}
+
+// customTimeEncoder 自定义时间编码器（用于文件输出: yyyy-mm-dd hh:mm:ss）
+func customTimeEncoder(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
 	enc.AppendString(t.Format("2006-01-02 15:04:05"))
 }
 

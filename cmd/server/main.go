@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"os"
 
 	"go.uber.org/fx"
@@ -16,6 +15,7 @@ import (
 	"things-expired/pkg/utils"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 func main() {
@@ -25,10 +25,33 @@ func main() {
 		configPath = os.Args[1]
 	}
 
+	// 尝试加载配置，如果失败则打印友好错误信息
+	cfg, err := config.Load(configPath)
+	if err != nil {
+		printStartupError(err, configPath)
+		os.Exit(1)
+	}
+
+	// 初始化日志（在 fx 之前初始化，以便记录启动日志）
+	logCfg := &cfg.Log
+	logger, err := utils.NewLoggerWithConfig(logCfg)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "初始化日志失败: %v\n", err)
+		os.Exit(1)
+	}
+
+	// 确保退出时同步日志
+	defer logger.Sync()
+
+	logger.Info("应用程序启动",
+		zap.String("config", configPath),
+		zap.String("mode", cfg.App.Mode),
+	)
+
 	fx.New(
 		// 配置模块
-		fx.Provide(func() (*config.Config, error) {
-			return config.Load(configPath)
+		fx.Provide(func() *config.Config {
+			return cfg
 		}),
 
 		// 数据库配置
@@ -94,21 +117,36 @@ func startServer(
 	lc fx.Lifecycle,
 	r *gin.Engine,
 	cfg *config.Config,
+	logger *utils.Logger,
 ) {
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
 			addr := fmt.Sprintf("%s:%d", cfg.App.Host, cfg.App.Port)
-			log.Printf("Server starting on %s", addr)
+			logger.Info("服务器启动", zap.String("address", addr))
 			go func() {
 				if err := r.Run(addr); err != nil {
-					log.Fatal(err)
+					logger.Fatal("服务器启动失败", zap.Error(err))
 				}
 			}()
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
-			log.Println("Server stopping")
+			logger.Info("服务器停止")
 			return nil
 		},
 	})
+}
+
+// printStartupError 打印启动错误信息
+func printStartupError(err error, configPath string) {
+	fmt.Fprintf(os.Stderr, "\n===========================================\n")
+	fmt.Fprintf(os.Stderr, "  应用程序启动失败\n")
+	fmt.Fprintf(os.Stderr, "===========================================\n\n")
+	fmt.Fprintf(os.Stderr, "错误: %v\n\n", err)
+	fmt.Fprintf(os.Stderr, "请检查以下内容:\n")
+	fmt.Fprintf(os.Stderr, "  1. 配置文件是否存在: %s\n", configPath)
+	fmt.Fprintf(os.Stderr, "  2. 配置文件格式是否正确 (YAML 语法)\n")
+	fmt.Fprintf(os.Stderr, "  3. 必要的配置项是否已填写\n")
+	fmt.Fprintf(os.Stderr, "\n提示: 复制 config/config.example.yaml 为 config/config.yaml\n")
+	fmt.Fprintf(os.Stderr, "===========================================\n")
 }
