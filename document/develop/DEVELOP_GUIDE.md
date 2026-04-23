@@ -1,0 +1,758 @@
+# Things Expired 前端开发规范指南
+
+> 本规范文档定义了项目的文件结构、代码规范、开发流程等所有开发人员必须遵守的准则。
+
+## 目录
+
+1. [项目概述](#1-项目概述)
+2. [技术栈](#2-技术栈)
+3. [目录结构](#3-目录结构)
+4. [命名规范](#4-命名规范)
+5. [代码规范](#5-代码规范)
+6. [API 开发规范](#6-api-开发规范)
+7. [状态管理规范](#7-状态管理规范)
+8. [组件开发规范](#8-组件开发规范)
+9. [路由规范](#9-路由规范)
+10. [样式规范](#10-样式规范)
+11. [国际化规范](#11-国际化规范)
+12. [环境变量规范](#12-环境变量规范)
+13. [Git 提交规范](#13-git-提交规范)
+
+---
+
+## 1. 项目概述
+
+Things Expired 是一个过期物品管理应用，采用 Vue 3 + TypeScript + Vite 构建。本项目采用分层架构和模块化设计，遵循最佳实践，旨在打造一个可维护、可扩展的前端项目。
+
+---
+
+## 2. 技术栈
+
+| 类别      | 技术选型               | 版本    |
+| --------- | ---------------------- | ------- |
+| 框架      | Vue                    | ^3.5.0  |
+| 语言      | TypeScript             | ~6.0.0  |
+| 构建工具  | Vite                   | ^7.0.0  |
+| 状态管理  | Pinia                  | ^3.0.0  |
+| 路由      | Vue Router             | ^5.0.0  |
+| UI 组件库 | PrimeVue               | ^4.5.0  |
+| 样式      | Tailwind CSS           | ^4.2.0  |
+| 网络请求  | Axios                  | ^1.15.0 |
+| 工具库    | Lodash, Day.js, VueUse | -       |
+| 图表      | Vue-Echarts            | ^8.0.0  |
+| 国际化    | Vue-i18n               | ^11.0.0 |
+
+---
+
+## 3. 目录结构
+
+```
+src/
+├── api/                      # 🌐 API 层 - 统一管理所有接口
+│   ├── index.ts              # axios 实例配置 + 拦截器
+│   └── *.ts                  # 各模块 API 接口
+│
+├── assets/                   # 🎨 静态资源
+│   ├── images/               # 图片资源
+│   ├── fonts/                # 字体资源
+│   └── styles/               # 全局样式
+│       └── index.scss        # 全局样式入口
+│
+├── components/               # 🧩 公共组件
+│   ├── common/               # 通用组件
+│   │   └── BaseButton.vue   # 基础按钮组件
+│   ├── business/             # 业务组件
+│   └── index.ts              # 组件统一导出
+│
+├── composables/              # 🔄 组合式函数
+│   ├── useAuth.ts            # 认证相关
+│   ├── useFetch.ts           # 数据请求
+│   └── index.ts              # 统一导出
+│
+├── layouts/                  # 🏠 布局组件
+│   ├── DefaultLayout.vue     # 默认布局（带侧边栏）
+│   ├── BlankLayout.vue       # 空白布局（登录页等）
+│   └── index.ts              # 统一导出
+│
+├── locales/                  # 🌏 国际化
+│   ├── en.json               # 英文翻译
+│   ├── zh-CN.json            # 中文翻译
+│   └── index.ts              # i18n 配置
+│
+├── router/                   # 🚦 路由管理
+│   ├── index.ts              # 路由实例
+│   ├── guards.ts             # 路由守卫
+│   └── routes/               # 路由模块
+│       ├── index.ts          # 路由汇总
+│       └── default.routes.ts # 默认路由
+│
+├── stores/                   # 📦 状态管理
+│   ├── index.ts              # Pinia 配置
+│   └── user/                 # 用户模块
+│       └── userStore.ts      # 用户状态
+│
+├── types/                    # 📝 TypeScript 类型
+│   ├── index.ts              # 全局类型导出
+│   └── api.d.ts              # API 响应类型
+│
+├── utils/                    # 🛠️ 工具函数
+│   ├── format.ts             # 格式化工具
+│   ├── storage.ts            # 存储工具
+│   └── index.ts              # 统一导出
+│
+├── views/                    # 📄 页面组件
+│   ├── home/                 # 首页模块
+│   │   └── HomeView.vue
+│   ├── login/                 # 登录模块
+│   │   └── LoginView.vue
+│   └── error/                # 错误页面
+│       ├── NotFoundView.vue
+│       └── ForbiddenView.vue
+│
+├── App.vue                   # 🏁 根组件
+└── main.ts                   # 🚀 入口文件
+```
+
+---
+
+## 4. 命名规范
+
+### 4.1 文件命名
+
+| 类型       | 命名规则                   | 示例                                  |
+| ---------- | -------------------------- | ------------------------------------- |
+| 组件文件   | PascalCase                 | `UserList.vue`、`BaseButton.vue`      |
+| 组合式函数 | camelCase，以 `use` 开头   | `useAuth.ts`、`useFetch.ts`           |
+| 工具函数   | camelCase                  | `format.ts`、`storage.ts`             |
+| 类型文件   | camelCase 或 PascalCase    | `api.d.ts`、`UserType.ts`             |
+| 路由文件   | camelCase                  | `default.routes.ts`、`user.routes.ts` |
+| Store 文件 | camelCase，以 `Store` 结尾 | `userStore.ts`、`appStore.ts`         |
+| 样式文件   | kebab-case                 | `index.scss`、`variables.scss`        |
+
+### 4.2 目录命名
+
+| 类型         | 命名规则           | 示例                                  |
+| ------------ | ------------------ | ------------------------------------- |
+| 业务模块目录 | kebab-case         | `views/user/`、`components/business/` |
+| 通用目录     | 复数形式或特定名称 | `api/`、`utils/`、`locales/`          |
+
+### 4.3 变量命名
+
+| 类型        | 命名规则         | 示例                            |
+| ----------- | ---------------- | ------------------------------- |
+| 常量        | UPPER_SNAKE_CASE | `API_BASE_URL`、`MAX_COUNT`     |
+| 枚举        | PascalCase       | `UserStatus`、`OrderType`       |
+| 接口/类型   | PascalCase       | `UserInfo`、`ApiResponse`       |
+| 函数        | camelCase        | `getUserList()`、`formatDate()` |
+| 组件 Props  | camelCase        | `userName`、`isLoading`         |
+| 组件 Events | camelCase        | `onClick`、`handleSubmit`       |
+
+---
+
+## 5. 代码规范
+
+### 5.1 TypeScript 规范
+
+```typescript
+// ✅ 正确：使用类型定义
+interface User {
+  id: number
+  name: string
+  email: string
+}
+
+// ✅ 正确：使用泛型
+function getData<T>(url: string): Promise<T> {
+  return axios.get(url).then((res) => res.data)
+}
+
+// ✅ 正确：使用类型别名
+type Status = 'pending' | 'success' | 'error'
+
+// ❌ 错误：使用 any
+function getData(url: string): any {
+  return axios.get(url)
+}
+```
+
+### 5.2 Vue 组件规范
+
+```vue
+<template>
+  <!-- 组件模板 -->
+  <div class="component-name">
+    <slot />
+  </div>
+</template>
+
+<script setup lang="ts">
+// Props 定义
+interface Props {
+  title?: string
+  disabled?: boolean
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  title: '',
+  disabled: false,
+})
+
+// Emits 定义
+const emit = defineEmits<{
+  click: [event: MouseEvent]
+  update: [value: string]
+}>()
+
+// 响应式数据
+const count = ref(0)
+
+// 计算属性
+const doubleCount = computed(() => count.value * 2)
+
+// 方法
+function handleClick() {
+  emit('click', event)
+}
+</script>
+
+<style scoped>
+/* 组件样式 */
+.component-name {
+  /* 使用 scoped 避免样式污染 */
+}
+</style>
+```
+
+### 5.3 导入顺序
+
+```typescript
+// 1. Vue 相关
+import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+
+// 2. 第三方库
+import { useQuery } from '@tanstack/vue-query'
+import dayjs from 'dayjs'
+
+// 3. 项目内部 - 工具函数
+import { formatDate, formatNumber } from '@/utils'
+
+// 4. 项目内部 - 组件
+import { BaseButton, BaseInput } from '@/components'
+
+// 5. 项目内部 - Store
+import { useUserStore } from '@/stores'
+
+// 6. 项目内部 - API
+import { getUserList, createUser } from '@/api'
+```
+
+---
+
+## 6. API 开发规范
+
+### 6.1 API 模块划分
+
+按业务模块划分 API 文件，一个模块一个文件：
+
+```
+api/
+├── index.ts              # axios 实例 + 拦截器
+├── auth.ts               # 认证相关接口
+├── user.ts               # 用户管理接口
+├── items.ts              # 物品管理接口
+└── categories.ts         # 分类管理接口
+```
+
+### 6.2 API 接口定义
+
+```typescript
+// api/user.ts
+import { get, post, put, del } from '@/api'
+import type { ApiResponse, PaginatedResponse } from '@/types'
+
+// 用户类型
+export interface User {
+  id: number
+  name: string
+  email: string
+  avatar?: string
+}
+
+// 获取用户列表
+export function getUserList(params: { page: number; pageSize: number }) {
+  return get<ApiResponse<PaginatedResponse<User>>>('/users', { params })
+}
+
+// 获取用户详情
+export function getUserDetail(id: number) {
+  return get<ApiResponse<User>>(`/users/${id}`)
+}
+
+// 创建用户
+export function createUser(data: Partial<User>) {
+  return post<ApiResponse<User>>('/users', data)
+}
+
+// 更新用户
+export function updateUser(id: number, data: Partial<User>) {
+  return put<ApiResponse<User>>(`/users/${id}`, data)
+}
+
+// 删除用户
+export function deleteUser(id: number) {
+  return del<ApiResponse<void>>(`/users/${id}`)
+}
+```
+
+### 6.3 axios 实例配置
+
+```typescript
+// api/index.ts
+import axios from 'axios'
+
+const apiClient = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
+  timeout: 15000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
+
+// 请求拦截器 - 添加 Token
+apiClient.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token')
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+  return config
+})
+
+// 响应拦截器 - 统一错误处理
+apiClient.interceptors.response.use(
+  (response) => response.data,
+  (error) => {
+    if (error.response?.status === 401) {
+      // 处理未授权
+      window.location.href = '/login'
+    }
+    return Promise.reject(error)
+  },
+)
+
+export default apiClient
+```
+
+---
+
+## 7. 状态管理规范
+
+### 7.1 Store 目录结构
+
+```
+stores/
+├── index.ts              # Pinia 配置
+├── user/                 # 用户模块
+│   └── userStore.ts     # 用户状态
+└── app/                  # 应用模块
+    └── appStore.ts      # 应用状态
+```
+
+### 7.2 Store 定义规范
+
+```typescript
+// stores/user/userStore.ts
+import { ref, computed } from 'vue'
+import { defineStore } from 'pinia'
+import { post } from '@/api'
+import { localCache } from '@/utils/storage'
+
+export const useUserStore = defineStore('user', () => {
+  // State
+  const token = ref<string>(localCache.get('token') || '')
+  const userInfo = ref<UserInfo | null>(localCache.get('userInfo') || null)
+
+  // Getters
+  const isLoggedIn = computed(() => !!token.value)
+  const userName = computed(() => userInfo.value?.name || '')
+
+  // Actions
+  async function login(params: LoginParams) {
+    const res = await post<{ token: string; user: UserInfo }>('/auth/login', params)
+    token.value = res.data.token
+    userInfo.value = res.data.user
+    localCache.set('token', res.data.token)
+    localCache.set('userInfo', res.data.user)
+  }
+
+  async function logout() {
+    token.value = ''
+    userInfo.value = null
+    localCache.remove('token')
+    localCache.remove('userInfo')
+  }
+
+  return {
+    // State
+    token,
+    userInfo,
+    // Getters
+    isLoggedIn,
+    userName,
+    // Actions
+    login,
+    logout,
+  }
+})
+```
+
+### 7.3 使用持久化
+
+```typescript
+export const useUserStore = defineStore(
+  'user',
+  () => {
+    // ...
+  },
+  {
+    persist: {
+      key: 'user-store',
+      paths: ['token', 'userInfo'],
+    },
+  },
+)
+```
+
+---
+
+## 8. 组件开发规范
+
+### 8.1 组件分类
+
+| 目录                   | 说明         | 示例               |
+| ---------------------- | ------------ | ------------------ |
+| `components/common/`   | 通用基础组件 | 按钮、输入框、表格 |
+| `components/business/` | 业务通用组件 | 用户卡片、订单表格 |
+| `views/*/`             | 页面特定组件 | 仅在该页面使用     |
+
+### 8.2 组件模板
+
+```vue
+<template>
+  <div class="component-name">
+    <slot name="header" />
+    <div class="content">
+      <slot />
+    </div>
+    <slot name="footer" />
+  </div>
+</template>
+
+<script setup lang="ts">
+// Props
+interface Props {
+  title?: string
+  disabled?: boolean
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  title: '',
+  disabled: false,
+})
+
+// Emits
+const emit = defineEmits<{
+  click: [event: MouseEvent]
+  change: [value: string]
+}>()
+
+// 响应式数据
+const localValue = ref(props.value)
+
+// 计算属性
+const isDisabled = computed(() => props.disabled)
+
+// 方法
+function handleClick(event: MouseEvent) {
+  emit('click', event)
+}
+
+// 生命周期
+onMounted(() => {
+  console.log('Component mounted')
+})
+</script>
+
+<style scoped>
+.component-name {
+  /* 组件样式 */
+}
+</style>
+```
+
+---
+
+## 9. 路由规范
+
+### 9.1 路由文件结构
+
+```
+router/
+├── index.ts              # 路由实例
+├── guards.ts             # 路由守卫
+└── routes/               # 路由模块
+    ├── index.ts          # 路由汇总
+    ├── default.routes.ts # 默认路由
+    ├── user.routes.ts   # 用户模块路由
+    └── admin.routes.ts  # 管理模块路由
+```
+
+### 9.2 路由定义
+
+```typescript
+// router/routes/default.routes.ts
+import type { RouteRecordRaw } from 'vue-router'
+import { DefaultLayout, BlankLayout } from '@/layouts'
+
+export const defaultRoutes: RouteRecordRaw[] = [
+  {
+    path: '/login',
+    name: 'Login',
+    component: () => import('@/views/login/LoginView.vue'),
+    meta: {
+      title: '登录',
+      layout: BlankLayout,
+      requiresAuth: false,
+    },
+  },
+  {
+    path: '/',
+    name: 'Home',
+    component: () => import('@/views/home/HomeView.vue'),
+    meta: {
+      title: '首页',
+      layout: DefaultLayout,
+      requiresAuth: true,
+    },
+  },
+]
+```
+
+### 9.3 路由守卫
+
+```typescript
+// router/guards.ts
+export function setupRouterGuards(router: any) {
+  router.beforeEach((to, from, next) => {
+    // 设置页面标题
+    document.title = (to.meta.title as string) || 'Things Expired'
+
+    // 检查是否需要登录
+    const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
+
+    if (requiresAuth) {
+      const userStore = useUserStore()
+      if (!userStore.isLoggedIn) {
+        next({ name: 'Login', query: { redirect: to.fullPath } })
+        return
+      }
+    }
+
+    next()
+  })
+}
+```
+
+---
+
+## 10. 样式规范
+
+### 10.1 样式文件结构
+
+```
+assets/styles/
+├── index.scss        # 样式入口
+├── variables.scss   # CSS 变量
+└── mixins.scss      # 混入
+```
+
+### 10.2 全局样式
+
+```scss
+// assets/styles/index.scss
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary-color: #3b82f6;
+  --text-primary: #1f2937;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+```
+
+### 10.3 组件样式
+
+```vue
+<style scoped>
+/* 使用 scoped 避免样式污染 */
+.component-name {
+  /* 组件样式 */
+}
+</style>
+```
+
+---
+
+## 11. 国际化规范
+
+### 11.1 翻译文件结构
+
+```
+locales/
+├── en.json          # 英文
+├── zh-CN.json       # 中文
+└── index.ts         # i18n 配置
+```
+
+### 11.2 翻译文件格式
+
+```json
+// locales/zh-CN.json
+{
+  "common": {
+    "confirm": "确认",
+    "cancel": "取消",
+    "save": "保存"
+  },
+  "menu": {
+    "home": "首页",
+    "items": "物品管理"
+  }
+}
+```
+
+### 11.3 使用翻译
+
+```vue
+<script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+</script>
+
+<template>
+  <h1>{{ t('menu.home') }}</h1>
+  <button>{{ t('common.save') }}</button>
+</template>
+```
+
+---
+
+## 12. 环境变量规范
+
+### 12.1 环境变量文件
+
+| 文件               | 说明         |
+| ------------------ | ------------ |
+| `.env`             | 默认配置     |
+| `.env.development` | 开发环境配置 |
+| `.env.production`  | 生产环境配置 |
+
+### 12.2 变量命名规范
+
+```env
+# 必须以 VITE_ 开头
+VITE_API_BASE_URL=http://localhost:3000
+VITE_APP_TITLE=Things Expired
+VITE_STORAGE_PREFIX=te_
+```
+
+### 12.3 使用环境变量
+
+```typescript
+const apiUrl = import.meta.env.VITE_API_BASE_URL
+const isDev = import.meta.env.DEV
+const isProd = import.meta.env.PROD
+```
+
+---
+
+## 13. Git 提交规范
+
+### 13.1 提交信息格式
+
+```
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+```
+
+### 13.2 Type 类型
+
+| 类型       | 说明                           |
+| ---------- | ------------------------------ |
+| `feat`     | 新功能                         |
+| `fix`      | Bug 修复                       |
+| `docs`     | 文档更新                       |
+| `style`    | 代码格式（不影响功能）         |
+| `refactor` | 重构（既不是新功能也不是修复） |
+| `perf`     | 性能优化                       |
+| `test`     | 测试相关                       |
+| `chore`    | 构建过程或辅助工具变动         |
+
+### 13.3 提交示例
+
+```bash
+# 新功能
+git commit -m "feat(user): add user profile page"
+
+# Bug 修复
+git commit -m "fix(api): fix token refresh issue"
+
+# 文档更新
+git commit -m "docs: update README.md"
+
+# 重构
+git commit -m "refactor(store): optimize user store structure"
+```
+
+---
+
+## 附录
+
+### A. 常用命令
+
+```bash
+# 安装依赖
+pnpm install
+
+# 开发模式
+pnpm dev
+
+# 构建生产版本
+pnpm build
+
+# 类型检查
+pnpm type-check
+
+# 代码格式化
+pnpm format
+```
+
+### B. 代码检查工具
+
+- **ESLint**: 代码质量检查
+- **Prettier**: 代码格式化
+- **TypeScript**: 类型检查
+- **vue-tsc**: Vue 文件类型检查
+
+---
+
+> 本规范文档将持续更新，请开发人员严格遵守。
+> 如有疑问，请联系技术负责人。
