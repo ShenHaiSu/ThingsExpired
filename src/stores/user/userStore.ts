@@ -37,7 +37,7 @@ export const useUserStore = defineStore(
     async function login(params: LoginParams) {
       try {
         // 调用登录 API（根据实际后端接口调整）
-        const res = await post<{ token: string; user: UserInfo }>('/auth/login', params)
+        const res = await post<{ data: { token: string; user: UserInfo } }>('/auth/login', params)
         token.value = res.data.token
         userInfo.value = res.data.user
 
@@ -71,7 +71,7 @@ export const useUserStore = defineStore(
 
     async function fetchUserInfo() {
       try {
-        const res = await post<{ user: UserInfo }>('/auth/info')
+        const res = await post<{ data: { user: UserInfo } }>('/auth/info')
         userInfo.value = res.data.user
         localCache.set('userInfo', res.data.user)
         return res.data.user
@@ -103,7 +103,6 @@ export const useUserStore = defineStore(
   {
     persist: {
       key: 'user-store',
-      paths: ['token', 'userInfo'],
     },
   }
 )
