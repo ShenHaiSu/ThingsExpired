@@ -27,7 +27,7 @@ apiClient.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error)
-  }
+  },
 )
 
 // 响应拦截器
@@ -54,7 +54,7 @@ apiClient.interceptors.response.use(
     }
 
     return Promise.reject(error)
-  }
+  },
 )
 
 /**
@@ -66,9 +66,15 @@ export function get<T = any>(url: string, config?: AxiosRequestConfig): Promise<
 
 /**
  * POST 请求
+ * @description 针对 /api 的 POST 请求，如果 data 为 null、undefined 或不传，必须传输空对象 {}
+ * @param url - 请求 URL
+ * @param data - 请求体数据，如果为 null/undefined/不传，则使用空对象 {}
+ * @param config - Axios 配置
  */
 export function post<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
-  return apiClient.post(url, data, config)
+  // 兜底处理：确保 body 不为 null 或 undefined
+  const safeData = data === null || data === undefined ? {} : data
+  return apiClient.post(url, safeData, config)
 }
 
 /**
