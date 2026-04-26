@@ -14,7 +14,8 @@
     "success": "Success",
     "error": "Error",
     "warning": "Warning",
-    "noData": "No Data"
+    "noData": "No Data",
+    "actions": "Actions"
   },
   "menu": {
     "home": "Home",
@@ -26,18 +27,55 @@
     "login": "Login",
     "logout": "Logout",
     "username": "Username",
+    "email": "Email Address",
     "password": "Password",
     "rememberMe": "Remember Me",
-    "forgotPassword": "Forgot Password?"
+    "forgotPassword": "Forgot Password?",
+    "noAccount": "Don't have an account?",
+    "registerNow": "Register Now",
+    "title": "Things Expired",
+    "subtitle": "Expired Items Management Platform",
+    "emailPlaceholder": "Please enter your email address",
+    "passwordPlaceholder": "Please enter your password"
+  },
+  "category": {
+    "title": "Categories",
+    "add": "Add Category",
+    "edit": "Edit Category",
+    "create": "Create Category",
+    "name": "Name",
+    "color": "Color",
+    "icon": "Icon",
+    "sortOrder": "Sort Order",
+    "id": "ID",
+    "createdAt": "Created At"
   },
   "items": {
-    "title": "Items Management",
-    "name": "Item Name",
+    "title": "Items",
+    "add": "Add Item",
+    "edit": "Edit Item",
+    "create": "Create Item",
+    "name": "Name",
     "category": "Category",
-    "expireDate": "Expire Date",
-    "status": "Status",
-    "addItem": "Add Item",
-    "editItem": "Edit Item",
-    "deleteConfirm": "Are you sure to delete this item?"
+    "quantity": "Quantity",
+    "unit": "Unit",
+    "expiredAt": "Expired At",
+    "description": "Description",
+    "remindDays": "Remind Days",
+    "selectCategory": "Select Category",
+    "markAsUsed": "Mark as Used",
+    "status": {
+      "title": "Status",
+      "normal": "Normal",
+      "expiringSoon": "Expiring Soon",
+      "expired": "Expired",
+      "used": "Used"
+    },
+    "stats": {
+      "total": "Total",
+      "expiringSoon": "Expiring Soon",
+      "expired": "Expired",
+      "used": "Used"
+    }
   }
 }

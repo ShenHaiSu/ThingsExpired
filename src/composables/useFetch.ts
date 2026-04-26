@@ -28,7 +28,7 @@ export function useFetch<T = any>(url: string, options: UseFetchOptions<T> = {})
 
     try {
       const mergedParams = { ...params.value, ...fetchParams }
-      const result = await get<T>(url, { params: mergedParams })
+      const result = await get<{ data: T }>(url, { params: mergedParams })
       data.value = result.data
       onSuccess?.(result.data)
       return result

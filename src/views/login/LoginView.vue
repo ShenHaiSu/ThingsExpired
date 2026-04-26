@@ -1,22 +1,20 @@
 <template>
   <div class="login-view">
-    <div class="login-card">
-      <h2>登录</h2>
-      <form @submit.prevent="handleLogin">
-        <div class="form-item">
-          <label>用户名</label>
-          <InputText v-model="form.username" placeholder="请输入用户名" />
-        </div>
-        <div class="form-item">
-          <label>密码</label>
-          <Password v-model="form.password" placeholder="请输入密码" :feedback="false" toggleMask />
-        </div>
-        <div class="form-item">
-          <Checkbox v-model="form.rememberMe" :binary="true" inputId="rememberMe" />
-          <label for="rememberMe">记住我</label>
-        </div>
-        <Button type="submit" label="登录" :loading="loading" class="login-btn" />
-      </form>
+    <!-- 背景装饰 -->
+    <LoginBackground />
+
+    <!-- 登录容器 -->
+    <div class="login-container">
+      <div class="login-card">
+        <!-- 登录头部 -->
+        <LoginHeader />
+
+        <!-- 登录表单 -->
+        <LoginForm :loading="loading" @submit="handleLogin" />
+
+        <!-- 登录底部 -->
+        <LoginFooter />
+      </div>
     </div>
   </div>
 </template>
@@ -25,36 +23,33 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores'
-import InputText from 'primevue/inputtext'
-import Password from 'primevue/password'
-import Checkbox from 'primevue/checkbox'
-import Button from 'primevue/button'
+import { useToast } from '@/composables'
+import { LoginHeader, LoginForm, LoginFooter, LoginBackground } from './components'
 
 const router = useRouter()
 const userStore = useUserStore()
-
-const form = ref({
-  username: '',
-  password: '',
-  rememberMe: false,
-})
+const toast = useToast()
 
 const loading = ref(false)
 
-async function handleLogin() {
-  if (!form.value.username || !form.value.password) {
-    return
-  }
-
+async function handleLogin(payload: { email: string; password: string }) {
   loading.value = true
   try {
-    await userStore.login({
-      username: form.value.username,
-      password: form.value.password,
+    const res = await userStore.login({
+      email: payload.email,
+      password: payload.password,
     })
-    router.push('/')
-  } catch (error) {
+    // 登录成功（code === 0）则跳转首页
+    if (res.code === 0) {
+      router.push('/')
+    } else {
+      // 登录失败，显示错误信息
+      toast.error(res.message || '登录失败，请稍后重试')
+    }
+  } catch (error: any) {
     console.error('Login failed:', error)
+    // 显示错误信息
+    toast.error(error?.response?.data?.message || error?.message || '登录失败，请稍后重试')
   } finally {
     loading.value = false
   }
@@ -62,45 +57,5 @@ async function handleLogin() {
 </script>
 
 <style scoped>
-.login-view {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  background: #f5f5f5;
-}
-
-.login-card {
-  width: 400px;
-  padding: 40px;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-}
-
-.login-card h2 {
-  margin-bottom: 30px;
-  text-align: center;
-  color: #333;
-}
-
-.form-item {
-  margin-bottom: 20px;
-}
-
-.form-item label {
-  display: block;
-  margin-bottom: 8px;
-  color: #666;
-}
-
-.form-item :deep(.p-inputtext),
-.form-item :deep(.p-password-input) {
-  width: 100%;
-}
-
-.login-btn {
-  width: 100%;
-  margin-top: 10px;
-}
+@import '../../assets/styles/login.scss';
 </style>

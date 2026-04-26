@@ -14,7 +14,8 @@
     "success": "成功",
     "error": "错误",
     "warning": "警告",
-    "noData": "暂无数据"
+    "noData": "暂无数据",
+    "actions": "操作"
   },
   "menu": {
     "home": "首页",
@@ -26,18 +27,55 @@
     "login": "登录",
     "logout": "退出登录",
     "username": "用户名",
+    "email": "邮箱地址",
     "password": "密码",
     "rememberMe": "记住我",
-    "forgotPassword": "忘记密码？"
+    "forgotPassword": "忘记密码？",
+    "noAccount": "还没有账号？",
+    "registerNow": "立即注册",
+    "title": "Things Expired",
+    "subtitle": "过期物品管理平台",
+    "emailPlaceholder": "请输入邮箱地址",
+    "passwordPlaceholder": "请输入登录密码"
+  },
+  "category": {
+    "title": "分类管理",
+    "add": "新增分类",
+    "edit": "编辑分类",
+    "create": "创建分类",
+    "name": "分类名称",
+    "color": "颜色",
+    "icon": "图标",
+    "sortOrder": "排序",
+    "id": "ID",
+    "createdAt": "创建时间"
   },
   "items": {
     "title": "物品管理",
+    "add": "添加物品",
+    "edit": "编辑物品",
+    "create": "创建物品",
     "name": "物品名称",
     "category": "分类",
-    "expireDate": "过期日期",
-    "status": "状态",
-    "addItem": "添加物品",
-    "editItem": "编辑物品",
-    "deleteConfirm": "确定要删除该物品吗？"
+    "quantity": "数量",
+    "unit": "单位",
+    "expiredAt": "过期时间",
+    "description": "描述",
+    "remindDays": "提前提醒天数",
+    "selectCategory": "选择分类",
+    "markAsUsed": "标记为已使用",
+    "status": {
+      "title": "状态",
+      "normal": "正常",
+      "expiringSoon": "即将过期",
+      "expired": "已过期",
+      "used": "已使用"
+    },
+    "stats": {
+      "total": "总数量",
+      "expiringSoon": "即将过期",
+      "expired": "已过期",
+      "used": "已使用"
+    }
   }
 }

@@ -29,6 +29,28 @@ export const defaultRoutes: RouteRecordRaw[] = [
       requiresAuth: true,
     },
   },
+  // 分类管理页
+  {
+    path: '/categories',
+    name: 'Categories',
+    component: () => import('@/views/category/CategoryView.vue'),
+    meta: {
+      title: '分类管理',
+      layout: DefaultLayout,
+      requiresAuth: true,
+    },
+  },
+  // 物品管理页
+  {
+    path: '/items',
+    name: 'Items',
+    component: () => import('@/views/items/ItemsView.vue'),
+    meta: {
+      title: '物品管理',
+      layout: DefaultLayout,
+      requiresAuth: true,
+    },
+  },
   // 404 页面
   {
     path: '/404',

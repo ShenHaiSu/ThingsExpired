@@ -15,3 +15,4 @@ export default pinia
 
 // 导出各模块 store
 export { useUserStore } from './user/userStore'
+export { useAppStore } from './app/appStore'
