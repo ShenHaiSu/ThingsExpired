@@ -290,8 +290,7 @@ function getStatusSeverity(status: ItemStatus): 'success' | 'info' | 'warn' | 'd
   const map: Record<ItemStatus, 'success' | 'info' | 'warn' | 'danger'> = {
     1: 'info',
     2: 'warn',
-    3: 'danger',
-    4: 'success',
+    3: 'success',
   }
   return map[status]
 }
@@ -300,9 +299,8 @@ function getStatusSeverity(status: ItemStatus): 'success' | 'info' | 'warn' | 'd
 function getStatusText(status: ItemStatus): string {
   const map: Record<ItemStatus, string> = {
     1: 'items.status.normal',
-    2: 'items.status.expiringSoon',
-    3: 'items.status.expired',
-    4: 'items.status.used',
+    2: 'items.status.expired',
+    3: 'items.status.used',
   }
   return t(map[status])
 }
