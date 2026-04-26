@@ -16,6 +16,7 @@ type IItemRepository interface {
 	GetByID(ctx context.Context, id uint) (*model.Item, error)
 	List(ctx context.Context, userID uint, req *dto.ItemListRequest) ([]*model.Item, int64, error)
 	GetExpiring(ctx context.Context, userID uint, days int) ([]*model.Item, error)
+	GetStats(ctx context.Context, userID uint) (total, expiringSoon, expired, used int64, err error)
 	Update(ctx context.Context, item *model.Item) error
 	Delete(ctx context.Context, id uint) error
 }
@@ -74,4 +75,51 @@ func (r *ItemRepository) Update(ctx context.Context, item *model.Item) error {
 
 func (r *ItemRepository) Delete(ctx context.Context, id uint) error {
 	return r.db.WithContext(ctx).Delete(&model.Item{}, id).Error
+}
+
+// GetStats 获取物品统计数据
+// 统计逻辑：
+// - total: 所有物品（status = 1, 2, 3）
+// - expiring_soon: expired_at <= 当前时间 + 7天 且 status = 1（正常）
+// - expired: expired_at < 当前时间 且 status = 2（已过期）
+// - used: status = 3（已消耗）
+func (r *ItemRepository) GetStats(ctx context.Context, userID uint) (total, expiringSoon, expired, used int64, err error) {
+	now := time.Now()
+	sevenDaysLater := now.AddDate(0, 0, 7)
+
+	db := r.db.WithContext(ctx).Model(&model.Item{}).Where("user_id = ?", userID)
+
+	// total: 所有物品
+	if err := db.Count(&total).Error; err != nil {
+		return 0, 0, 0, 0, err
+	}
+
+	// expiring_soon: 距离过期≤7天且状态为正常
+	if err := r.db.WithContext(ctx).Model(&model.Item{}).
+		Where("user_id = ?", userID).
+		Where("status = ?", 1).
+		Where("expired_at <= ?", sevenDaysLater).
+		Where("expired_at >= ?", now).
+		Count(&expiringSoon).Error; err != nil {
+		return 0, 0, 0, 0, err
+	}
+
+	// expired: 已过期（expired_at < 当前时间 且 status = 2）
+	if err := r.db.WithContext(ctx).Model(&model.Item{}).
+		Where("user_id = ?", userID).
+		Where("status = ?", 2).
+		Where("expired_at < ?", now).
+		Count(&expired).Error; err != nil {
+		return 0, 0, 0, 0, err
+	}
+
+	// used: 已消耗（status = 3）
+	if err := r.db.WithContext(ctx).Model(&model.Item{}).
+		Where("user_id = ?", userID).
+		Where("status = ?", 3).
+		Count(&used).Error; err != nil {
+		return 0, 0, 0, 0, err
+	}
+
+	return total, expiringSoon, expired, used, nil
 }

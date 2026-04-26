@@ -56,11 +56,11 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 
 ### 2.4 请求头
 
-| 请求头名称 | 必填 | 说明 |
-|-----------|------|------|
-| Content-Type | 是 | 固定值: `application/json` |
-| Authorization | 需认证接口 | 格式: `Bearer {token}` |
-| User-Agent | 建议 | 客户端标识，用于记录登录设备信息 |
+| 请求头名称    | 必填       | 说明                             |
+| ------------- | ---------- | -------------------------------- |
+| Content-Type  | 是         | 固定值: `application/json`       |
+| Authorization | 需认证接口 | 格式: `Bearer {token}`           |
+| User-Agent    | 建议       | 客户端标识，用于记录登录设备信息 |
 
 ---
 
@@ -88,11 +88,11 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 
 ### 3.3 响应字段说明
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| code | int | 状态码，0表示成功，非0表示失败 |
-| message | string | 提示信息 |
-| data | object/null | 响应数据，成功时返回数据，失败时为null |
+| 字段    | 类型        | 说明                                   |
+| ------- | ----------- | -------------------------------------- |
+| code    | int         | 状态码，0表示成功，非0表示失败         |
+| message | string      | 提示信息                               |
+| data    | object/null | 响应数据，成功时返回数据，失败时为null |
 
 ---
 
@@ -100,27 +100,27 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 
 ### 4.1 通用错误码
 
-| 错误码 | 说明 |
-|--------|------|
-| 0 | 成功 |
-| 1001 | 参数无效 |
-| 1002 | 未授权（未登录或token无效） |
-| 1003 | 禁止访问 |
+| 错误码 | 说明                        |
+| ------ | --------------------------- |
+| 0      | 成功                        |
+| 1001   | 参数无效                    |
+| 1002   | 未授权（未登录或token无效） |
+| 1003   | 禁止访问                    |
 
 ### 4.2 用户相关错误码
 
-| 错误码 | 说明 |
-|--------|------|
-| 2001 | 用户不存在 |
-| 2002 | 用户已存在（注册时邮箱或用户名重复） |
-| 2003 | 密码错误 |
+| 错误码 | 说明                                 |
+| ------ | ------------------------------------ |
+| 2001   | 用户不存在                           |
+| 2002   | 用户已存在（注册时邮箱或用户名重复） |
+| 2003   | 密码错误                             |
 
 ### 4.3 系统相关错误码
 
-| 错误码 | 说明 |
-|--------|------|
-| 5001 | 内部错误 |
-| 5002 | 数据库错误 |
+| 错误码 | 说明       |
+| ------ | ---------- |
+| 5001   | 内部错误   |
+| 5002   | 数据库错误 |
 
 ---
 
@@ -141,6 +141,7 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 ### 5.3 需要认证的接口
 
 以下模块的接口需要携带Token：
+
 - 用户模块: 获取用户信息、更新用户信息、登出、获取会话列表、撤销会话、强制下线
 - 分类模块: 所有接口
 - 物品模块: 所有接口
@@ -155,13 +156,14 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 
 **请求参数**:
 
-| 参数名 | 类型 | 必填 | 说明 | 验证规则 |
-|--------|------|------|------|----------|
-| username | string | 是 | 用户名 | 3-50个字符 |
-| email | string | 是 | 邮箱 | 有效的邮箱格式 |
-| password | string | 是 | 密码 | 6-20个字符 |
+| 参数名   | 类型   | 必填 | 说明   | 验证规则       |
+| -------- | ------ | ---- | ------ | -------------- |
+| username | string | 是   | 用户名 | 3-50个字符     |
+| email    | string | 是   | 邮箱   | 有效的邮箱格式 |
+| password | string | 是   | 密码   | 6-20个字符     |
 
 **请求示例**:
+
 ```json
 {
   "username": "zhangsan",
@@ -171,6 +173,7 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 ```
 
 **响应数据**:
+
 ```json
 {
   "code": 0,
@@ -187,13 +190,13 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 
 **响应字段说明**:
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| user_id | uint | 用户ID |
-| username | string | 用户名 |
-| email | string | 邮箱 |
-| status | int8 | 账户状态（1: 正常） |
-| created_at | string | 创建时间 |
+| 字段       | 类型   | 说明                |
+| ---------- | ------ | ------------------- |
+| user_id    | uint   | 用户ID              |
+| username   | string | 用户名              |
+| email      | string | 邮箱                |
+| status     | int8   | 账户状态（1: 正常） |
+| created_at | string | 创建时间            |
 
 ---
 
@@ -203,12 +206,13 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 
 **请求参数**:
 
-| 参数名 | 类型 | 必填 | 说明 |
-|--------|------|------|------|
-| email | string | 是 | 邮箱 |
-| password | string | 是 | 密码 |
+| 参数名   | 类型   | 必填 | 说明 |
+| -------- | ------ | ---- | ---- |
+| email    | string | 是   | 邮箱 |
+| password | string | 是   | 密码 |
 
 **请求示例**:
+
 ```json
 {
   "email": "zhangsan@example.com",
@@ -217,6 +221,7 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 ```
 
 **响应数据**:
+
 ```json
 {
   "code": 0,
@@ -231,13 +236,14 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 
 **响应字段说明**:
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| user_id | uint | 用户ID |
-| token | string | JWT Token，用于后续请求认证 |
-| expired | string | Token过期时间 |
+| 字段    | 类型   | 说明                        |
+| ------- | ------ | --------------------------- |
+| user_id | uint   | 用户ID                      |
+| token   | string | JWT Token，用于后续请求认证 |
+| expired | string | Token过期时间               |
 
 **注意事项**:
+
 - 登录成功后会创建会话记录，记录设备信息和IP地址
 - 返回的token需要在后续请求的Authorization头中使用
 
@@ -252,6 +258,7 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 **请求参数**: 无（用户ID从Token中获取）
 
 **响应数据**:
+
 ```json
 {
   "code": 0,
@@ -276,11 +283,12 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 
 **请求参数**:
 
-| 参数名 | 类型 | 必填 | 说明 | 验证规则 |
-|--------|------|------|------|----------|
-| username | string | 否 | 用户名 | 3-50个字符，不传则不修改 |
+| 参数名   | 类型   | 必填 | 说明   | 验证规则                 |
+| -------- | ------ | ---- | ------ | ------------------------ |
+| username | string | 否   | 用户名 | 3-50个字符，不传则不修改 |
 
 **请求示例**:
+
 ```json
 {
   "username": "zhangsan_new"
@@ -288,6 +296,7 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 ```
 
 **响应数据**:
+
 ```json
 {
   "code": 0,
@@ -313,6 +322,7 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 **请求参数**: 无（用户ID和会话ID从Token中获取）
 
 **响应数据**:
+
 ```json
 {
   "code": 0,
@@ -322,6 +332,7 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 ```
 
 **注意事项**:
+
 - 登出会撤销当前会话，之后该token将失效
 
 ---
@@ -335,6 +346,7 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 **请求参数**: 无
 
 **响应数据**:
+
 ```json
 {
   "code": 0,
@@ -358,15 +370,15 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 
 **响应字段说明**:
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| session_id | uint | 会话ID |
-| user_id | uint | 用户ID |
+| 字段        | 类型   | 说明         |
+| ----------- | ------ | ------------ |
+| session_id  | uint   | 会话ID       |
+| user_id     | uint   | 用户ID       |
 | device_info | string | 登录设备信息 |
-| ip_address | string | 登录IP地址 |
-| created_at | string | 会话创建时间 |
-| expires_at | string | 会话过期时间 |
-| is_revoked | bool | 是否已撤销 |
+| ip_address  | string | 登录IP地址   |
+| created_at  | string | 会话创建时间 |
+| expires_at  | string | 会话过期时间 |
+| is_revoked  | bool   | 是否已撤销   |
 
 ---
 
@@ -378,11 +390,12 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 
 **请求参数**:
 
-| 参数名 | 类型 | 必填 | 说明 |
-|--------|------|------|------|
-| session_id | uint | 是 | 要撤销的会话ID |
+| 参数名     | 类型 | 必填 | 说明           |
+| ---------- | ---- | ---- | -------------- |
+| session_id | uint | 是   | 要撤销的会话ID |
 
 **请求示例**:
+
 ```json
 {
   "session_id": 2
@@ -390,6 +403,7 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 ```
 
 **响应数据**:
+
 ```json
 {
   "code": 0,
@@ -409,6 +423,7 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 **请求参数**: 无
 
 **响应数据**:
+
 ```json
 {
   "code": 0,
@@ -418,6 +433,7 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 ```
 
 **注意事项**:
+
 - 执行后会撤销当前用户的所有会话，包括当前会话
 - 执行后需要重新登录
 
@@ -433,14 +449,15 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 
 **请求参数**:
 
-| 参数名 | 类型 | 必填 | 说明 | 验证规则 |
-|--------|------|------|------|----------|
-| name | string | 是 | 分类名称 | 1-100个字符 |
-| color | string | 否 | 分类颜色 | 最多20个字符，如: "#FF0000" |
-| icon | string | 否 | 分类图标 | 最多50个字符 |
-| sort_order | int | 否 | 排序顺序 | 数字，默认为0 |
+| 参数名     | 类型   | 必填 | 说明     | 验证规则                    |
+| ---------- | ------ | ---- | -------- | --------------------------- |
+| name       | string | 是   | 分类名称 | 1-100个字符                 |
+| color      | string | 否   | 分类颜色 | 最多20个字符，如: "#FF0000" |
+| icon       | string | 否   | 分类图标 | 最多50个字符                |
+| sort_order | int    | 否   | 排序顺序 | 数字，默认为0               |
 
 **请求示例**:
+
 ```json
 {
   "name": "食品",
@@ -451,6 +468,7 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 ```
 
 **响应数据**:
+
 ```json
 {
   "code": 0,
@@ -469,15 +487,15 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 
 **响应字段说明**:
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| category_id | uint | 分类ID |
-| user_id | uint | 所属用户ID |
-| name | string | 分类名称 |
-| color | string | 分类颜色 |
-| icon | string | 分类图标 |
-| sort_order | int | 排序顺序 |
-| created_at | string | 创建时间 |
+| 字段        | 类型   | 说明       |
+| ----------- | ------ | ---------- |
+| category_id | uint   | 分类ID     |
+| user_id     | uint   | 所属用户ID |
+| name        | string | 分类名称   |
+| color       | string | 分类颜色   |
+| icon        | string | 分类图标   |
+| sort_order  | int    | 排序顺序   |
+| created_at  | string | 创建时间   |
 
 ---
 
@@ -490,6 +508,7 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 **请求参数**: 无（分页参数固定为page=1, pageSize=10）
 
 **响应数据**:
+
 ```json
 {
   "code": 0,
@@ -513,10 +532,10 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 
 **响应字段说明**:
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| list | array | 分类列表 |
-| total | int64 | 总数量 |
+| 字段  | 类型  | 说明     |
+| ----- | ----- | -------- |
+| list  | array | 分类列表 |
+| total | int64 | 总数量   |
 
 ---
 
@@ -528,15 +547,16 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 
 **请求参数**:
 
-| 参数名 | 类型 | 必填 | 说明 | 验证规则 |
-|--------|------|------|------|----------|
-| category_id | uint | 是 | 分类ID | 最小值为1 |
-| name | string | 否 | 分类名称 | 1-100个字符 |
-| color | string | 否 | 分类颜色 | 最多20个字符 |
-| icon | string | 否 | 分类图标 | 最多50个字符 |
-| sort_order | int | 否 | 排序顺序 | 数字 |
+| 参数名      | 类型   | 必填 | 说明     | 验证规则     |
+| ----------- | ------ | ---- | -------- | ------------ |
+| category_id | uint   | 是   | 分类ID   | 最小值为1    |
+| name        | string | 否   | 分类名称 | 1-100个字符  |
+| color       | string | 否   | 分类颜色 | 最多20个字符 |
+| icon        | string | 否   | 分类图标 | 最多50个字符 |
+| sort_order  | int    | 否   | 排序顺序 | 数字         |
 
 **请求示例**:
+
 ```json
 {
   "category_id": 1,
@@ -546,6 +566,7 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 ```
 
 **响应数据**:
+
 ```json
 {
   "code": 0,
@@ -572,11 +593,12 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 
 **请求参数**:
 
-| 参数名 | 类型 | 必填 | 说明 |
-|--------|------|------|------|
-| category_id | uint | 是 | 分类ID |
+| 参数名      | 类型 | 必填 | 说明   |
+| ----------- | ---- | ---- | ------ |
+| category_id | uint | 是   | 分类ID |
 
 **请求示例**:
+
 ```json
 {
   "category_id": 1
@@ -584,6 +606,7 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 ```
 
 **响应数据**:
+
 ```json
 {
   "code": 0,
@@ -593,6 +616,7 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 ```
 
 **注意事项**:
+
 - 删除分类会同时删除该分类下的所有物品
 - 删除后无法恢复
 
@@ -608,17 +632,18 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 
 **请求参数**:
 
-| 参数名 | 类型 | 必填 | 说明 | 验证规则 |
-|--------|------|------|------|----------|
-| category_id | uint | 是 | 分类ID | 最小值为1 |
-| name | string | 是 | 物品名称 | 1-200个字符 |
-| description | string | 否 | 物品描述 | 最多500个字符 |
-| quantity | int | 否 | 数量 | 最小值为1，默认为1 |
-| unit | string | 否 | 单位 | 最多20个字符，如: "个", "箱" |
-| expired_at | string | 是 | 过期时间 | ISO 8601格式，如: "2024-12-31T23:59:59Z" |
-| remind_days | int | 否 | 提前提醒天数 | 0-365，默认为3 |
+| 参数名      | 类型   | 必填 | 说明         | 验证规则                                 |
+| ----------- | ------ | ---- | ------------ | ---------------------------------------- |
+| category_id | uint   | 是   | 分类ID       | 最小值为1                                |
+| name        | string | 是   | 物品名称     | 1-200个字符                              |
+| description | string | 否   | 物品描述     | 最多500个字符                            |
+| quantity    | int    | 否   | 数量         | 最小值为1，默认为1                       |
+| unit        | string | 否   | 单位         | 最多20个字符，如: "个", "箱"             |
+| expired_at  | string | 是   | 过期时间     | ISO 8601格式，如: "2024-12-31T23:59:59Z" |
+| remind_days | int    | 否   | 提前提醒天数 | 0-365，默认为3                           |
 
 **请求示例**:
+
 ```json
 {
   "category_id": 1,
@@ -632,6 +657,7 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 ```
 
 **响应数据**:
+
 ```json
 {
   "code": 0,
@@ -654,19 +680,19 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 
 **响应字段说明**:
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| item_id | uint | 物品ID |
-| user_id | uint | 所属用户ID |
-| category_id | uint | 分类ID |
-| name | string | 物品名称 |
-| description | string | 物品描述 |
-| quantity | int | 数量 |
-| unit | string | 单位 |
-| expired_at | string | 过期时间 |
-| remind_days | int | 提前提醒天数 |
-| status | int8 | 物品状态（1: 正常, 2: 已过期, 3: 已消耗） |
-| created_at | string | 创建时间 |
+| 字段        | 类型   | 说明                                      |
+| ----------- | ------ | ----------------------------------------- |
+| item_id     | uint   | 物品ID                                    |
+| user_id     | uint   | 所属用户ID                                |
+| category_id | uint   | 分类ID                                    |
+| name        | string | 物品名称                                  |
+| description | string | 物品描述                                  |
+| quantity    | int    | 数量                                      |
+| unit        | string | 单位                                      |
+| expired_at  | string | 过期时间                                  |
+| remind_days | int    | 提前提醒天数                              |
+| status      | int8   | 物品状态（1: 正常, 2: 已过期, 3: 已消耗） |
+| created_at  | string | 创建时间                                  |
 
 ---
 
@@ -678,27 +704,28 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 
 **请求参数** (支持复合搜索和分页):
 
-| 参数名 | 类型 | 必填 | 说明 | 验证规则 |
-|--------|------|------|------|----------|
-| page | int | 否 | 页码 | 最小值为1，默认为1 |
-| page_size | int | 否 | 每页数量 | 1-100，默认为10 |
-| category_id | uint | 否 | 分类ID筛选 | 最小值为1 |
-| name | string | 否 | 物品名称筛选 | 模糊搜索，最多200个字符 |
-| description | string | 否 | 物品描述筛选 | 模糊搜索，最多500个字符 |
-| unit | string | 否 | 单位筛选 | 最多20个字符 |
-| status | int8 | 否 | 状态筛选 | 0: 全部, 1: 正常, 2: 已过期, 3: 已消耗 |
-| quantity_min | int | 否 | 最小数量 | 最小值为0 |
-| quantity_max | int | 否 | 最大数量 | 最小值为0 |
-| remind_days_min | int | 否 | 最小提醒天数 | 最小值为0 |
-| remind_days_max | int | 否 | 最大提醒天数 | 最小值为0 |
-| expired_at_from | string | 否 | 过期时间起始 | 格式: "2006-01-02" |
-| expired_at_to | string | 否 | 过期时间结束 | 格式: "2006-01-02" |
-| created_at_from | string | 否 | 创建时间起始 | 格式: "2006-01-02" |
-| created_at_to | string | 否 | 创建时间结束 | 格式: "2006-01-02" |
-| order_by | string | 否 | 排序字段 | 可选值: created_at, updated_at, expired_at, name, quantity |
-| order | string | 否 | 排序方向 | 可选值: asc, desc，默认asc |
+| 参数名          | 类型   | 必填 | 说明         | 验证规则                                                   |
+| --------------- | ------ | ---- | ------------ | ---------------------------------------------------------- |
+| page            | int    | 否   | 页码         | 最小值为1，默认为1                                         |
+| page_size       | int    | 否   | 每页数量     | 1-100，默认为10                                            |
+| category_id     | uint   | 否   | 分类ID筛选   | 最小值为1                                                  |
+| name            | string | 否   | 物品名称筛选 | 模糊搜索，最多200个字符                                    |
+| description     | string | 否   | 物品描述筛选 | 模糊搜索，最多500个字符                                    |
+| unit            | string | 否   | 单位筛选     | 最多20个字符                                               |
+| status          | int8   | 否   | 状态筛选     | 0: 全部, 1: 正常, 2: 已过期, 3: 已消耗                     |
+| quantity_min    | int    | 否   | 最小数量     | 最小值为0                                                  |
+| quantity_max    | int    | 否   | 最大数量     | 最小值为0                                                  |
+| remind_days_min | int    | 否   | 最小提醒天数 | 最小值为0                                                  |
+| remind_days_max | int    | 否   | 最大提醒天数 | 最小值为0                                                  |
+| expired_at_from | string | 否   | 过期时间起始 | 格式: "2006-01-02"                                         |
+| expired_at_to   | string | 否   | 过期时间结束 | 格式: "2006-01-02"                                         |
+| created_at_from | string | 否   | 创建时间起始 | 格式: "2006-01-02"                                         |
+| created_at_to   | string | 否   | 创建时间结束 | 格式: "2006-01-02"                                         |
+| order_by        | string | 否   | 排序字段     | 可选值: created_at, updated_at, expired_at, name, quantity |
+| order           | string | 否   | 排序方向     | 可选值: asc, desc，默认asc                                 |
 
 **请求示例**:
+
 ```json
 {
   "page": 1,
@@ -711,6 +738,7 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 ```
 
 **响应数据**:
+
 ```json
 {
   "code": 0,
@@ -739,11 +767,11 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 
 **响应字段说明**:
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| list | array | 物品列表 |
-| total | int64 | 总数量 |
-| page | int | 当前页码 |
+| 字段  | 类型  | 说明     |
+| ----- | ----- | -------- |
+| list  | array | 物品列表 |
+| total | int64 | 总数量   |
+| page  | int   | 当前页码 |
 
 ---
 
@@ -755,11 +783,12 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 
 **请求参数**:
 
-| 参数名 | 类型 | 必填 | 说明 |
-|--------|------|------|------|
-| item_id | uint | 是 | 物品ID |
+| 参数名  | 类型 | 必填 | 说明   |
+| ------- | ---- | ---- | ------ |
+| item_id | uint | 是   | 物品ID |
 
 **请求示例**:
+
 ```json
 {
   "item_id": 1
@@ -767,6 +796,7 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 ```
 
 **响应数据**:
+
 ```json
 {
   "code": 0,
@@ -797,18 +827,19 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 
 **请求参数**:
 
-| 参数名 | 类型 | 必填 | 说明 | 验证规则 |
-|--------|------|------|------|----------|
-| item_id | uint | 是 | 物品ID | 最小值为1 |
-| category_id | uint | 否 | 分类ID | 最小值为1 |
-| name | string | 否 | 物品名称 | 1-200个字符 |
-| description | string | 否 | 物品描述 | 最多500个字符 |
-| quantity | int | 否 | 数量 | 最小值为1 |
-| unit | string | 否 | 单位 | 最多20个字符 |
-| expired_at | string | 否 | 过期时间 | ISO 8601格式 |
-| remind_days | int | 否 | 提前提醒天数 | 0-365 |
+| 参数名      | 类型   | 必填 | 说明         | 验证规则      |
+| ----------- | ------ | ---- | ------------ | ------------- |
+| item_id     | uint   | 是   | 物品ID       | 最小值为1     |
+| category_id | uint   | 否   | 分类ID       | 最小值为1     |
+| name        | string | 否   | 物品名称     | 1-200个字符   |
+| description | string | 否   | 物品描述     | 最多500个字符 |
+| quantity    | int    | 否   | 数量         | 最小值为1     |
+| unit        | string | 否   | 单位         | 最多20个字符  |
+| expired_at  | string | 否   | 过期时间     | ISO 8601格式  |
+| remind_days | int    | 否   | 提前提醒天数 | 0-365         |
 
 **请求示例**:
+
 ```json
 {
   "item_id": 1,
@@ -818,6 +849,7 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 ```
 
 **响应数据**:
+
 ```json
 {
   "code": 0,
@@ -848,11 +880,12 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 
 **请求参数**:
 
-| 参数名 | 类型 | 必填 | 说明 |
-|--------|------|------|------|
-| item_id | uint | 是 | 物品ID |
+| 参数名  | 类型 | 必填 | 说明   |
+| ------- | ---- | ---- | ------ |
+| item_id | uint | 是   | 物品ID |
 
 **请求示例**:
+
 ```json
 {
   "item_id": 1
@@ -860,6 +893,7 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 ```
 
 **响应数据**:
+
 ```json
 {
   "code": 0,
@@ -878,11 +912,12 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 
 **请求参数**:
 
-| 参数名 | 类型 | 必填 | 说明 | 验证规则 |
-|--------|------|------|------|----------|
-| days | int | 否 | 未来天数 | 1-365，默认为7 |
+| 参数名 | 类型 | 必填 | 说明     | 验证规则       |
+| ------ | ---- | ---- | -------- | -------------- |
+| days   | int  | 否   | 未来天数 | 1-365，默认为7 |
 
 **请求示例**:
+
 ```json
 {
   "days": 7
@@ -890,6 +925,7 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 ```
 
 **响应数据**:
+
 ```json
 {
   "code": 0,
@@ -915,9 +951,52 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 
 **响应字段说明**:
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| days_until_expired | int | 距离过期的天数，负数表示已过期 |
+| 字段               | 类型 | 说明                           |
+| ------------------ | ---- | ------------------------------ |
+| days_until_expired | int  | 距离过期的天数，负数表示已过期 |
+
+---
+
+### 8.7 获取物品统计信息
+
+**接口地址**: `/api/item/stats`
+
+**认证要求**: 需要携带Token
+
+**请求参数**: 无
+
+**响应数据**:
+
+```json
+{
+  "code": 0,
+  "message": "success",
+  "data": {
+    "total": 10,
+    "expiring_soon": 3,
+    "expired": 2,
+    "used": 5
+  }
+}
+```
+
+**响应字段说明**:
+
+| 字段          | 类型 | 说明                                                         |
+| ------------- | ---- | ------------------------------------------------------------ |
+| total         | int  | 物品总数（所有状态的物品数量）                               |
+| expiring_soon | int  | 即将过期数量（距离过期≤7天且状态为正常的物品）              |
+| expired       | int  | 已过期数量（已超过过期时间且状态为已过期的物品）            |
+| used          | int  | 已消耗数量（状态为已消耗的物品）                            |
+
+**统计逻辑说明**:
+
+| 统计项 | 统计条件 | 对应前端显示 |
+| ------ | -------- | ------------ |
+| total | 所有物品（status = 1, 2, 3） | 物品总数 |
+| expiring_soon | expired_at ≤ 当前时间 + 7天 且 status = 1（正常） | 即将过期 |
+| expired | expired_at < 当前时间 且 status = 2（已过期） | 已过期 |
+| used | status = 3（已消耗） | 已使用 |
 
 ---
 
@@ -925,58 +1004,58 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 
 ### 9.1 用户 (User)
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| user_id | uint | 用户ID（主键） |
-| username | string | 用户名（唯一） |
-| email | string | 邮箱（唯一） |
-| password | string | 密码（加密存储） |
-| status | int8 | 账户状态（1: 正常） |
-| created_at | string | 创建时间 |
-| updated_at | string | 更新时间 |
+| 字段       | 类型   | 说明                |
+| ---------- | ------ | ------------------- |
+| user_id    | uint   | 用户ID（主键）      |
+| username   | string | 用户名（唯一）      |
+| email      | string | 邮箱（唯一）        |
+| password   | string | 密码（加密存储）    |
+| status     | int8   | 账户状态（1: 正常） |
+| created_at | string | 创建时间            |
+| updated_at | string | 更新时间            |
 
 ### 9.2 分类 (Category)
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| category_id | uint | 分类ID（主键） |
-| user_id | uint | 所属用户ID |
-| name | string | 分类名称 |
-| color | string | 分类颜色（十六进制） |
-| icon | string | 分类图标 |
-| sort_order | int | 排序顺序 |
-| created_at | string | 创建时间 |
-| updated_at | string | 更新时间 |
+| 字段        | 类型   | 说明                 |
+| ----------- | ------ | -------------------- |
+| category_id | uint   | 分类ID（主键）       |
+| user_id     | uint   | 所属用户ID           |
+| name        | string | 分类名称             |
+| color       | string | 分类颜色（十六进制） |
+| icon        | string | 分类图标             |
+| sort_order  | int    | 排序顺序             |
+| created_at  | string | 创建时间             |
+| updated_at  | string | 更新时间             |
 
 ### 9.3 物品 (Item)
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| item_id | uint | 物品ID（主键） |
-| user_id | uint | 所属用户ID |
-| category_id | uint | 所属分类ID |
-| name | string | 物品名称 |
-| description | string | 物品描述 |
-| quantity | int | 数量 |
-| unit | string | 单位 |
-| expired_at | string | 过期时间 |
-| remind_days | int | 提前提醒天数 |
-| status | int8 | 状态（1: 正常, 2: 已过期, 3: 已消耗） |
-| created_at | string | 创建时间 |
-| updated_at | string | 更新时间 |
+| 字段        | 类型   | 说明                                  |
+| ----------- | ------ | ------------------------------------- |
+| item_id     | uint   | 物品ID（主键）                        |
+| user_id     | uint   | 所属用户ID                            |
+| category_id | uint   | 所属分类ID                            |
+| name        | string | 物品名称                              |
+| description | string | 物品描述                              |
+| quantity    | int    | 数量                                  |
+| unit        | string | 单位                                  |
+| expired_at  | string | 过期时间                              |
+| remind_days | int    | 提前提醒天数                          |
+| status      | int8   | 状态（1: 正常, 2: 已过期, 3: 已消耗） |
+| created_at  | string | 创建时间                              |
+| updated_at  | string | 更新时间                              |
 
 ### 9.4 会话 (Session)
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| session_id | uint | 会话ID（主键） |
-| user_id | uint | 所属用户ID |
-| jti | string | JWT Token标识符 |
-| device_info | string | 登录设备信息 |
-| ip_address | string | 登录IP地址 |
-| created_at | string | 会话创建时间 |
-| expires_at | string | 会话过期时间 |
-| is_revoked | bool | 是否已撤销 |
+| 字段        | 类型   | 说明            |
+| ----------- | ------ | --------------- |
+| session_id  | uint   | 会话ID（主键）  |
+| user_id     | uint   | 所属用户ID      |
+| jti         | string | JWT Token标识符 |
+| device_info | string | 登录设备信息    |
+| ip_address  | string | 登录IP地址      |
+| created_at  | string | 会话创建时间    |
+| expires_at  | string | 会话过期时间    |
+| is_revoked  | bool   | 是否已撤销      |
 
 ---
 
@@ -985,6 +1064,7 @@ ThingsExpired 是一个物品过期管理后端服务，用于帮助用户管理
 ### 附录A: 状态码参考
 
 **物品状态 (status)**:
+
 - `1` - 正常：物品未过期
 - `2` - 已过期：物品已超过过期时间
 - `3` - 已消耗：物品已被使用/消耗

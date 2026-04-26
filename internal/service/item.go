@@ -19,19 +19,20 @@ type IItemService interface {
 	Update(ctx context.Context, userID uint, req *dto.UpdateItemRequest) (*vo.ItemVO, error)
 	Delete(ctx context.Context, userID uint, itemID uint) error
 	GetExpiringItems(ctx context.Context, userID uint, days int) ([]vo.ExpiringItemVO, error)
+	GetStats(ctx context.Context, userID uint) (*vo.ItemStatsVO, error)
 }
 
 // ItemService 物品服务实现
 type ItemService struct {
-	itemRepo   repository.IItemRepository
-	validator  *ItemRequestValidator
+	itemRepo  repository.IItemRepository
+	validator *ItemRequestValidator
 }
 
 // NewItemService 创建物品服务
 func NewItemService(itemRepo repository.IItemRepository) IItemService {
 	return &ItemService{
-		itemRepo:   itemRepo,
-		validator:  NewItemRequestValidator(),
+		itemRepo:  itemRepo,
+		validator: NewItemRequestValidator(),
 	}
 }
 
@@ -183,6 +184,21 @@ func (s *ItemService) GetExpiringItems(ctx context.Context, userID uint, days in
 	}
 
 	return result, nil
+}
+
+// GetStats 获取物品统计数据
+func (s *ItemService) GetStats(ctx context.Context, userID uint) (*vo.ItemStatsVO, error) {
+	total, expiringSoon, expired, used, err := s.itemRepo.GetStats(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &vo.ItemStatsVO{
+		Total:        int(total),
+		ExpiringSoon: int(expiringSoon),
+		Expired:      int(expired),
+		Used:         int(used),
+	}, nil
 }
 
 func (s *ItemService) toVO(item *model.Item) *vo.ItemVO {
