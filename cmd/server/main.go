@@ -104,6 +104,7 @@ func main() {
 
 		// 中间件
 		fx.Provide(middleware.NewAuthMiddleware),
+		fx.Provide(middleware.NewEmptyBodyHandler),
 
 		// Router
 		fx.Provide(router.NewRouter),

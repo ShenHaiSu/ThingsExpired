@@ -14,6 +14,7 @@ func NewRouter(
 	categoryHandler *handler.CategoryHandler,
 	itemHandler *handler.ItemHandler,
 	authMiddleware *middleware.AuthMiddleware,
+	bodyHandler *middleware.EmptyBodyHandler,
 	logger *utils.Logger,
 	cfg *config.Config,
 ) *gin.Engine {
@@ -27,6 +28,7 @@ func NewRouter(
 
 	// API 路由组（所有 API 必须以 /api 开头）
 	api := r.Group("/api")
+	api.Use(bodyHandler.Handle())
 	{
 		// 用户相关路由（公开）
 		user := api.Group("/user")
