@@ -76,7 +76,7 @@
           </span>
         </template>
       </Column>
-      <Column field="status" :header="t('items.status')">
+      <Column field="status" :header="t('items.status.title')">
         <template #body="slotProps">
           <Tag :severity="getStatusSeverity(slotProps.data.status)" :value="getStatusText(slotProps.data.status)" />
         </template>

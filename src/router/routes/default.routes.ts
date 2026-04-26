@@ -18,6 +18,17 @@ export const defaultRoutes: RouteRecordRaw[] = [
       requiresAuth: false,
     },
   },
+  // 注册页 - 使用空白布局
+  {
+    path: '/register',
+    name: 'Register',
+    component: () => import('@/views/login/RegisterView.vue'),
+    meta: {
+      title: '注册',
+      layout: BlankLayout,
+      requiresAuth: false,
+    },
+  },
   // 首页 - 使用默认布局，需要登录
   {
     path: '/',
