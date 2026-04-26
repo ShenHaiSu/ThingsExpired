@@ -1,7 +1,9 @@
 <template>
   <div class="login-footer">
     <span class="footer-text">{{ t('auth.noAccount') }}</span>
-    <a href="#" class="register-link">{{ t('auth.registerNow') }}</a>
+    <router-link to="/register" class="register-link">
+      {{ t('auth.registerNow') }}
+    </router-link>
   </div>
 </template>
 

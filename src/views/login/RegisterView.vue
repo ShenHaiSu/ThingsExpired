@@ -1,7 +1,7 @@
 <template>
-  <div class="login-page">
+  <div class="register-page">
     <!-- 左侧装饰区域 -->
-    <div class="login-decoration">
+    <div class="register-decoration">
       <div class="decoration-content">
         <div class="logo-area">
           <div class="logo-icon">
@@ -29,15 +29,29 @@
       <div class="decoration-circle circle-2"></div>
     </div>
 
-    <!-- 右侧登录表单区域 -->
-    <div class="login-form-area">
+    <!-- 右侧注册表单区域 -->
+    <div class="register-form-area">
       <div class="form-container">
         <div class="form-header">
-          <h2>欢迎回来</h2>
-          <p>请登录您的账户</p>
+          <h2>创建账户</h2>
+          <p>开始管理您的过期物品</p>
         </div>
 
-        <form @submit.prevent="handleLogin" class="login-form">
+        <form @submit.prevent="handleRegister" class="register-form">
+          <!-- 用户名 -->
+          <div class="form-group">
+            <label for="username">{{ t('auth.username') }}</label>
+            <div class="input-container">
+              <i class="pi pi-user"></i>
+              <InputText
+                id="username"
+                v-model="form.username"
+                :placeholder="t('auth.usernamePlaceholder')"
+                autocomplete="username"
+              />
+            </div>
+          </div>
+
           <!-- 邮箱 -->
           <div class="form-group">
             <label for="email">{{ t('auth.email') }}</label>
@@ -62,37 +76,43 @@
                 id="password"
                 v-model="form.password"
                 :placeholder="t('auth.passwordPlaceholder')"
-                :feedback="false"
                 toggleMask
-                autocomplete="current-password"
+                autocomplete="new-password"
               />
             </div>
           </div>
 
-          <!-- 记住我 & 忘记密码 -->
-          <div class="form-options">
-            <div class="remember-me">
-              <Checkbox v-model="form.rememberMe" :binary="true" inputId="rememberMe" />
-              <label for="rememberMe">{{ t('auth.rememberMe') }}</label>
+          <!-- 确认密码 -->
+          <div class="form-group">
+            <label for="confirmPassword">{{ t('auth.confirmPassword') }}</label>
+            <div class="input-container">
+              <i class="pi pi-lock"></i>
+              <Password
+                id="confirmPassword"
+                v-model="form.confirmPassword"
+                :placeholder="t('auth.confirmPasswordPlaceholder')"
+                :feedback="false"
+                toggleMask
+                autocomplete="new-password"
+              />
             </div>
-            <a href="#" class="forgot-link">{{ t('auth.forgotPassword') }}</a>
           </div>
 
-          <!-- 登录按钮 -->
+          <!-- 注册按钮 -->
           <Button
             type="submit"
-            :label="t('auth.login')"
+            :label="t('auth.register')"
             :loading="loading"
             class="submit-btn"
-            icon="pi pi-sign-in"
+            icon="pi pi-user-plus"
           />
         </form>
 
-        <!-- 注册链接 -->
+        <!-- 登录链接 -->
         <div class="form-footer">
-          <span>{{ t('auth.noAccount') }}</span>
-          <router-link to="/register" class="register-link">
-            {{ t('auth.registerNow') }}
+          <span>{{ t('auth.hasAccount') }}</span>
+          <router-link to="/login" class="login-link">
+            {{ t('auth.loginNow') }}
           </router-link>
         </div>
       </div>
@@ -106,47 +126,60 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import InputText from 'primevue/inputtext'
 import Password from 'primevue/password'
-import Checkbox from 'primevue/checkbox'
 import Button from 'primevue/button'
-import { useUserStore } from '@/stores'
+import { register as registerApi } from '@/api/user'
 import { useToast } from '@/composables'
 
 const router = useRouter()
 const { t } = useI18n()
-const userStore = useUserStore()
 const toast = useToast()
 
 const loading = ref(false)
 
 const form = ref({
+  username: '',
   email: '',
   password: '',
-  rememberMe: false,
+  confirmPassword: '',
 })
 
-async function handleLogin() {
+async function handleRegister() {
   // 表单验证
-  if (!form.value.email || !form.value.password) {
+  if (!form.value.username || !form.value.email || !form.value.password) {
     toast.error(t('auth.fillAllFields'))
+    return
+  }
+
+  // 验证密码匹配
+  if (form.value.password !== form.value.confirmPassword) {
+    toast.error(t('auth.passwordMismatch'))
+    return
+  }
+
+  // 验证密码长度
+  if (form.value.password.length < 6) {
+    toast.error(t('auth.passwordTooShort'))
     return
   }
 
   loading.value = true
   try {
-    const res = await userStore.login({
+    const res = await registerApi({
+      username: form.value.username,
       email: form.value.email,
       password: form.value.password,
     })
 
-    // 登录成功（code === 0）则跳转首页
     if (res.code === 0) {
-      router.push('/')
+      toast.success(t('auth.registerSuccess'))
+      // 注册成功后跳转到登录页
+      router.push('/login')
     } else {
-      toast.error(res.message || '登录失败，请稍后重试')
+      toast.error(res.message || t('auth.registerFailed'))
     }
   } catch (error: any) {
-    console.error('Login failed:', error)
-    toast.error(error?.response?.data?.message || error?.message || '登录失败，请稍后重试')
+    console.error('Register failed:', error)
+    toast.error(error?.response?.data?.message || error?.message || t('auth.registerFailed'))
   } finally {
     loading.value = false
   }
@@ -154,7 +187,7 @@ async function handleLogin() {
 </script>
 
 <style scoped>
-.login-page {
+.register-page {
   display: flex;
   min-height: 100vh;
   width: 100%;
@@ -162,7 +195,7 @@ async function handleLogin() {
 }
 
 /* 左侧装饰区域 */
-.login-decoration {
+.register-decoration {
   flex: 1;
   display: none;
   position: relative;
@@ -171,7 +204,7 @@ async function handleLogin() {
 }
 
 @media (min-width: 992px) {
-  .login-decoration {
+  .register-decoration {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -257,8 +290,8 @@ async function handleLogin() {
   left: -50px;
 }
 
-/* 右侧登录表单区域 */
-.login-form-area {
+/* 右侧注册表单区域 */
+.register-form-area {
   flex: 1;
   display: flex;
   align-items: center;
@@ -291,10 +324,10 @@ async function handleLogin() {
 }
 
 /* 表单样式 */
-.login-form {
+.register-form {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 20px;
 }
 
 .form-group {
@@ -367,59 +400,11 @@ async function handleLogin() {
   outline: none;
 }
 
-/* 表单选项 */
-.form-options {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.remember-me {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.remember-me label {
-  font-size: 14px;
-  color: #6b7280;
-  cursor: pointer;
-  user-select: none;
-}
-
-.remember-me :deep(.p-checkbox .p-checkbox-box) {
-  border: 2px solid #d1d5db;
-  border-radius: 6px;
-  transition: all 0.2s ease;
-}
-
-.remember-me :deep(.p-checkbox .p-checkbox-box:hover) {
-  border-color: #1a5f4a;
-}
-
-.remember-me :deep(.p-checkbox .p-checkbox-box.p-highlight) {
-  background: #1a5f4a;
-  border-color: #1a5f4a;
-}
-
-.forgot-link {
-  font-size: 14px;
-  color: #1a5f4a;
-  text-decoration: none;
-  font-weight: 500;
-  transition: color 0.2s ease;
-}
-
-.forgot-link:hover {
-  color: #0d3d32;
-  text-decoration: underline;
-}
-
 /* 提交按钮 */
 .submit-btn {
   width: 100%;
   padding: 14px 24px;
-  margin-top: 8px;
+  margin-top: 12px;
   font-size: 16px;
   font-weight: 600;
   background: #1a5f4a !important;
@@ -452,7 +437,7 @@ async function handleLogin() {
   color: #6b7280;
 }
 
-.register-link {
+.login-link {
   font-size: 14px;
   color: #1a5f4a;
   font-weight: 600;
@@ -461,7 +446,7 @@ async function handleLogin() {
   transition: color 0.2s ease;
 }
 
-.register-link:hover {
+.login-link:hover {
   color: #0d3d32;
   text-decoration: underline;
 }
