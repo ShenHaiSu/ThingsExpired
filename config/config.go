@@ -15,6 +15,7 @@ type Config struct {
 	Upload   UploadConfig   `mapstructure:"upload"`
 	Security SecurityConfig `mapstructure:"security"`
 	Log      LogConfig      `mapstructure:"log"`
+	Frontend FrontendConfig `mapstructure:"frontend"`
 }
 
 // AppConfig 应用配置
@@ -43,6 +44,11 @@ type UploadConfig struct {
 	MaxSizeMB    int      `mapstructure:"max_size_mb"`
 	AllowedTypes []string `mapstructure:"allowed_types"`
 	SavePath     string   `mapstructure:"save_path"`
+}
+
+// FrontendConfig 前端静态资源配置
+type FrontendConfig struct {
+	StaticPath string `mapstructure:"static_path"` // 前端静态资源目录路径
 }
 
 // SecurityConfig 安全配置

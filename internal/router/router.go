@@ -2,6 +2,7 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
+	"things-expired/config"
 	"things-expired/internal/handler"
 	"things-expired/pkg/middleware"
 	"things-expired/pkg/utils"
@@ -14,6 +15,7 @@ func NewRouter(
 	itemHandler *handler.ItemHandler,
 	authMiddleware *middleware.AuthMiddleware,
 	logger *utils.Logger,
+	cfg *config.Config,
 ) *gin.Engine {
 	r := gin.New()
 
@@ -60,6 +62,12 @@ func NewRouter(
 			authenticated.POST("/item/expiring", itemHandler.GetExpiringItems)
 		}
 	}
+
+	// SPA 兜底路由：处理前端静态资源和 SPA 路由
+	// 当请求路径不符合所有已知路径时，返回前端资源让 SPA 处理 404 页面
+	// 如果请求以 /api 开头，则不会返回前端资源（由上面的 API 路由处理）
+	// 使用 NoRoute 来处理未匹配的路由
+	r.NoRoute(middleware.SPACatchAllMiddleware(cfg.Frontend.StaticPath))
 
 	return r
 }
