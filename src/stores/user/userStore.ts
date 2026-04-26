@@ -5,7 +5,8 @@
 
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
-import { post } from '@/api'
+import { login as loginApi, logout as logoutApi, getUserInfo as getUserInfoApi } from '@/api'
+import type { LoginParams, User, LoginResponse } from '@/api/user'
 import { localCache } from '@/utils/storage'
 
 export interface UserInfo {
@@ -15,11 +16,6 @@ export interface UserInfo {
   avatar?: string
   roles?: string[]
   permissions?: string[]
-}
-
-interface LoginParams {
-  username: string
-  password: string
 }
 
 export const useUserStore = defineStore(
@@ -36,15 +32,13 @@ export const useUserStore = defineStore(
     // Actions
     async function login(params: LoginParams) {
       try {
-        // 调用登录 API（根据实际后端接口调整）
-        const res = await post<{ data: { token: string; user: UserInfo } }>('/auth/login', params)
-        token.value = res.data.token
-        userInfo.value = res.data.user
-
-        // 持久化存储
-        localCache.set('token', res.data.token)
-        localCache.set('userInfo', res.data.user)
-
+        const res = await loginApi(params)
+        if (res.code === 0 && res.data) {
+          token.value = res.data.token
+          localCache.set('token', res.data.token)
+          // 获取用户信息
+          await fetchUserInfo()
+        }
         return res
       } catch (error) {
         console.error('Login failed:', error)
@@ -54,8 +48,7 @@ export const useUserStore = defineStore(
 
     async function logout() {
       try {
-        // 调用退出登录 API（可选）
-        await post('/auth/logout')
+        await logoutApi()
       } catch (error) {
         console.error('Logout error:', error)
       } finally {
@@ -71,10 +64,16 @@ export const useUserStore = defineStore(
 
     async function fetchUserInfo() {
       try {
-        const res = await post<{ data: { user: UserInfo } }>('/auth/info')
-        userInfo.value = res.data.user
-        localCache.set('userInfo', res.data.user)
-        return res.data.user
+        const res = await getUserInfoApi()
+        if (res.code === 0 && res.data) {
+          userInfo.value = {
+            id: res.data.user_id,
+            name: res.data.username,
+            email: res.data.email,
+          }
+          localCache.set('userInfo', userInfo.value)
+        }
+        return userInfo.value
       } catch (error) {
         console.error('Fetch user info failed:', error)
         throw error

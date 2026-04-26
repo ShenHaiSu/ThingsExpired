@@ -35,7 +35,7 @@ apiClient.interceptors.response.use(
   (response: AxiosResponse) => {
     // 统一处理成功响应
     const res = response.data
-    if (res.code !== undefined && res.code !== 200) {
+    if (res.code !== undefined && res.code !== 0) {
       console.error('API Error:', res.message)
       return Promise.reject(new Error(res.message || 'Error'))
     }
@@ -93,3 +93,8 @@ export function patch<T = any>(url: string, data?: any, config?: AxiosRequestCon
 }
 
 export default apiClient
+
+// 导出各模块 API
+export * from './user'
+export * from './category'
+export * from './item'

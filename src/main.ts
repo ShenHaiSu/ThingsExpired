@@ -10,6 +10,7 @@ import router from './router'
 import i18n from './locales'
 import PrimeVue from 'primevue/config'
 import Aura from '@primeuix/themes/aura'
+import ToastService from 'primevue/toastservice'
 
 import App from './App.vue'
 
@@ -23,6 +24,9 @@ app.use(router)
 
 // 使用国际化
 app.use(i18n)
+
+// 使用 PrimeVue Toast 服务
+app.use(ToastService)
 
 // 使用 PrimeVue UI 组件库
 app.use(PrimeVue, {
