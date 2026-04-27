@@ -158,7 +158,7 @@ async function handleLogin() {
   display: flex;
   min-height: 100vh;
   width: 100%;
-  background: #fff;
+  background: var(--color-bg-card);
 }
 
 /* 左侧装饰区域 */
@@ -166,7 +166,7 @@ async function handleLogin() {
   flex: 1;
   display: none;
   position: relative;
-  background: linear-gradient(135deg, #1a5f4a 0%, #0d3d32 100%);
+  background: linear-gradient(135deg, var(--color-primary-700) 0%, var(--color-primary-900) 100%);
   overflow: hidden;
 }
 
@@ -264,7 +264,7 @@ async function handleLogin() {
   align-items: center;
   justify-content: center;
   padding: 40px 20px;
-  background: #fafbfc;
+  background: var(--color-bg-page);
 }
 
 .form-container {
@@ -280,13 +280,13 @@ async function handleLogin() {
 .form-header h2 {
   font-size: 28px;
   font-weight: 700;
-  color: #1a1a2e;
+  color: var(--color-text-primary);
   margin: 0 0 8px;
 }
 
 .form-header p {
   font-size: 14px;
-  color: #6b7280;
+  color: var(--color-text-secondary);
   margin: 0;
 }
 
@@ -306,7 +306,7 @@ async function handleLogin() {
 .form-group label {
   font-size: 14px;
   font-weight: 500;
-  color: #374151;
+  color: var(--color-text-primary);
 }
 
 .input-container {
@@ -319,27 +319,27 @@ async function handleLogin() {
   position: absolute;
   left: 16px;
   z-index: 1;
-  color: #9ca3af;
+  color: var(--color-text-disabled);
   font-size: 16px;
 }
 
 .input-container :deep(.p-inputtext) {
   width: 100%;
   padding: 14px 16px 14px 44px;
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--color-border);
   border-radius: 12px;
   font-size: 15px;
-  background: #fff;
+  background: var(--color-bg-card);
   transition: all 0.2s ease;
 }
 
 .input-container :deep(.p-inputtext:hover) {
-  border-color: #d1d5db;
+  border-color: var(--color-border-hover);
 }
 
 .input-container :deep(.p-inputtext:focus) {
-  border-color: #1a5f4a;
-  box-shadow: 0 0 0 4px rgba(26, 95, 74, 0.1);
+  border-color: var(--color-primary-500);
+  box-shadow: 0 0 0 4px var(--color-primary-100);
   outline: none;
 }
 
@@ -350,20 +350,20 @@ async function handleLogin() {
 .input-container :deep(.p-password-input) {
   width: 100%;
   padding: 14px 16px 14px 44px;
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--color-border);
   border-radius: 12px;
   font-size: 15px;
-  background: #fff;
+  background: var(--color-bg-card);
   transition: all 0.2s ease;
 }
 
 .input-container :deep(.p-password-input:hover) {
-  border-color: #d1d5db;
+  border-color: var(--color-border-hover);
 }
 
 .input-container :deep(.p-password-input:focus) {
-  border-color: #1a5f4a;
-  box-shadow: 0 0 0 4px rgba(26, 95, 74, 0.1);
+  border-color: var(--color-primary-500);
+  box-shadow: 0 0 0 4px var(--color-primary-100);
   outline: none;
 }
 
@@ -382,36 +382,36 @@ async function handleLogin() {
 
 .remember-me label {
   font-size: 14px;
-  color: #6b7280;
+  color: var(--color-text-secondary);
   cursor: pointer;
   user-select: none;
 }
 
 .remember-me :deep(.p-checkbox .p-checkbox-box) {
-  border: 2px solid #d1d5db;
+  border: 2px solid var(--color-border-hover);
   border-radius: 6px;
   transition: all 0.2s ease;
 }
 
 .remember-me :deep(.p-checkbox .p-checkbox-box:hover) {
-  border-color: #1a5f4a;
+  border-color: var(--color-primary-500);
 }
 
 .remember-me :deep(.p-checkbox .p-checkbox-box.p-highlight) {
-  background: #1a5f4a;
-  border-color: #1a5f4a;
+  background: var(--color-primary-500);
+  border-color: var(--color-primary-500);
 }
 
 .forgot-link {
   font-size: 14px;
-  color: #1a5f4a;
+  color: var(--color-primary-600);
   text-decoration: none;
   font-weight: 500;
   transition: color 0.2s ease;
 }
 
 .forgot-link:hover {
-  color: #0d3d32;
+  color: var(--color-primary-700);
   text-decoration: underline;
 }
 
@@ -422,7 +422,7 @@ async function handleLogin() {
   margin-top: 8px;
   font-size: 16px;
   font-weight: 600;
-  background: #1a5f4a !important;
+  background: var(--color-primary-500) !important;
   border: none !important;
   border-radius: 12px;
   color: #fff !important;
@@ -430,9 +430,9 @@ async function handleLogin() {
 }
 
 .submit-btn:hover {
-  background: #0d3d32 !important;
+  background: var(--color-primary-600) !important;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(26, 95, 74, 0.3) !important;
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3) !important;
 }
 
 .submit-btn:active {
@@ -444,17 +444,17 @@ async function handleLogin() {
   margin-top: 32px;
   text-align: center;
   padding-top: 24px;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--color-border);
 }
 
 .form-footer span {
   font-size: 14px;
-  color: #6b7280;
+  color: var(--color-text-secondary);
 }
 
 .register-link {
   font-size: 14px;
-  color: #1a5f4a;
+  color: var(--color-primary-600);
   font-weight: 600;
   text-decoration: none;
   margin-left: 6px;
@@ -462,7 +462,7 @@ async function handleLogin() {
 }
 
 .register-link:hover {
-  color: #0d3d32;
+  color: var(--color-primary-700);
   text-decoration: underline;
 }
 </style>

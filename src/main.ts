@@ -3,6 +3,7 @@
  * 初始化 Vue 应用、Pinia、Router、i18n 等
  */
 
+import '@/assets/styles/variables.css'
 import '@/assets/styles/public.css'
 import { createApp } from 'vue'
 import pinia from './stores'
