@@ -16,6 +16,10 @@ export const routes: RouteRecordRaw[] = [
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
     component: () => import('@/views/error/NotFoundView.vue'),
-    meta: { title: '404 Not Found' },
+    meta: {
+      title: '404 Not Found',
+      layout: 'BlankLayout',
+      requiresAuth: false
+    },
   },
 ]

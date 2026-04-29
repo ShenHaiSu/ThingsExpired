@@ -29,6 +29,17 @@ export const defaultRoutes: RouteRecordRaw[] = [
       requiresAuth: false,
     },
   },
+  // 忘记密码页 - 使用空白布局
+  {
+    path: '/forgot-password',
+    name: 'ForgotPassword',
+    component: () => import('@/views/login/ForgotPasswordView.vue'),
+    meta: {
+      title: '忘记密码',
+      layout: BlankLayout,
+      requiresAuth: false,
+    },
+  },
   // 首页 - 使用默认布局，需要登录
   {
     path: '/',
@@ -70,6 +81,7 @@ export const defaultRoutes: RouteRecordRaw[] = [
     meta: {
       title: '404 Not Found',
       layout: BlankLayout,
+      requiresAuth: false,
     },
   },
   // 403 页面
@@ -80,6 +92,7 @@ export const defaultRoutes: RouteRecordRaw[] = [
     meta: {
       title: '403 Forbidden',
       layout: BlankLayout,
+      requiresAuth: false,
     },
   },
 ]
