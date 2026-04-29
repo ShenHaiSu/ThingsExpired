@@ -28,7 +28,7 @@ function goHome() {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
+  height: 100%;
   background: var(--surface-ground, #f9fafb);
 }
 
