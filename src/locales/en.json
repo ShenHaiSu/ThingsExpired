@@ -15,7 +15,12 @@
     "error": "Error",
     "warning": "Warning",
     "noData": "No Data",
-    "actions": "Actions"
+    "actions": "Actions",
+    "min": "Min",
+    "max": "Max",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "sort": "Sort"
   },
   "menu": {
     "home": "Home",
@@ -80,6 +85,7 @@
     "category": "Category",
     "quantity": "Quantity",
     "unit": "Unit",
+    "unitPlaceholder": "Enter unit",
     "expiredAt": "Expired At",
     "description": "Description",
     "remindDays": "Remind Days",
@@ -97,6 +103,19 @@
       "expiringSoon": "Expiring Soon",
       "expired": "Expired",
       "used": "Used"
+    },
+    "search": {
+      "title": "Search Items",
+      "keyword": "Keyword",
+      "keywordPlaceholder": "Enter keyword to search",
+      "selectCategory": "Select Category",
+      "selectStatus": "Select Status"
+    },
+    "sort": {
+      "byExpiredAt": "By Expiry Date",
+      "byCreatedAt": "By Creation Date",
+      "byQuantity": "By Quantity",
+      "byName": "By Name"
     }
   }
 }
