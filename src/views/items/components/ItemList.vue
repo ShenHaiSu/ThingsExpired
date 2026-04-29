@@ -103,7 +103,7 @@ const emit = defineEmits<{
 }>()
 
 function getCategoryName(categoryId: number): string {
-  const category = props.categories.find(c => c.category_id === categoryId)
+  const category = props.categories.find((c) => c.category_id === categoryId)
   return category ? category.name : 'Unknown'
 }
 
@@ -170,7 +170,7 @@ function getStatusText(status: ItemStatus): string {
   .content-card {
     padding: 12px;
   }
-  
+
   .action-buttons {
     flex-direction: column;
     gap: 8px;

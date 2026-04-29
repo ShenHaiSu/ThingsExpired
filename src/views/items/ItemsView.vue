@@ -19,11 +19,7 @@
     <ItemStatsCard :stats="stats" />
 
     <!-- 搜索组件 -->
-    <ItemSearch
-      :categories="categoryList"
-      @search="handleSearch"
-      @reset="handleReset"
-    />
+    <ItemSearch :categories="categoryList" @search="handleSearch" @reset="handleReset" />
 
     <!-- 物品列表 - 桌面端 -->
     <div class="desktop-only">

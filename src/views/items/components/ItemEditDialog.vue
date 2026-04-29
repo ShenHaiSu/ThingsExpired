@@ -30,7 +30,11 @@
       </div>
       <div class="form-field">
         <label class="form-label">{{ t('items.unit') }}</label>
-        <InputText v-model="formData.unit" :placeholder="t('items.unitPlaceholder')" class="w-full" />
+        <InputText
+          v-model="formData.unit"
+          :placeholder="t('items.unitPlaceholder')"
+          class="w-full"
+        />
       </div>
     </div>
     <div class="form-field">
@@ -48,12 +52,7 @@
       <InputNumber v-model="formData.remind_days" :min="0" :max="365" class="w-full" />
     </div>
     <template #footer>
-      <Button
-        :label="t('common.cancel')"
-        severity="secondary"
-        text
-        @click="close"
-      />
+      <Button :label="t('common.cancel')" severity="secondary" text @click="close" />
       <Button :label="t('common.save')" icon="pi pi-check" @click="submit" />
     </template>
   </Dialog>
@@ -158,9 +157,10 @@ function close() {
 }
 
 function submit() {
-  const submitData = props.isEdit && props.item
-    ? { ...formData.value, item_id: props.item.item_id }
-    : { ...formData.value }
+  const submitData =
+    props.isEdit && props.item
+      ? { ...formData.value, item_id: props.item.item_id }
+      : { ...formData.value }
   emit('submit', submitData)
 }
 </script>
