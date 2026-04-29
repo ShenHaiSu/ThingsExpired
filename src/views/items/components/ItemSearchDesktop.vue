@@ -9,12 +9,12 @@
 
     <div class="search-fields">
       <div class="search-grid">
-        <!-- 关键词搜索 -->
+        <!-- 名称搜索 -->
         <div class="field-group">
-          <label>{{ t('items.search.keyword') }}</label>
+          <label>{{ t('items.search.name') }}</label>
           <InputText
             v-model="searchParams.name"
-            :placeholder="t('items.search.keywordPlaceholder')"
+            :placeholder="t('items.search.namePlaceholder')"
             class="w-full"
           />
         </div>

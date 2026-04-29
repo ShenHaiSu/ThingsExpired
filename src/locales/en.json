@@ -82,6 +82,7 @@
     "edit": "Edit Item",
     "create": "Create Item",
     "name": "Name",
+    "namePlaceholder": "Item Name",
     "category": "Category",
     "quantity": "Quantity",
     "unit": "Unit",
@@ -106,8 +107,8 @@
     },
     "search": {
       "title": "Search Items",
-      "keyword": "Keyword",
-      "keywordPlaceholder": "Enter keyword to search",
+      "name": "Name",
+      "namePlaceholder": "Enter name to search",
       "selectCategory": "Select Category",
       "selectStatus": "Select Status"
     },

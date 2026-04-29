@@ -82,6 +82,7 @@
     "edit": "编辑物品",
     "create": "创建物品",
     "name": "物品名称",
+    "namePlaceholder": "物品名称",
     "category": "分类",
     "quantity": "数量",
     "unit": "单位",
@@ -106,8 +107,8 @@
     },
     "search": {
       "title": "搜索物品",
-      "keyword": "关键词",
-      "keywordPlaceholder": "请输入关键词搜索",
+      "name": "名称",
+      "namePlaceholder": "请输入名称搜索",
       "selectCategory": "选择分类",
       "selectStatus": "选择状态"
     },

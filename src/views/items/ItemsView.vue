@@ -114,19 +114,42 @@ const stats = ref({
 async function loadItemList() {
   loading.value = true
   try {
-    // 构建查询参数，处理类型转换
+    // 构建查询参数
     const params: any = {
       page: pagination.value.page,
-      pageSize: pagination.value.pageSize,
+      page_size: pagination.value.pageSize,
     }
 
-    // 复制搜索参数，处理类型转换
+    // 复制搜索参数
     const searchParams = currentSearchParams.value
-    if (searchParams.name) params.keyword = searchParams.name
+
+    // 名称搜索（模糊搜索）
+    if (searchParams.name) params.name = searchParams.name
+
+    // 描述搜索（模糊搜索）
+    if (searchParams.description) params.description = searchParams.description
+
+    // 分类筛选
     if (searchParams.category_id) params.category_id = searchParams.category_id
+
+    // 状态筛选
     if (searchParams.status) params.status = searchParams.status as 1 | 2 | 3
-    if (searchParams.order_by) params.sort_by = searchParams.order_by
-    if (searchParams.order) params.sort_order = searchParams.order
+
+    // 数量范围筛选
+    if (searchParams.quantity_min !== undefined) params.quantity_min = searchParams.quantity_min
+    if (searchParams.quantity_max !== undefined) params.quantity_max = searchParams.quantity_max
+
+    // 过期时间范围筛选
+    if (searchParams.expired_at_from) params.expired_at_from = searchParams.expired_at_from
+    if (searchParams.expired_at_to) params.expired_at_to = searchParams.expired_at_to
+
+    // 创建时间范围筛选
+    if (searchParams.created_at_from) params.created_at_from = searchParams.created_at_from
+    if (searchParams.created_at_to) params.created_at_to = searchParams.created_at_to
+
+    // 排序参数
+    if (searchParams.order_by) params.order_by = searchParams.order_by
+    if (searchParams.order) params.order = searchParams.order
 
     const res = await getItemList(params)
     itemList.value = res.data.list
