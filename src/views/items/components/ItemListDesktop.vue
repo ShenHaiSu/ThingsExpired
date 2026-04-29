@@ -3,9 +3,7 @@
     <DataTable
       :value="items"
       :loading="loading"
-      :paginator="true"
-      :rows="10"
-      :rowsPerPageOptions="[5, 10, 20, 50]"
+      :paginator="false"
       stripedRows
       tableStyle="min-width: 50rem"
       :removableSort="true"
@@ -73,6 +71,21 @@
         </template>
       </Column>
     </DataTable>
+    
+    <!-- 自定义分页器 -->
+    <Pagination
+      :total="pagination.total"
+      :current-page="pagination.page"
+      :page-size="pagination.pageSize"
+      :page-size-options="[
+        { label: '5', value: 5 },
+        { label: '10', value: 10 },
+        { label: '20', value: 20 },
+        { label: '50', value: 50 }
+      ]"
+      @update:current-page="handlePageChange"
+      @update:page-size="handlePageSizeChange"
+    />
   </div>
 </template>
 
@@ -85,6 +98,7 @@ import Button from 'primevue/button'
 import { formatDateTime } from '@/utils'
 import { type Item, type ItemStatus } from '@/api/item'
 import { type Category } from '@/api/category'
+import Pagination from '@/components/common/Pagination.vue'
 
 const { t } = useI18n()
 
@@ -92,6 +106,11 @@ interface Props {
   items: Item[]
   categories: Category[]
   loading: boolean
+  pagination: {
+    total: number
+    page: number
+    pageSize: number
+  }
 }
 
 const props = defineProps<Props>()
@@ -100,7 +119,17 @@ const emit = defineEmits<{
   (e: 'edit', item: Item): void
   (e: 'markUsed', id: number): void
   (e: 'delete', id: number): void
+  (e: 'page-change', page: number): void
+  (e: 'page-size-change', size: number): void
 }>()
+
+function handlePageChange(page: number) {
+  emit('page-change', page)
+}
+
+function handlePageSizeChange(size: number) {
+  emit('page-size-change', size)
+}
 
 function getCategoryName(categoryId: number): string {
   const category = props.categories.find((c) => c.category_id === categoryId)

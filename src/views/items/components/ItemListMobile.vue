@@ -77,6 +77,16 @@
         <p>{{ t('common.noData') }}</p>
       </div>
     </div>
+
+    <!-- 自定义分页器 -->
+    <Pagination
+      :total="pagination.total"
+      :current-page="pagination.page"
+      :page-size="pagination.pageSize"
+      :page-size-options="[5, 10, 20, 50]"
+      @update:current-page="handlePageChange"
+      @update:page-size="handlePageSizeChange"
+    />
   </div>
 </template>
 
@@ -87,6 +97,7 @@ import Button from 'primevue/button'
 import { formatDateTime } from '@/utils'
 import { type Item, type ItemStatus } from '@/api/item'
 import { type Category } from '@/api/category'
+import Pagination from '@/components/common/Pagination.vue'
 
 const { t } = useI18n()
 
@@ -94,6 +105,11 @@ interface Props {
   items: Item[]
   categories: Category[]
   loading: boolean
+  pagination: {
+    total: number
+    page: number
+    pageSize: number
+  }
 }
 
 const props = defineProps<Props>()
@@ -102,7 +118,17 @@ const emit = defineEmits<{
   (e: 'edit', item: Item): void
   (e: 'markUsed', id: number): void
   (e: 'delete', id: number): void
+  (e: 'page-change', page: number): void
+  (e: 'page-size-change', size: number): void
 }>()
+
+function handlePageChange(page: number) {
+  emit('page-change', page)
+}
+
+function handlePageSizeChange(size: number) {
+  emit('page-size-change', size)
+}
 
 function getCategoryName(categoryId: number): string {
   const category = props.categories.find((c) => c.category_id === categoryId)

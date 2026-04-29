@@ -98,17 +98,17 @@
             class="w-full"
           />
         </div>
-      </div>
 
-      <!-- 操作按钮 -->
-      <div class="search-actions">
-        <Button :label="t('common.search')" icon="pi pi-search" @click="handleSearch" />
-        <Button
-          :label="t('common.reset')"
-          icon="pi pi-refresh"
-          severity="secondary"
-          @click="handleReset"
-        />
+        <!-- 操作按钮 -->
+        <div class="search-actions">
+          <Button :label="t('common.search')" icon="pi pi-search" @click="handleSearch" />
+          <Button
+            :label="t('common.reset')"
+            icon="pi pi-refresh"
+            severity="secondary"
+            @click="handleReset"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -283,8 +283,8 @@ watch(
 .search-actions {
   display: flex;
   gap: 12px;
-  padding-top: 16px;
-  border-top: 1px solid var(--surface-border, #e5e7eb);
+  grid-column: span 2;
+  align-items: flex-end;
 }
 
 .search-actions :deep(.p-button) {
@@ -300,11 +300,19 @@ watch(
   .search-grid {
     grid-template-columns: repeat(3, 1fr);
   }
+  
+  .search-actions {
+    grid-column: span 1;
+  }
 }
 
 @media (min-width: 1024px) {
   .search-grid {
     grid-template-columns: repeat(4, 1fr);
+  }
+  
+  .search-actions {
+    grid-column: span 2;
   }
 }
 </style>
