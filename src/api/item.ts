@@ -105,22 +105,25 @@ export interface DeleteItemParams {
 /**
  * 物品列表查询参数
  * @description 获取物品列表时支持的查询参数，支持复合搜索和分页
+ * @see {@link https://github.com/things-expired/docs#82-获取物品列表 API文档}
  */
 export interface ItemListParams {
   /** 页码，最小值为1，默认为1 */
   page?: number
   /** 每页数量，1-100，默认为10 */
-  pageSize?: number
+  page_size?: number
   /** 分类ID筛选，最小值为1 */
   category_id?: number
   /** 状态筛选（0: 全部, 1: 正常, 2: 已过期, 3: 已消耗） */
   status?: ItemStatus
-  /** 物品名称筛选，模糊搜索，最多200个字符 */
-  keyword?: string
+  /** 物品名称筛选，模糊搜索 */
+  name?: string
+  /** 物品描述筛选，模糊搜索 */
+  description?: string
   /** 排序字段，可选值: created_at, updated_at, expired_at, name, quantity */
-  sort_by?: 'expired_at' | 'created_at' | 'name' | 'updated_at' | 'quantity'
+  order_by?: 'expired_at' | 'created_at' | 'name' | 'updated_at' | 'quantity'
   /** 排序方向，可选值: asc, desc，默认asc */
-  sort_order?: 'asc' | 'desc'
+  order?: 'asc' | 'desc'
 }
 
 /**
@@ -175,8 +178,6 @@ export interface ItemListResponse {
   total: number
   /** 当前页码 */
   page: number
-  /** 每页数量 */
-  pageSize: number
 }
 
 /**
@@ -232,12 +233,13 @@ export function createItem(data: CreateItemParams) {
  * @requires 认证 - 需要在请求头中携带Token: Authorization: Bearer {token}
  * @param {ItemListParams} [params] - 查询参数
  * @param {number} [params.page] - 页码，最小值为1，默认为1
- * @param {number} [params.pageSize] - 每页数量，1-100，默认为10
+ * @param {number} [params.page_size] - 每页数量，1-100，默认为10
  * @param {number} [params.category_id] - 分类ID筛选，最小值为1
  * @param {ItemStatus} [params.status] - 状态筛选（0: 全部, 1: 正常, 2: 已过期, 3: 已消耗）
- * @param {string} [params.keyword] - 物品名称筛选，模糊搜索，最多200个字符
- * @param {string} [params.sort_by] - 排序字段: created_at, updated_at, expired_at, name, quantity
- * @param {string} [params.sort_order] - 排序方向: asc, desc，默认asc
+ * @param {string} [params.name] - 物品名称筛选，模糊搜索
+ * @param {string} [params.description] - 物品描述筛选，模糊搜索
+ * @param {string} [params.order_by] - 排序字段: created_at, updated_at, expired_at, name, quantity
+ * @param {string} [params.order] - 排序方向: asc, desc，默认asc
  * @returns {Promise<ApiResponse<PaginatedResponse<Item>>>} 成功返回物品列表、总数量和当前页码
  * @throws {Error} code=1002 未授权
  * @throws {Error} code=1001 参数无效
@@ -250,7 +252,7 @@ export function createItem(data: CreateItemParams) {
  * // 分页查询即将过期的物品
  * const response = await getItemList({
  *   page: 1,
- *   pageSize: 10,
+ *   page_size: 10,
  *   category_id: 1,
  *   status: 1,
  *   order_by: 'expired_at',
