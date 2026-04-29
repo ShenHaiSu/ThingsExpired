@@ -15,10 +15,14 @@ export function setupRouterGuards(router: any) {
     // 页面标题
     document.title = (to.meta.title as string) || 'Things Expired'
 
-    // 判断是否需要登录
-    const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
+    // 定义不需要登录的路径（白名单）
+    const publicPaths = ['/login', '/register', '/forgot-password', '/404', '/403']
+    
+    // 检查当前路径是否在白名单中
+    const isPublicPath = publicPaths.some(path => to.path.startsWith(path))
 
-    if (requiresAuth) {
+    if (!isPublicPath) {
+      // 不是白名单路径，需要检查登录状态
       const userStore = useUserStore()
 
       // 检查是否已登录

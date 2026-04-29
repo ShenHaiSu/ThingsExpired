@@ -1,10 +1,13 @@
 <template>
   <div class="error-view">
     <div class="error-content">
+      <div class="error-icon">
+        <i class="pi pi-exclamation-triangle text-6xl text-warning-500"></i>
+      </div>
       <h1 class="error-code">404</h1>
       <p class="error-message">页面未找到</p>
       <p class="error-description">抱歉，您访问的页面不存在</p>
-      <Button label="返回首页" @click="goHome" />
+      <Button label="返回首页" icon="pi pi-home" @click="goHome" />
     </div>
   </div>
 </template>
@@ -25,30 +28,41 @@ function goHome() {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
-  background: #f5f5f5;
+  height: 100%;
+  background: var(--surface-ground, #f9fafb);
 }
 
 .error-content {
   text-align: center;
+  padding: 48px;
+  background: var(--surface-card, #ffffff);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--surface-border, #e5e7eb);
+}
+
+.error-icon {
+  margin-bottom: 16px;
 }
 
 .error-code {
-  font-size: 120px;
-  font-weight: bold;
-  color: #3b82f6;
+  font-size: 72px;
+  font-weight: 700;
+  color: var(--primary-500, #22c55e);
   margin: 0;
+  line-height: 1;
 }
 
 .error-message {
   font-size: 24px;
-  color: #333;
-  margin: 20px 0 10px;
+  font-weight: 600;
+  color: var(--text-color, #1f2937);
+  margin: 16px 0 8px;
 }
 
 .error-description {
   font-size: 14px;
-  color: #666;
-  margin-bottom: 30px;
+  color: var(--text-color-secondary, #6b7280);
+  margin-bottom: 32px;
 }
 </style>

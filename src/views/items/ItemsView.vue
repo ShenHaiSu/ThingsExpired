@@ -1,7 +1,10 @@
 <template>
   <div class="items-view">
     <div class="page-header">
-      <h1>{{ t('items.title') }}</h1>
+      <div class="page-header-left">
+        <i class="pi pi-box text-green-500 text-xl mr-2"></i>
+        <h1 class="page-title">{{ t('items.title') }}</h1>
+      </div>
       <div class="header-actions">
         <Button
           :label="t('items.add')"
@@ -13,114 +16,138 @@
 
     <!-- 统计卡片 -->
     <div class="stats-grid">
-      <Card>
-        <template #title>{{ t('items.stats.total') }}</template>
-        <template #content>
-          <div class="stat-value">{{ stats.total }}</div>
-        </template>
-      </Card>
-      <Card>
-        <template #title>{{ t('items.stats.expiringSoon') }}</template>
-        <template #content>
-          <div class="stat-value warning">{{ stats.expiring_soon }}</div>
-        </template>
-      </Card>
-      <Card>
-        <template #title>{{ t('items.stats.expired') }}</template>
-        <template #content>
-          <div class="stat-value danger">{{ stats.expired }}</div>
-        </template>
-      </Card>
-      <Card>
-        <template #title>{{ t('items.stats.used') }}</template>
-        <template #content>
-          <div class="stat-value success">{{ stats.used }}</div>
-        </template>
-      </Card>
+      <div class="stat-card">
+        <div class="stat-icon bg-green-50">
+          <i class="pi pi-box text-green-500"></i>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">{{ t('items.stats.total') }}</span>
+          <span class="stat-value">{{ stats.total }}</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon bg-orange-50">
+          <i class="pi pi-clock text-orange-500"></i>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">{{ t('items.stats.expiringSoon') }}</span>
+          <span class="stat-value text-orange-500">{{ stats.expiring_soon }}</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon bg-red-50">
+          <i class="pi pi-exclamation-triangle text-red-500"></i>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">{{ t('items.stats.expired') }}</span>
+          <span class="stat-value text-red-500">{{ stats.expired }}</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon bg-teal-50">
+          <i class="pi pi-check-circle text-teal-500"></i>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">{{ t('items.stats.used') }}</span>
+          <span class="stat-value text-teal-500">{{ stats.used }}</span>
+        </div>
+      </div>
     </div>
 
     <!-- 物品列表 -->
-    <DataTable
-      :value="itemList"
-      :loading="loading"
-      :paginator="true"
-      :rows="10"
-      :rowsPerPageOptions="[5, 10, 20, 50]"
-      stripedRows
-      tableStyle="min-width: 50rem"
-      :filters="filters"
-    >
-      <template #header>
-        <div class="table-header">
-          <IconField>
-            <InputIcon class="pi pi-search" />
-            <InputText v-model="filters['global'].value" :placeholder="t('common.search')" />
-          </IconField>
-        </div>
-      </template>
-      <Column field="name" :header="t('items.name')" sortable />
-      <Column field="category_name" :header="t('items.category')">
-        <template #body="slotProps">
-          <Tag :value="slotProps.data.category_name" />
+    <div class="content-card">
+      <DataTable
+        :value="itemList"
+        :loading="loading"
+        :paginator="true"
+        :rows="10"
+        :rowsPerPageOptions="[5, 10, 20, 50]"
+        stripedRows
+        tableStyle="min-width: 50rem"
+        :filters="filters"
+      >
+        <template #header>
+          <div class="table-header">
+            <IconField>
+              <InputIcon class="pi pi-search" />
+              <InputText v-model="filters['global'].value" :placeholder="t('common.search')" />
+            </IconField>
+          </div>
         </template>
-      </Column>
-      <Column field="quantity" :header="t('items.quantity')">
-        <template #body="slotProps">
-          {{ slotProps.data.quantity }} {{ slotProps.data.unit }}
-        </template>
-      </Column>
-      <Column field="expired_at" :header="t('items.expiredAt')" sortable>
-        <template #body="slotProps">
-          <span :class="getExpiredClass(slotProps.data.expired_at)">
-            {{ formatDateTime(slotProps.data.expired_at) }}
-          </span>
-        </template>
-      </Column>
-      <Column field="status" :header="t('items.status.title')">
-        <template #body="slotProps">
-          <Tag :severity="getStatusSeverity(slotProps.data.status)" :value="getStatusText(slotProps.data.status)" />
-        </template>
-      </Column>
-      <Column :header="t('common.actions')">
-        <template #body="slotProps">
-          <Button
-            icon="pi pi-pencil"
-            text
-            rounded
-            @click="openEditDialog(slotProps.data)"
-          />
-          <Button
-            icon="pi pi-check"
-            text
-            rounded
-            severity="success"
-            @click="handleMarkUsed(slotProps.data.item_id)"
-            :title="t('items.markAsUsed')"
-          />
-          <Button
-            icon="pi pi-trash"
-            text
-            rounded
-            severity="danger"
-            @click="handleDelete(slotProps.data.item_id)"
-          />
-        </template>
-      </Column>
-    </DataTable>
+        <Column field="name" :header="t('items.name')" sortable>
+          <template #body="slotProps">
+            <span class="font-medium">{{ slotProps.data.name }}</span>
+          </template>
+        </Column>
+        <Column field="category_name" :header="t('items.category')">
+          <template #body="slotProps">
+            <Tag :value="slotProps.data.category_name" severity="success" rounded />
+          </template>
+        </Column>
+        <Column field="quantity" :header="t('items.quantity')">
+          <template #body="slotProps">
+            <span class="text-sm">{{ slotProps.data.quantity }} {{ slotProps.data.unit }}</span>
+          </template>
+        </Column>
+        <Column field="expired_at" :header="t('items.expiredAt')" sortable>
+          <template #body="slotProps">
+            <span :class="getExpiredClass(slotProps.data.expired_at)" class="text-sm">
+              {{ formatDateTime(slotProps.data.expired_at) }}
+            </span>
+          </template>
+        </Column>
+        <Column field="status" :header="t('items.status.title')" align="center">
+          <template #body="slotProps">
+            <Tag :severity="getStatusSeverity(slotProps.data.status)" :value="getStatusText(slotProps.data.status)" rounded />
+          </template>
+        </Column>
+        <Column :header="t('common.actions')" align="center">
+          <template #body="slotProps">
+            <div class="action-buttons">
+              <Button
+                icon="pi pi-pencil"
+                text
+                rounded
+                severity="secondary"
+                @click="openEditDialog(slotProps.data)"
+                v-tooltip.top="t('common.edit')"
+              />
+              <Button
+                icon="pi pi-check"
+                text
+                rounded
+                severity="success"
+                @click="handleMarkUsed(slotProps.data.item_id)"
+                v-tooltip.top="t('items.markAsUsed')"
+              />
+              <Button
+                icon="pi pi-trash"
+                text
+                rounded
+                severity="danger"
+                @click="handleDelete(slotProps.data.item_id)"
+                v-tooltip.top="t('common.delete')"
+              />
+            </div>
+          </template>
+        </Column>
+      </DataTable>
+    </div>
 
     <!-- 创建/编辑对话框 -->
     <Dialog
       v-model:visible="dialogVisible"
       :header="isEdit ? t('items.edit') : t('items.create')"
       modal
-      :style="{ width: '500px' }"
+      :style="{ width: '520px' }"
+      :breakpoints="{ '640px': '90vw' }"
     >
       <div class="form-field">
-        <label>{{ t('items.name') }} *</label>
-        <InputText v-model="formData.name" />
+        <label class="form-label">{{ t('items.name') }} <span class="text-red-500">*</span></label>
+        <InputText v-model="formData.name" :placeholder="t('items.namePlaceholder')" />
       </div>
       <div class="form-field">
-        <label>{{ t('items.category') }} *</label>
+        <label class="form-label">{{ t('items.category') }} <span class="text-red-500">*</span></label>
         <Select
           v-model="formData.category_id"
           :options="categoryOptions"
@@ -131,29 +158,29 @@
       </div>
       <div class="form-row">
         <div class="form-field">
-          <label>{{ t('items.quantity') }}</label>
+          <label class="form-label">{{ t('items.quantity') }}</label>
           <InputNumber v-model="formData.quantity" :min="1" />
         </div>
         <div class="form-field">
-          <label>{{ t('items.unit') }}</label>
-          <InputText v-model="formData.unit" />
+          <label class="form-label">{{ t('items.unit') }}</label>
+          <InputText v-model="formData.unit" :placeholder="t('items.unitPlaceholder')" />
         </div>
       </div>
       <div class="form-field">
-        <label>{{ t('items.expiredAt') }} *</label>
+        <label class="form-label">{{ t('items.expiredAt') }} <span class="text-red-500">*</span></label>
         <DatePicker v-model="expiredAtDate" showTime hourFormat="24" />
       </div>
       <div class="form-field">
-        <label>{{ t('items.description') }}</label>
+        <label class="form-label">{{ t('items.description') }}</label>
         <Textarea v-model="formData.description" rows="3" />
       </div>
       <div class="form-field">
-        <label>{{ t('items.remindDays') }}</label>
+        <label class="form-label">{{ t('items.remindDays') }}</label>
         <InputNumber v-model="formData.remind_days" :min="0" :max="365" />
       </div>
       <template #footer>
-        <Button :label="t('common.cancel')" text @click="dialogVisible = false" />
-        <Button :label="t('common.save')" @click="handleSubmit" />
+        <Button :label="t('common.cancel')" severity="secondary" text @click="dialogVisible = false" />
+        <Button :label="t('common.save')" icon="pi pi-check" @click="handleSubmit" />
       </template>
     </Dialog>
   </div>
@@ -163,7 +190,6 @@
 import { ref, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
-import Card from 'primevue/card'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Tag from 'primevue/tag'
@@ -280,17 +306,17 @@ function getExpiredClass(expiredAt: string): string {
   const expired = new Date(expiredAt)
   const diffDays = Math.ceil((expired.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
 
-  if (diffDays < 0) return 'text-danger'
-  if (diffDays <= 7) return 'text-warning'
+  if (diffDays < 0) return 'expired-text'
+  if (diffDays <= 7) return 'warning-text'
   return ''
 }
 
-// 获取状态严重程度
-function getStatusSeverity(status: ItemStatus): 'success' | 'info' | 'warn' | 'danger' | undefined {
-  const map: Record<ItemStatus, 'success' | 'info' | 'warn' | 'danger'> = {
-    1: 'info',
-    2: 'warn',
-    3: 'success',
+// 获取状态严重程度 - 按照设计规范使用绿色系
+function getStatusSeverity(status: ItemStatus): 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast' | undefined {
+  const map: Record<ItemStatus, 'success' | 'danger' | 'info'> = {
+    1: 'success',    // 正常 - 绿色
+    2: 'danger',     // 已过期 - 红色
+    3: 'info',       // 已消耗 - 青色（替代蓝色）
   }
   return map[status]
 }
@@ -387,16 +413,30 @@ onMounted(() => {
 
 <style scoped>
 .items-view {
-  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
+.page-header-left {
+  display: flex;
+  align-items: center;
+}
+
+.page-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-color, #1f2937);
+  margin: 0;
+}
+
+/* 统计卡片 */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -404,17 +444,61 @@ onMounted(() => {
   margin-bottom: 24px;
 }
 
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: var(--surface-card, #ffffff);
+  border-radius: 10px;
+  border: 1px solid var(--surface-border, #e5e7eb);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stat-icon i {
+  font-size: 1.25rem;
+}
+
+.stat-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: var(--text-color-secondary, #6b7280);
+}
+
 .stat-value {
-  font-size: 2rem;
-  font-weight: bold;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-color, #1f2937);
+  line-height: 1;
 }
 
-.text-danger {
-  color: #ef4444;
-}
-
-.text-warning {
-  color: #f59e0b;
+/* 内容卡片 */
+.content-card {
+  background: var(--surface-card, #ffffff);
+  border-radius: 10px;
+  border: 1px solid var(--surface-border, #e5e7eb);
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .table-header {
@@ -422,14 +506,35 @@ onMounted(() => {
   justify-content: flex-end;
 }
 
-.form-field {
-  margin-bottom: 16px;
+/* 过期文本颜色 - 遵循设计规范 */
+.expired-text {
+  color: var(--color-danger, #ef4444);
+  font-weight: 500;
 }
 
-.form-field label {
-  display: block;
-  margin-bottom: 8px;
+.warning-text {
+  color: var(--color-warning, #f59e0b);
   font-weight: 500;
+}
+
+/* 操作按钮组 */
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+}
+
+/* 表单样式 */
+.form-field {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-color, #1f2937);
 }
 
 .form-field :deep(.p-inputtext),
@@ -444,5 +549,16 @@ onMounted(() => {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

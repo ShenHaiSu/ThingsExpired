@@ -1,0 +1,145 @@
+/**
+ * Things Expired 颜色变量定义
+ * 
+ * 禁止使用蓝色和紫色，统一使用绿色系作为主色调
+ * 
+ * 使用方式：
+ * - 在 CSS 中使用：var(--color-primary)
+ * - 在 Tailwind 中使用：bg-[var(--color-primary)]
+ */
+
+/* ========================================
+   主色 - 绿色系
+   ======================================== */
+:root {
+  /* 主色 - 绿色系（深绿色） */
+  --color-primary-50: #dcfce7;
+  --color-primary-100: #bbf7d0;
+  --color-primary-200: #86efac;
+  --color-primary-300: #4ade80;
+  --color-primary-400: #22c55e;
+  --color-primary-500: #16a34a;  /* 主色 */
+  --color-primary-600: #15803d;  /* 悬停 */
+  --color-primary-700: #166534;  /* 按下 */
+  --color-primary-800: #14532d;
+  --color-primary-900: #0f3622;
+
+  /* 语义颜色 */
+  --color-primary: var(--color-primary-500);
+  --color-primary-hover: var(--color-primary-600);
+  --color-primary-active: var(--color-primary-700);
+
+  /* 成功 - 绿色 */
+  --color-success: #16a34a;
+  --color-success-bg: #bbf7d0;
+  --color-success-text: #14532d;
+
+  /* 警告 - 黄色/橙色 */
+  --color-warning: #f59e0b;
+  --color-warning-bg: #fef3c7;
+  --color-warning-text: #92400e;
+
+  /* 危险 - 红色 */
+  --color-danger: #ef4444;
+  --color-danger-bg: #fee2e2;
+  --color-danger-text: #991b1b;
+
+  /* 信息 - 青色（替代蓝色） */
+  --color-info: #14b8a6;
+  --color-info-bg: #ccfbf1;
+  --color-info-text: #0f766e;
+
+  /* 文字颜色 */
+  --color-text-primary: #1f2937;
+  --color-text-secondary: #6b7280;
+  --color-text-disabled: #9ca3af;
+
+  /* 边框颜色 */
+  --color-border: #e5e7eb;
+  --color-border-hover: #d1d5db;
+  --color-border-focus: var(--color-primary-500);
+
+  /* 背景颜色 */
+  --color-bg-page: #f9fafb;
+  --color-bg-card: #ffffff;
+  --color-bg-hover: #f3f4f6;
+  --color-bg-active: #e5e7eb;
+
+  /* 阴影颜色 */
+  --color-shadow: rgba(0, 0, 0, 0.1);
+  --color-shadow-lg: rgba(0, 0, 0, 0.15);
+}
+
+/* ========================================
+   PrimeVue 主题覆盖 - 绿色系
+   ======================================== */
+
+/* 按钮主色覆盖 */
+.p-button {
+  --p-button-primary-background: var(--color-primary-500);
+  --p-button-primary-border-color: var(--color-primary-500);
+  --p-button-primary-hover-background: var(--color-primary-600);
+  --p-button-primary-hover-border-color: var(--color-primary-600);
+  --p-button-primary-active-background: var(--color-primary-700);
+  --p-button-primary-active-border-color: var(--color-primary-700);
+}
+
+/* 输入框聚焦颜色 */
+.p-inputtext:focus,
+.p-inputtext.p-focus {
+  border-color: var(--color-primary-500);
+  box-shadow: 0 0 0 2px var(--color-primary-100);
+}
+
+.p-password-input:focus,
+.p-password-input.p-focus {
+  border-color: var(--color-primary-500);
+  box-shadow: 0 0 0 2px var(--color-primary-100);
+}
+
+/* 复选框选中颜色 */
+.p-checkbox .p-checkbox-box.p-highlight {
+  background: var(--color-primary-500);
+  border-color: var(--color-primary-500);
+}
+
+.p-checkbox .p-checkbox-box:hover {
+  border-color: var(--color-primary-600);
+}
+
+/* 链接颜色 */
+a {
+  color: var(--color-primary-600);
+}
+
+a:hover {
+  color: var(--color-primary-700);
+}
+
+/* ========================================
+   状态标签颜色
+   ======================================== */
+
+/* 正常状态 - 绿色 */
+.status-normal {
+  background-color: var(--color-success-bg);
+  color: var(--color-success-text);
+}
+
+/* 已过期 - 红色 */
+.status-expired {
+  background-color: var(--color-danger-bg);
+  color: var(--color-danger-text);
+}
+
+/* 已消耗 - 青色 */
+.status-consumed {
+  background-color: var(--color-info-bg);
+  color: var(--color-info-text);
+}
+
+/* 即将过期 - 警告色 */
+.status-warning {
+  background-color: var(--color-warning-bg);
+  color: var(--color-warning-text);
+}
