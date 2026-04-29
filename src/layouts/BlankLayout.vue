@@ -21,6 +21,7 @@
   width: 100%;
   min-height: 100vh;
   background: var(--surface-ground, #f9fafb);
+  padding: 16px;
 }
 
 /* 页面过渡动画 */
@@ -32,5 +33,14 @@
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+/* 移动端适配 */
+@media (max-width: 640px) {
+  .blank-layout {
+    padding: 12px;
+    align-items: flex-start;
+    padding-top: 24px;
+  }
 }
 </style>
