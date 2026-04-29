@@ -48,7 +48,16 @@
     "passwordMismatch": "Passwords do not match",
     "passwordTooShort": "Password must be at least 6 characters",
     "registerSuccess": "Registration successful, please login",
-    "registerFailed": "Registration failed, please try again later"
+    "registerFailed": "Registration failed, please try again later",
+    "welcomeBack": "Welcome Back",
+    "pleaseLogin": "Please login to your account",
+    "createAccount": "Create Account",
+    "startManaging": "Start managing your expired items",
+    "sendResetLink": "Send Reset Link",
+    "resetPasswordHint": "Please enter your email, we will send a reset password link",
+    "fillEmail": "Please enter your email address",
+    "rememberPassword": "Remember your password?",
+    "backToLogin": "Back to Login"
   },
   "category": {
     "title": "Categories",
