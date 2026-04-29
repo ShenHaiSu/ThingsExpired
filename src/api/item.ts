@@ -124,6 +124,47 @@ export interface ItemListParams {
 }
 
 /**
+ * 物品搜索参数
+ * @description 支持复杂复合搜索的参数定义
+ */
+export interface ItemSearchParams {
+  /** 页码，最小值为1，默认为1 */
+  page?: number
+  /** 每页数量，1-100，默认为10 */
+  page_size?: number
+  /** 分类ID筛选，最小值为1 */
+  category_id?: number
+  /** 物品名称筛选，模糊搜索 */
+  name?: string
+  /** 物品描述筛选，模糊搜索 */
+  description?: string
+  /** 单位筛选 */
+  unit?: string
+  /** 状态筛选（0: 全部, 1: 正常, 2: 已过期, 3: 已消耗） */
+  status?: number
+  /** 最小数量筛选 */
+  quantity_min?: number
+  /** 最大数量筛选 */
+  quantity_max?: number
+  /** 最小提前提醒天数筛选 */
+  remind_days_min?: number
+  /** 最大提前提醒天数筛选 */
+  remind_days_max?: number
+  /** 过期时间起始日期（YYYY-MM-DD） */
+  expired_at_from?: string
+  /** 过期时间结束日期（YYYY-MM-DD） */
+  expired_at_to?: string
+  /** 创建时间起始日期（YYYY-MM-DD） */
+  created_at_from?: string
+  /** 创建时间结束日期（YYYY-MM-DD） */
+  created_at_to?: string
+  /** 排序字段 */
+  order_by?: 'created_at' | 'updated_at' | 'expired_at' | 'name' | 'quantity'
+  /** 排序方向 */
+  order?: 'asc' | 'desc'
+}
+
+/**
  * 物品列表响应
  * @description 获取物品列表的响应结构
  */

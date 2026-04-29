@@ -10,7 +10,10 @@ import dayjs from 'dayjs'
  * @param date 日期字符串、数字或 Date 对象
  * @param format 格式化模板，默认为 'YYYY-MM-DD HH:mm:ss'
  */
-export function formatDateTime(date?: string | number | Date, format: string = 'YYYY-MM-DD HH:mm:ss'): string {
+export function formatDateTime(
+  date?: string | number | Date,
+  format: string = 'YYYY-MM-DD HH:mm:ss',
+): string {
   if (!date) return '-'
   return dayjs(date).format(format)
 }
@@ -64,7 +67,11 @@ export function formatFileSize(bytes: number): string {
  * @param isDecimal 是否为小数形式（true: 0.5, false: 50）
  * @param decimals 保留小数位数
  */
-export function formatPercent(value: number, isDecimal: boolean = false, decimals: number = 0): string {
+export function formatPercent(
+  value: number,
+  isDecimal: boolean = false,
+  decimals: number = 0,
+): string {
   const num = isDecimal ? value * 100 : value
   return `${num.toFixed(decimals)}%`
 }
