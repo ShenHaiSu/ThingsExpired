@@ -85,6 +85,7 @@
     "category": "Category",
     "quantity": "Quantity",
     "unit": "Unit",
+    "unitPlaceholder": "Enter unit",
     "expiredAt": "Expired At",
     "description": "Description",
     "remindDays": "Remind Days",

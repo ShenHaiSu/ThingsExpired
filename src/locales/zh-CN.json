@@ -85,6 +85,7 @@
     "category": "分类",
     "quantity": "数量",
     "unit": "单位",
+    "unitPlaceholder": "请输入单位",
     "expiredAt": "过期时间",
     "description": "描述",
     "remindDays": "提前提醒天数",

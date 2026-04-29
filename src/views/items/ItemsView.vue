@@ -23,7 +23,7 @@
 
     <!-- 物品列表 - 桌面端 -->
     <div class="desktop-only">
-      <ItemList
+      <ItemListDesktop
         :items="filteredItems"
         :categories="categoryList"
         :loading="loading"
@@ -35,7 +35,7 @@
 
     <!-- 物品列表 - 移动端 -->
     <div class="mobile-only">
-      <ItemMobileList
+      <ItemListMobile
         :items="filteredItems"
         :categories="categoryList"
         :loading="loading"
@@ -62,8 +62,8 @@ import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import ItemStatsCard from './components/ItemStatsCard.vue'
 import ItemSearch from './components/ItemSearch.vue'
-import ItemList from './components/ItemList.vue'
-import ItemMobileList from './components/ItemMobileList.vue'
+import ItemListDesktop from './components/ItemListDesktop.vue'
+import ItemListMobile from './components/ItemListMobile.vue'
 import ItemEditDialog from './components/ItemEditDialog.vue'
 import {
   getItemList,
