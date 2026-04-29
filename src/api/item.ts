@@ -6,6 +6,7 @@
 
 import { post } from '@/api'
 import type { ApiResponse, PaginatedResponse } from '@/types'
+import { isUtcFormat, toUtcFormat } from '@/utils/date'
 
 // ============ 类型定义 ============
 
@@ -223,7 +224,16 @@ export interface ExpiringItem extends Item {
  * ```
  */
 export function createItem(data: CreateItemParams) {
-  return post<ApiResponse<Item>>('/item/create', data)
+  // 检查并转换过期日期为UTC格式
+  let expiredAt = data.expired_at
+  if (expiredAt && !isUtcFormat(expiredAt)) {
+    expiredAt = toUtcFormat(expiredAt)
+  }
+  
+  return post<ApiResponse<Item>>('/item/create', {
+    ...data,
+    expired_at: expiredAt,
+  })
 }
 
 /**
@@ -314,7 +324,16 @@ export function getItemDetail(itemId: number) {
  * ```
  */
 export function updateItem(data: UpdateItemParams) {
-  return post<ApiResponse<Item>>('/item/update', data)
+  // 检查并转换过期日期为UTC格式
+  let expiredAt = data.expired_at
+  if (expiredAt && !isUtcFormat(expiredAt)) {
+    expiredAt = toUtcFormat(expiredAt)
+  }
+  
+  return post<ApiResponse<Item>>('/item/update', {
+    ...data,
+    expired_at: expiredAt,
+  })
 }
 
 /**

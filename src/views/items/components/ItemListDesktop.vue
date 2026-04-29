@@ -27,7 +27,7 @@
       <Column field="expired_at" :header="t('items.expiredAt')" sortable>
         <template #body="slotProps">
           <span :class="getExpiredClass(slotProps.data.expired_at)" class="text-sm">
-            {{ formatDateTime(slotProps.data.expired_at) }}
+            {{ getExpiredDisplay(slotProps.data.expired_at) }}
           </span>
         </template>
       </Column>
@@ -111,9 +111,12 @@ interface Props {
     page: number
     pageSize: number
   }
+  defaultMode?: 'production' | 'expiry'
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  defaultMode: 'production',
+})
 
 const emit = defineEmits<{
   (e: 'edit', item: Item): void
@@ -144,6 +147,23 @@ function getExpiredClass(expiredAt: string): string {
   if (diffDays < 0) return 'expired-text'
   if (diffDays <= 7) return 'warning-text'
   return ''
+}
+
+// 获取过期日期显示文本
+function getExpiredDisplay(expiredAt: string): string {
+  const now = new Date()
+  const expired = new Date(expiredAt)
+  const diffDays = Math.ceil((expired.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+
+  if (diffDays < 0) {
+    return `已过期 ${Math.abs(diffDays)} 天`
+  } else if (diffDays === 0) {
+    return '今天过期'
+  } else if (diffDays === 1) {
+    return '明天过期'
+  } else {
+    return `还有 ${diffDays} 天过期`
+  }
 }
 
 function getStatusSeverity(

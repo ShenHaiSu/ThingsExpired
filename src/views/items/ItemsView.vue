@@ -28,6 +28,7 @@
         :categories="categoryList"
         :loading="loading"
         :pagination="pagination"
+        :default-mode="'expiry'"
         @edit="openEditDialog"
         @markUsed="handleMarkUsed"
         @delete="handleDelete"
@@ -43,6 +44,7 @@
         :categories="categoryList"
         :loading="loading"
         :pagination="pagination"
+        :default-mode="'expiry'"
         @edit="openEditDialog"
         @markUsed="handleMarkUsed"
         @delete="handleDelete"
@@ -57,6 +59,7 @@
       :is-edit="isEdit"
       :item="editingItem"
       :categories="categoryList"
+      :default-mode="'expiry'"
       @submit="handleSubmit"
     />
   </div>
@@ -83,6 +86,7 @@ import {
   type ItemSearchParams,
 } from '@/api/item'
 import { getCategoryList, type Category } from '@/api/category'
+import { isUtcFormat, toUtcFormat } from '@/utils/date'
 
 const { t } = useI18n()
 
@@ -198,6 +202,12 @@ function openEditDialog(item: Item) {
 // 提交表单
 async function handleSubmit(data: CreateItemParams & { item_id?: number }) {
   try {
+    // 检查并转换过期日期为UTC格式
+    let expiredAt = data.expired_at
+    if (expiredAt && !isUtcFormat(expiredAt)) {
+      expiredAt = toUtcFormat(expiredAt)
+    }
+
     if (isEdit.value && data.item_id) {
       await updateItem({
         item_id: data.item_id,
@@ -206,11 +216,14 @@ async function handleSubmit(data: CreateItemParams & { item_id?: number }) {
         description: data.description,
         quantity: data.quantity,
         unit: data.unit,
-        expired_at: data.expired_at,
+        expired_at: expiredAt,
         remind_days: data.remind_days,
       })
     } else {
-      await createItem(data)
+      await createItem({
+        ...data,
+        expired_at: expiredAt,
+      })
     }
     dialogVisible.value = false
     loadItemList()

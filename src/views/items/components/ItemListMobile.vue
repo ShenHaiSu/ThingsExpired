@@ -37,7 +37,7 @@
           <div class="info-row">
             <span class="info-label">{{ t('items.expiredAt') }}:</span>
             <span :class="getExpiredClass(item.expired_at)" class="info-value">
-              {{ formatDateTime(item.expired_at) }}
+              {{ getExpiredDisplay(item.expired_at) }}
             </span>
           </div>
         </div>
@@ -83,7 +83,12 @@
       :total="pagination.total"
       :current-page="pagination.page"
       :page-size="pagination.pageSize"
-      :page-size-options="[5, 10, 20, 50]"
+      :page-size-options="[
+        { label: '5', value: 5 },
+        { label: '10', value: 10 },
+        { label: '20', value: 20 },
+        { label: '50', value: 50 }
+      ]"
       @update:current-page="handlePageChange"
       @update:page-size="handlePageSizeChange"
     />
@@ -110,9 +115,12 @@ interface Props {
     page: number
     pageSize: number
   }
+  defaultMode?: 'production' | 'expiry'
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  defaultMode: 'production',
+})
 
 const emit = defineEmits<{
   (e: 'edit', item: Item): void
@@ -133,6 +141,23 @@ function handlePageSizeChange(size: number) {
 function getCategoryName(categoryId: number): string {
   const category = props.categories.find((c) => c.category_id === categoryId)
   return category ? category.name : 'Unknown'
+}
+
+// 获取过期日期显示文本
+function getExpiredDisplay(expiredAt: string): string {
+  const now = new Date()
+  const expired = new Date(expiredAt)
+  const diffDays = Math.ceil((expired.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+
+  if (diffDays < 0) {
+    return `已过期 ${Math.abs(diffDays)} 天`
+  } else if (diffDays === 0) {
+    return '今天过期'
+  } else if (diffDays === 1) {
+    return '明天过期'
+  } else {
+    return `还有 ${diffDays} 天过期`
+  }
 }
 
 function getExpiredClass(expiredAt: string): string {

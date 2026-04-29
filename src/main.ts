@@ -14,6 +14,10 @@ import Aura from '@primeuix/themes/aura'
 import ToastService from 'primevue/toastservice'
 import Tooltip from 'primevue/tooltip'
 
+// Import PrimeVue locale files
+import primevueEn from './locales/primevue-en.json'
+import primevueZhCN from './locales/primevue-zh-CN.json'
+
 import App from './App.vue'
 
 const app = createApp(App)
@@ -39,6 +43,10 @@ app.use(PrimeVue, {
     preset: Aura,
   },
   ripple: true,
+  locale: {
+    en: primevueEn,
+    'zh-CN': primevueZhCN,
+  },
 })
 
 // 挂载应用

@@ -6,6 +6,7 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { localCache } from '@/utils/storage'
+import { usePrimeVue } from 'primevue/config'
 
 // ============ 类型定义 ============
 
@@ -85,6 +86,12 @@ export const useAppStore = defineStore('app', () => {
   function setLocale(newLocale: Locale) {
     locale.value = newLocale
     localCache.set('locale', newLocale)
+    
+    // 同步 PrimeVue 本地化
+    const primeVue = usePrimeVue()
+    if (primeVue) {
+      primeVue.config.locale = newLocale
+    }
   }
 
   /**
