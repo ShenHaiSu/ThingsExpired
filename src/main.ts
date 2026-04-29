@@ -12,6 +12,7 @@ import i18n from './locales'
 import PrimeVue from 'primevue/config'
 import Aura from '@primeuix/themes/aura'
 import ToastService from 'primevue/toastservice'
+import Tooltip from 'primevue/tooltip'
 
 import App from './App.vue'
 
@@ -28,6 +29,9 @@ app.use(i18n)
 
 // 使用 PrimeVue Toast 服务
 app.use(ToastService)
+
+// 使用 PrimeVue Tooltip 服务
+app.directive('tooltip', Tooltip)
 
 // 使用 PrimeVue UI 组件库
 app.use(PrimeVue, {
