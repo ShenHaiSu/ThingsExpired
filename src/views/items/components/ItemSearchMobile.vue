@@ -228,11 +228,15 @@ watch(
   justify-content: space-between;
   padding: 12px 16px;
   cursor: pointer;
-  border-bottom: 1px solid var(--surface-border, #e5e7eb);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .search-toggle i {
-  color: var(--text-color-secondary, #6b7280);
+  color: var(--color-text-secondary);
+}
+
+.search-toggle span {
+  color: var(--color-text-primary);
 }
 
 .search-content {
@@ -250,7 +254,7 @@ watch(
 .field-group label {
   font-size: 13px;
   font-weight: 500;
-  color: var(--text-color-secondary, #6b7280);
+  color: var(--color-text-secondary);
 }
 
 /* 范围输入样式 */
@@ -262,7 +266,7 @@ watch(
 }
 
 .range-separator {
-  color: var(--text-color-secondary, #6b7280);
+  color: var(--color-text-secondary);
   flex-shrink: 0;
 }
 
@@ -272,7 +276,7 @@ watch(
   flex-direction: column;
   gap: 12px;
   padding-top: 16px;
-  border-top: 1px solid var(--surface-border, #e5e7eb);
+  border-top: 1px solid var(--color-border);
 }
 
 .search-actions :deep(.p-button) {

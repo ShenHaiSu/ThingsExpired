@@ -54,7 +54,6 @@ const { t } = useI18n()
 
 <style scoped>
 .home-view {
-  max-width: 960px;
   margin: 0 auto;
 }
 

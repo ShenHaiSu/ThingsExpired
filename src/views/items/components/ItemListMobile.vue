@@ -216,25 +216,25 @@ function getStatusText(status: ItemStatus): string {
 }
 
 .item-card {
-  background: var(--surface-card, #ffffff);
+  background: var(--color-bg-card);
   border-radius: 10px;
-  border: 1px solid var(--surface-border, #e5e7eb);
+  border: 1px solid var(--color-border);
   padding: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px var(--color-shadow);
   transition: all 0.2s ease;
 }
 
 .item-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 12px var(--color-shadow-lg);
 }
 
 /* 过期状态边框高亮 */
 .card-expired {
-  border-left: 4px solid var(--color-danger, #ef4444);
+  border-left: 4px solid var(--color-danger);
 }
 
 .card-warning {
-  border-left: 4px solid var(--color-warning, #f59e0b);
+  border-left: 4px solid var(--color-warning);
 }
 
 .card-header {
@@ -247,7 +247,7 @@ function getStatusText(status: ItemStatus): string {
 .item-name {
   font-weight: 600;
   font-size: 16px;
-  color: var(--text-color, #1f2937);
+  color: var(--color-text-primary);
   flex: 1;
   margin-right: 8px;
   white-space: nowrap;
@@ -274,12 +274,12 @@ function getStatusText(status: ItemStatus): string {
 }
 
 .info-label {
-  color: var(--text-color-secondary, #6b7280);
+  color: var(--color-text-secondary);
   flex-shrink: 0;
 }
 
 .info-value {
-  color: var(--text-color, #1f2937);
+  color: var(--color-text-primary);
 }
 
 .category-tag {
@@ -289,12 +289,12 @@ function getStatusText(status: ItemStatus): string {
 
 /* 过期文本颜色 */
 .expired-text {
-  color: var(--color-danger, #ef4444);
+  color: var(--color-danger);
   font-weight: 500;
 }
 
 .warning-text {
-  color: var(--color-warning, #f59e0b);
+  color: var(--color-warning);
   font-weight: 500;
 }
 
@@ -302,12 +302,12 @@ function getStatusText(status: ItemStatus): string {
   display: flex;
   gap: 4px;
   padding-top: 8px;
-  border-top: 1px solid var(--surface-border, #e5e7eb);
+  border-top: 1px solid var(--color-border);
 }
 
 .empty-state {
   text-align: center;
   padding: 40px 20px;
-  color: var(--text-color-secondary, #6b7280);
+  color: var(--color-text-secondary);
 }
 </style>

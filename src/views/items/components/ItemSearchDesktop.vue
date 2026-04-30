@@ -229,7 +229,7 @@ watch(
 
 .search-header {
   padding: 16px;
-  border-bottom: 1px solid var(--surface-border, #e5e7eb);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .search-title {
@@ -239,7 +239,11 @@ watch(
   margin: 0;
   font-size: 16px;
   font-weight: 600;
-  color: var(--text-color, #1f2937);
+  color: var(--color-text-primary);
+}
+
+.search-title i {
+  color: var(--color-primary-500);
 }
 
 .search-fields {
@@ -263,7 +267,7 @@ watch(
 .field-group label {
   font-size: 13px;
   font-weight: 500;
-  color: var(--text-color-secondary, #6b7280);
+  color: var(--color-text-secondary);
 }
 
 /* 范围输入样式 */
@@ -275,7 +279,7 @@ watch(
 }
 
 .range-separator {
-  color: var(--text-color-secondary, #6b7280);
+  color: var(--color-text-secondary);
   flex-shrink: 0;
 }
 

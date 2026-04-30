@@ -194,21 +194,21 @@ function getStatusText(status: ItemStatus): string {
 
 <style scoped>
 .content-card {
-  background: var(--surface-card, #ffffff);
+  background: var(--color-bg-card);
   border-radius: 10px;
-  border: 1px solid var(--surface-border, #e5e7eb);
+  border: 1px solid var(--color-border);
   padding: 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px var(--color-shadow);
 }
 
 /* 过期文本颜色 - 遵循设计规范 */
 .expired-text {
-  color: var(--color-danger, #ef4444);
+  color: var(--color-danger);
   font-weight: 500;
 }
 
 .warning-text {
-  color: var(--color-warning, #f59e0b);
+  color: var(--color-warning);
   font-weight: 500;
 }
 

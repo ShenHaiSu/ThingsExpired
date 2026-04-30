@@ -50,10 +50,10 @@ function handleReset() {
 
 <style scoped>
 .search-panel {
-  background: var(--surface-card, #ffffff);
+  background: var(--color-bg-card);
   border-radius: 10px;
-  border: 1px solid var(--surface-border, #e5e7eb);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 1px 3px var(--color-shadow);
   margin-bottom: 24px;
 }
 </style>

@@ -284,7 +284,7 @@ function submit() {
   margin-bottom: 6px;
   font-size: 14px;
   font-weight: 500;
-  color: var(--text-color, #1f2937);
+  color: var(--color-text-primary);
 }
 
 .form-row {
@@ -306,7 +306,7 @@ function submit() {
   
   :deep(.p-inputgroup > *:first-child) {
     border-radius: 6px 6px 0 0;
-    border-right: 1px solid var(--surface-border);
+    border-right: 1px solid var(--color-border);
   }
   
   :deep(.p-inputgroup > *:last-child) {
