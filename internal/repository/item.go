@@ -2,10 +2,10 @@ package repository
 
 import (
 	"context"
-	"time"
 
 	"things-expired/internal/model"
 	"things-expired/internal/model/dto"
+	"things-expired/pkg/utils"
 
 	"gorm.io/gorm"
 )
@@ -53,7 +53,7 @@ func (r *ItemRepository) List(ctx context.Context, userID uint, req *dto.ItemLis
 
 func (r *ItemRepository) GetExpiring(ctx context.Context, userID uint, days int) ([]*model.Item, error) {
 	var items []*model.Item
-	now := time.Now()
+	now := utils.NowUTC()
 	expirationThreshold := now.AddDate(0, 0, days)
 
 	query := r.db.WithContext(ctx).Model(&model.Item{}).
@@ -84,7 +84,7 @@ func (r *ItemRepository) Delete(ctx context.Context, id uint) error {
 // - expired: expired_at < 当前时间 且 status = 2（已过期）
 // - used: status = 3（已消耗）
 func (r *ItemRepository) GetStats(ctx context.Context, userID uint) (total, expiringSoon, expired, used int64, err error) {
-	now := time.Now()
+	now := utils.NowUTC()
 	sevenDaysLater := now.AddDate(0, 0, 7)
 
 	db := r.db.WithContext(ctx).Model(&model.Item{}).Where("user_id = ?", userID)

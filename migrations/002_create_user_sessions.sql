@@ -1,13 +1,16 @@
 -- ThingsExpired 数据库迁移脚本
 -- 创建用户会话表（用于多端登录控制）
+-- 注意：所有时间字段均使用 UTC 时间存储，遵循 ISO 8601 标准
+-- SQLite 的 CURRENT_TIMESTAMP 默认返回 UTC 时间
+
 CREATE TABLE IF NOT EXISTS user_sessions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
     token_jti TEXT NOT NULL UNIQUE,
     device_info TEXT,
     ip_address TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    expires_at DATETIME NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,  -- UTC 时间
+    expires_at DATETIME NOT NULL,                    -- UTC 时间，由应用层确保传入 UTC
     is_revoked INTEGER DEFAULT 0,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );

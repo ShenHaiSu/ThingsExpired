@@ -146,7 +146,7 @@ func (s *UserService) Login(ctx context.Context, req *dto.LoginRequest, deviceIn
 	return &vo.LoginVO{
 		UserID:  user.ID,
 		Token:   token,
-		Expired: expireTime.Format("2006-01-02 15:04:05"),
+		Expired: utils.FormatTimeUTC(expireTime),
 	}, nil
 }
 
@@ -213,7 +213,7 @@ func (s *UserService) toVO(user *model.User) *vo.UserVO {
 		Username:  user.Username,
 		Email:     user.Email,
 		Status:    user.Status,
-		CreatedAt: user.CreatedAt.Format("2006-01-02 15:04:05"),
+		CreatedAt: utils.FormatTimeUTC(user.CreatedAt),
 	}
 }
 
@@ -240,8 +240,8 @@ func (s *UserService) GetSessions(ctx context.Context, userID uint) (*vo.Session
 			UserID:     session.UserID,
 			DeviceInfo: session.DeviceInfo,
 			IPAddress:  session.IPAddress,
-			CreatedAt:  session.CreatedAt.Format("2006-01-02 15:04:05"),
-			ExpiresAt:  session.ExpiresAt.Format("2006-01-02 15:04:05"),
+			CreatedAt:  utils.FormatTimeUTC(session.CreatedAt),
+			ExpiresAt:  utils.FormatTimeUTC(session.ExpiresAt),
 			IsRevoked:  session.IsRevoked,
 		})
 	}

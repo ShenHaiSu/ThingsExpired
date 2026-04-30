@@ -1,4 +1,7 @@
 -- ThingsExpired 数据库初始化脚本
+-- 注意：所有时间字段均使用 UTC 时间存储，遵循 ISO 8601 标准
+-- SQLite 的 CURRENT_TIMESTAMP 默认返回 UTC 时间
+
 -- 创建用户表
 CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -6,8 +9,8 @@ CREATE TABLE IF NOT EXISTS users (
     email TEXT NOT NULL UNIQUE,
     password TEXT NOT NULL,
     status INTEGER DEFAULT 1,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,  -- UTC 时间
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP   -- UTC 时间
 );
 
 -- 创建分类表
@@ -18,12 +21,13 @@ CREATE TABLE IF NOT EXISTS categories (
     color TEXT DEFAULT '#000000',
     icon TEXT,
     sort_order INTEGER DEFAULT 0,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,  -- UTC 时间
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,   -- UTC 时间
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 -- 创建物品表
+-- expired_at 字段必须存储 UTC 时间，前端传入的时间需转换为 UTC 后存储
 CREATE TABLE IF NOT EXISTS items (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
@@ -32,11 +36,11 @@ CREATE TABLE IF NOT EXISTS items (
     description TEXT,
     quantity INTEGER DEFAULT 1,
     unit TEXT,
-    expired_at DATETIME NOT NULL,
+    expired_at DATETIME NOT NULL,                     -- UTC 时间，由应用层确保传入 UTC
     remind_days INTEGER DEFAULT 3,
     status INTEGER DEFAULT 1,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,    -- UTC 时间
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,     -- UTC 时间
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
 );

@@ -8,6 +8,7 @@ import (
 	"things-expired/internal/model/vo"
 	"things-expired/internal/repository"
 	"things-expired/pkg/errors"
+	"things-expired/pkg/utils"
 )
 
 // ICategoryService 分类服务接口
@@ -129,6 +130,6 @@ func (s *CategoryService) toVO(category *model.Category) *vo.CategoryVO {
 		Color:      category.Color,
 		Icon:       category.Icon,
 		SortOrder:  category.SortOrder,
-		CreatedAt:  category.CreatedAt.Format("2006-01-02 15:04:05"),
+		CreatedAt:  utils.FormatTimeUTC(category.CreatedAt),
 	}
 }

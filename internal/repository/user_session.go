@@ -2,9 +2,10 @@ package repository
 
 import (
 	"context"
-	"time"
 
 	"things-expired/internal/model"
+	"things-expired/pkg/utils"
+
 	"gorm.io/gorm"
 )
 
@@ -65,7 +66,7 @@ func (r *UserSessionRepository) GetByJTI(ctx context.Context, jti string) (*mode
 func (r *UserSessionRepository) GetActiveSessionsByUserID(ctx context.Context, userID uint) ([]*model.UserSession, error) {
 	var sessions []*model.UserSession
 	err := r.db.WithContext(ctx).
-		Where("user_id = ? AND is_revoked = 0 AND expires_at > ?", userID, time.Now()).
+		Where("user_id = ? AND is_revoked = 0 AND expires_at > ?", userID, utils.NowUTC()).
 		Order("created_at DESC").
 		Find(&sessions).Error
 	return sessions, err
@@ -108,7 +109,7 @@ func (r *UserSessionRepository) RevokeByJTI(ctx context.Context, jti string) err
 // DeleteExpired 删除已过期的会话
 func (r *UserSessionRepository) DeleteExpired(ctx context.Context) (int64, error) {
 	result := r.db.WithContext(ctx).
-		Where("expires_at < ?", time.Now()).
+		Where("expires_at < ?", utils.NowUTC()).
 		Delete(&model.UserSession{})
 	return result.RowsAffected, result.Error
 }

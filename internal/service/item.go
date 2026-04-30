@@ -9,6 +9,7 @@ import (
 	"things-expired/internal/model/vo"
 	"things-expired/internal/repository"
 	"things-expired/pkg/errors"
+	"things-expired/pkg/utils"
 )
 
 // IItemService 物品服务接口
@@ -176,7 +177,8 @@ func (s *ItemService) GetExpiringItems(ctx context.Context, userID uint, days in
 	result := make([]vo.ExpiringItemVO, 0, len(items))
 
 	for _, item := range items {
-		daysUntil := int(time.Until(item.ExpiredAt).Hours() / 24)
+		// 使用 UTC 时间计算距离过期的天数
+		daysUntil := int(time.Until(item.ExpiredAt.UTC()).Hours() / 24)
 		result = append(result, vo.ExpiringItemVO{
 			ItemVO:           *s.toVO(item),
 			DaysUntilExpired: daysUntil,
@@ -210,9 +212,9 @@ func (s *ItemService) toVO(item *model.Item) *vo.ItemVO {
 		Desc:       item.Description,
 		Quantity:   item.Quantity,
 		Unit:       item.Unit,
-		ExpiredAt:  item.ExpiredAt.Format("2006-01-02 15:04:05"),
+		ExpiredAt:  utils.FormatTimeUTC(item.ExpiredAt),
 		RemindDays: item.RemindDays,
 		Status:     item.Status,
-		CreatedAt:  item.CreatedAt.Format("2006-01-02 15:04:05"),
+		CreatedAt:  utils.FormatTimeUTC(item.CreatedAt),
 	}
 }
