@@ -1,5 +1,6 @@
 <template>
   <Toast />
+  <ConfirmDialog />
   <component :is="layoutComponent">
     <router-view />
   </component>
@@ -9,6 +10,7 @@
 import { computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import Toast from 'primevue/toast'
+import ConfirmDialog from 'primevue/confirmdialog'
 import { DefaultLayout, BlankLayout } from '@/layouts'
 import { useAppStore } from '@/stores'
 

@@ -13,6 +13,7 @@ import PrimeVue from 'primevue/config'
 import Aura from '@primeuix/themes/aura'
 import ToastService from 'primevue/toastservice'
 import Tooltip from 'primevue/tooltip'
+import ConfirmationService from 'primevue/confirmationservice'
 
 // Import PrimeVue locale files
 import primevueEn from './locales/primevue-en.json'
@@ -41,6 +42,10 @@ app.directive('tooltip', Tooltip)
 app.use(PrimeVue, {
   theme: {
     preset: Aura,
+    options: {
+      // 使用 .dark 作为暗色模式选择器，与自定义组件共用同一个 class
+      darkModeSelector: '.dark',
+    },
   },
   ripple: true,
   locale: {
@@ -48,6 +53,9 @@ app.use(PrimeVue, {
     'zh-CN': primevueZhCN,
   },
 })
+
+// 使用 PrimeVue Confirm 服务
+app.use(ConfirmationService)
 
 // 挂载应用
 app.mount('#app')

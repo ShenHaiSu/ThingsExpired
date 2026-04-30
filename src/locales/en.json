@@ -20,13 +20,37 @@
     "max": "Max",
     "startDate": "Start Date",
     "endDate": "End Date",
-    "sort": "Sort"
+    "sort": "Sort",
+    "theme": "Theme",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "themeAuto": "Auto",
+    "language": "Language",
+    "languageZh": "简体中文",
+    "languageEn": "English"
+  },
+  "home": {
+    "welcomeTitle": "Welcome to Things Expired",
+    "welcomeDesc": "Easily manage your item expiration information and avoid waste",
+    "quickActions": "Quick Actions",
+    "addItem": "Add Item",
+    "addItemDesc": "Record new item information",
+    "manageCategory": "Manage Categories",
+    "manageCategoryDesc": "Organize item categories",
+    "expiringSoon": "Expiring Soon",
+    "expiringSoonDesc": "View items expiring soon",
+    "systemSettings": "System Settings",
+    "systemSettingsDesc": "Manage account and preferences"
   },
   "menu": {
     "home": "Home",
     "items": "Items",
     "categories": "Categories",
     "settings": "Settings"
+  },
+  "footer": {
+    "items": "Items",
+    "categories": "Categories"
   },
   "auth": {
     "login": "Login",
@@ -62,7 +86,10 @@
     "resetPasswordHint": "Please enter your email, we will send a reset password link",
     "fillEmail": "Please enter your email address",
     "rememberPassword": "Remember your password?",
-    "backToLogin": "Back to Login"
+    "backToLogin": "Back to Login",
+    "featureTrack": "Track item expiration time",
+    "featureRemind": "Smart reminder feature",
+    "featureOrganize": "Organize items by category"
   },
   "category": {
     "title": "Categories",
@@ -129,6 +156,37 @@
       "byCreatedAt": "By Creation Date",
       "byQuantity": "By Quantity",
       "byName": "By Name"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "description": "Manage your account and preferences",
+    "language": {
+      "title": "Language Settings",
+      "description": "Select your preferred display language",
+      "zh": "简体中文",
+      "en": "English"
+    },
+    "theme": {
+      "title": "Theme Settings",
+      "description": "Select your preferred display theme",
+      "light": "Light Theme",
+      "dark": "Dark Theme",
+      "auto": "Follow System"
+    },
+    "account": {
+      "title": "Account Information",
+      "description": "Current logged in account information",
+      "username": "Username",
+      "email": "Email"
+    },
+    "logout": {
+      "title": "Logout",
+      "description": "Sign out of your current account",
+      "button": "Logout",
+      "confirmTitle": "Confirm Logout",
+      "confirmMessage": "Are you sure you want to logout?",
+      "success": "Successfully logged out"
     }
   }
 }

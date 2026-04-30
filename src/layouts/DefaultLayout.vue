@@ -9,14 +9,7 @@
         <h1 class="logo">Things Expired</h1>
       </div>
       <div class="header-right">
-        <span class="username hidden sm:inline">{{ userStore.userInfo?.name }}</span>
-        <Button
-          icon="pi pi-sign-out"
-          label="退出"
-          severity="secondary"
-          text
-          @click="handleLogout"
-        />
+        <span class="username sm:inline">{{ userStore.userInfo?.name }}</span>
       </div>
     </header>
 
@@ -26,28 +19,28 @@
       <aside
         class="layout-sidebar"
         :class="{
-          'hidden': isMobile && !mobileSidebarOpen,
+          hidden: isMobile && !mobileSidebarOpen,
           'mobile-open': isMobile && mobileSidebarOpen,
           'md:block': !isMobile,
-          'collapsed': sidebarCollapsed && !isMobile,
+          collapsed: sidebarCollapsed && !isMobile,
         }"
       >
         <nav class="sidebar-nav">
           <router-link to="/" class="nav-item" @click="handleNavClick">
             <i class="pi pi-home"></i>
-            <span>首页</span>
+            <span>{{ t('menu.home') }}</span>
           </router-link>
           <router-link to="/items" class="nav-item" @click="handleNavClick">
             <i class="pi pi-list"></i>
-            <span>物品管理</span>
+            <span>{{ t('menu.items') }}</span>
           </router-link>
           <router-link to="/categories" class="nav-item" @click="handleNavClick">
             <i class="pi pi-folder"></i>
-            <span>分类管理</span>
+            <span>{{ t('menu.categories') }}</span>
           </router-link>
           <router-link to="/settings" class="nav-item" @click="handleNavClick">
             <i class="pi pi-cog"></i>
-            <span>设置</span>
+            <span>{{ t('menu.settings') }}</span>
           </router-link>
         </nav>
       </aside>
@@ -72,20 +65,20 @@
       <footer class="mobile-footer" v-if="isMobile">
         <router-link to="/" class="footer-item" @click="closeMobileSidebar">
           <i class="pi pi-home"></i>
-          <span>首页</span>
+          <span>{{ t('menu.home') }}</span>
         </router-link>
         <router-link to="/items" class="footer-item" @click="closeMobileSidebar">
           <i class="pi pi-list"></i>
-          <span>物品</span>
+          <span>{{ t('footer.items') }}</span>
         </router-link>
         <router-link to="/categories" class="footer-item" @click="closeMobileSidebar">
           <i class="pi pi-folder"></i>
-          <span>分类</span>
+          <span>{{ t('footer.categories') }}</span>
         </router-link>
-        <div class="footer-item" @click="toggleSidebar">
-          <i class="pi pi-bars"></i>
-          <span>菜单</span>
-        </div>
+        <router-link to="/settings" class="footer-item" @click="closeMobileSidebar">
+          <i class="pi pi-cog"></i>
+          <span>{{ t('menu.settings') }}</span>
+        </router-link>
       </footer>
     </div>
   </div>
@@ -94,11 +87,11 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useUserStore } from '@/stores/user/userStore'
-import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 
 const userStore = useUserStore()
-const router = useRouter()
+const { t } = useI18n()
 
 // 响应式状态
 const sidebarCollapsed = ref(false)
@@ -124,11 +117,6 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
 })
-
-function handleLogout() {
-  userStore.logout()
-  router.push('/login')
-}
 
 // 切换侧边栏（桌面端切换常驻状态，移动端切换抽屉显示）
 function toggleSidebar() {
@@ -174,8 +162,8 @@ function handleMainClick() {
   align-items: center;
   height: 60px;
   padding: 0 16px;
-  background: var(--surface-card, #ffffff);
-  border-bottom: 1px solid var(--surface-border, #e5e7eb);
+  background: var(--color-bg-card);
+  border-bottom: 1px solid var(--color-border);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -190,7 +178,7 @@ function handleMainClick() {
 .logo {
   font-size: 16px;
   font-weight: 600;
-  color: var(--text-color, #1f2937);
+  color: var(--color-text-primary);
 }
 
 .header-right {
@@ -200,8 +188,29 @@ function handleMainClick() {
 }
 
 .username {
-  color: var(--text-color-secondary, #6b7280);
+  color: var(--color-text-secondary);
   font-size: 14px;
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+.username::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--color-primary-500);
+  transition: width 0.3s ease;
+}
+
+.username:hover {
+  color: var(--color-primary-500);
+}
+
+.username:hover::after {
+  width: 100%;
 }
 
 .layout-body {
@@ -215,8 +224,8 @@ function handleMainClick() {
 /* 统一侧边栏样式 */
 .layout-sidebar {
   width: 220px;
-  background: var(--surface-card, #ffffff);
-  border-right: 1px solid var(--surface-border, #e5e7eb);
+  background: var(--color-bg-card);
+  border-right: 1px solid var(--color-border);
   flex-shrink: 0;
   transition:
     width 0.2s ease,
@@ -254,8 +263,8 @@ function handleMainClick() {
   justify-content: space-around;
   align-items: center;
   height: 60px;
-  background: var(--surface-card, #ffffff);
-  border-top: 1px solid var(--surface-border, #e5e7eb);
+  background: var(--color-bg-card);
+  border-top: 1px solid var(--color-border);
   position: fixed;
   bottom: 0;
   left: 0;
@@ -270,7 +279,7 @@ function handleMainClick() {
   justify-content: center;
   gap: 4px;
   padding: 8px 16px;
-  color: var(--text-color-secondary, #6b7280);
+  color: var(--color-text-secondary);
   text-decoration: none;
   font-size: 12px;
   transition: all 0.2s ease;
@@ -278,11 +287,11 @@ function handleMainClick() {
 }
 
 .footer-item:hover {
-  color: var(--primary-600, #16a34a);
+  color: var(--color-primary-600);
 }
 
 .footer-item.router-link-active {
-  color: var(--primary-500, #22c55e);
+  color: var(--color-primary-500);
 }
 
 .footer-item i {
@@ -296,7 +305,7 @@ function handleMainClick() {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--color-shadow-lg);
   z-index: 200;
 }
 
@@ -309,7 +318,7 @@ function handleMainClick() {
   align-items: center;
   gap: 12px;
   padding: 12px 24px;
-  color: var(--text-color-secondary, #6b7280);
+  color: var(--color-text-secondary);
   text-decoration: none;
   font-size: 14px;
   transition: all 0.2s ease;
@@ -317,14 +326,14 @@ function handleMainClick() {
 }
 
 .nav-item:hover {
-  background: var(--primary-50, #f0fdf4);
-  color: var(--primary-600, #16a34a);
+  background: var(--color-primary-50);
+  color: var(--color-primary-600);
 }
 
 .nav-item.router-link-active {
-  background: var(--primary-50, #f0fdf4);
-  color: var(--primary-500, #22c55e);
-  border-right: 3px solid var(--primary-500, #22c55e);
+  background: var(--color-primary-50);
+  color: var(--color-primary-500);
+  border-right: 3px solid var(--color-primary-500);
   font-weight: 500;
 }
 
@@ -332,7 +341,7 @@ function handleMainClick() {
   flex: 1;
   padding: 16px;
   overflow-y: auto;
-  background: var(--surface-ground, #f9fafb);
+  background: var(--color-bg-page);
   padding-bottom: 70px; /* 为移动端底栏留出空间 */
 }
 

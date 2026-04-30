@@ -8,20 +8,20 @@
             <i class="pi pi-clock"></i>
           </div>
           <h1 class="app-title">Things Expired</h1>
-          <p class="app-slogan">过期物品管理平台</p>
+          <p class="app-slogan">{{ t('auth.subtitle') }}</p>
         </div>
         <div class="feature-list">
           <div class="feature-item">
             <i class="pi pi-check-circle"></i>
-            <span>追踪物品过期时间</span>
+            <span>{{ t('auth.featureTrack') }}</span>
           </div>
           <div class="feature-item">
             <i class="pi pi-bell"></i>
-            <span>智能提醒功能</span>
+            <span>{{ t('auth.featureRemind') }}</span>
           </div>
           <div class="feature-item">
             <i class="pi pi-folder"></i>
-            <span>分类整理物品</span>
+            <span>{{ t('auth.featureOrganize') }}</span>
           </div>
         </div>
       </div>
@@ -31,6 +31,29 @@
 
     <!-- 右侧表单区域 -->
     <div class="form-area">
+      <!-- 顶部设置栏 -->
+      <div class="form-top-bar">
+        <!-- 主题切换 -->
+        <Button
+          :icon="themeIcon"
+          text
+          size="small"
+          @click="toggleTheme"
+          v-tooltip="t('common.theme')"
+        />
+
+        <!-- 语言切换 -->
+        <Select
+          v-model="currentLocale"
+          :options="localeOptions"
+          optionLabel="label"
+          optionValue="value"
+          @change="handleLocaleChange"
+          class="locale-select"
+          size="small"
+        />
+      </div>
+
       <div class="form-container">
         <!-- 表单头部 -->
         <div class="form-header">
@@ -53,12 +76,51 @@
 </template>
 
 <script setup lang="ts">
+import { ref, computed } from 'vue'
+import { useAppStore, type Theme, type Locale } from '@/stores/app/appStore'
+import { useI18n } from 'vue-i18n'
+import Button from 'primevue/button'
+import Select from 'primevue/select'
+
 interface Props {
   title: string
   subtitle: string
 }
 
 defineProps<Props>()
+
+const appStore = useAppStore()
+const { t, locale: i18nLocale } = useI18n()
+
+// 从 appStore 获取主题和语言
+const theme = computed(() => appStore.theme)
+
+// 主题图标
+const themeIcon = computed(() => {
+  if (theme.value === 'light') return 'pi pi-sun'
+  if (theme.value === 'dark') return 'pi pi-moon'
+  return 'pi pi-desktop'
+})
+
+// 当前语言选择
+const currentLocale = ref(appStore.locale)
+
+// 语言选项
+const localeOptions = computed(() => [
+  { label: t('common.languageZh'), value: 'zh-CN' },
+  { label: t('common.languageEn'), value: 'en' },
+])
+
+// 切换主题
+function toggleTheme() {
+  appStore.toggleTheme()
+}
+
+// 处理语言切换
+function handleLocaleChange() {
+  appStore.setLocale(currentLocale.value as Locale)
+  i18nLocale.value = currentLocale.value as Locale
+}
 </script>
 
 <style scoped>
@@ -169,10 +231,26 @@ defineProps<Props>()
 .form-area {
   flex: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 40px 20px;
   background: var(--color-bg-page);
+  position: relative;
+}
+
+/* 顶部设置栏 */
+.form-top-bar {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.locale-select {
+  width: 150px;
 }
 
 .form-container {
