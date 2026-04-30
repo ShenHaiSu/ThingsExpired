@@ -9,92 +9,9 @@
         <h1 class="logo">Things Expired</h1>
       </div>
       <div class="header-right">
-        <!-- 主题切换 -->
-        <div class="header-control hidden sm:flex">
-          <Button
-            :icon="themeIcon"
-            text
-            @click="toggleTheme"
-            v-tooltip="t('common.theme')"
-          />
-        </div>
-        
-        <!-- 语言切换 -->
-        <div class="header-control hidden sm:flex">
-          <Select
-            v-model="currentLocale"
-            :options="localeOptions"
-            optionLabel="label"
-            optionValue="value"
-            @change="handleLocaleChange"
-            class="locale-select"
-          />
-        </div>
-        
-        <!-- 移动端设置按钮 -->
-        <Button
-          icon="pi pi-cog"
-          text
-          class="sm:hidden"
-          @click="showSettingsMenu = true"
-        />
-        
-        <span class="username hidden sm:inline">{{ userStore.userInfo?.name }}</span>
-        <Button
-          icon="pi pi-sign-out"
-          label="退出"
-          severity="secondary"
-          text
-          @click="handleLogout"
-        />
+        <span class="username sm:inline">{{ userStore.userInfo?.name }}</span>
       </div>
     </header>
-    
-    <!-- 移动端设置弹出菜单 -->
-    <Popover v-model:visible="showSettingsMenu" class="settings-popover">
-      <div class="settings-menu">
-        <div class="settings-section">
-          <span class="settings-label">{{ t('common.theme') }}</span>
-          <div class="settings-options">
-            <Button
-              :icon="theme === 'light' ? 'pi pi-sun' : 'pi pi-circle'"
-              text
-              :class="{ 'active': theme === 'light' }"
-              @click="setTheme('light')"
-            />
-            <Button
-              :icon="theme === 'dark' ? 'pi pi-moon' : 'pi pi-circle'"
-              text
-              :class="{ 'active': theme === 'dark' }"
-              @click="setTheme('dark')"
-            />
-            <Button
-              :icon="theme === 'auto' ? 'pi pi-desktop' : 'pi pi-circle'"
-              text
-              :class="{ 'active': theme === 'auto' }"
-              @click="setTheme('auto')"
-            />
-          </div>
-        </div>
-        <div class="settings-section">
-          <span class="settings-label">{{ t('common.language') }}</span>
-          <div class="settings-options">
-            <Button
-              label="中文"
-              text
-              :class="{ 'active': locale === 'zh-CN' }"
-              @click="setLocale('zh-CN')"
-            />
-            <Button
-              label="EN"
-              text
-              :class="{ 'active': locale === 'en' }"
-              @click="setLocale('en')"
-            />
-          </div>
-        </div>
-      </div>
-    </Popover>
 
     <!-- 主体内容 -->
     <div class="layout-body">
@@ -102,28 +19,28 @@
       <aside
         class="layout-sidebar"
         :class="{
-          'hidden': isMobile && !mobileSidebarOpen,
+          hidden: isMobile && !mobileSidebarOpen,
           'mobile-open': isMobile && mobileSidebarOpen,
           'md:block': !isMobile,
-          'collapsed': sidebarCollapsed && !isMobile,
+          collapsed: sidebarCollapsed && !isMobile,
         }"
       >
         <nav class="sidebar-nav">
           <router-link to="/" class="nav-item" @click="handleNavClick">
             <i class="pi pi-home"></i>
-            <span>首页</span>
+            <span>{{ t('menu.home') }}</span>
           </router-link>
           <router-link to="/items" class="nav-item" @click="handleNavClick">
             <i class="pi pi-list"></i>
-            <span>物品管理</span>
+            <span>{{ t('menu.items') }}</span>
           </router-link>
           <router-link to="/categories" class="nav-item" @click="handleNavClick">
             <i class="pi pi-folder"></i>
-            <span>分类管理</span>
+            <span>{{ t('menu.categories') }}</span>
           </router-link>
           <router-link to="/settings" class="nav-item" @click="handleNavClick">
             <i class="pi pi-cog"></i>
-            <span>设置</span>
+            <span>{{ t('menu.settings') }}</span>
           </router-link>
         </nav>
       </aside>
@@ -148,20 +65,20 @@
       <footer class="mobile-footer" v-if="isMobile">
         <router-link to="/" class="footer-item" @click="closeMobileSidebar">
           <i class="pi pi-home"></i>
-          <span>首页</span>
+          <span>{{ t('menu.home') }}</span>
         </router-link>
         <router-link to="/items" class="footer-item" @click="closeMobileSidebar">
           <i class="pi pi-list"></i>
-          <span>物品</span>
+          <span>{{ t('footer.items') }}</span>
         </router-link>
         <router-link to="/categories" class="footer-item" @click="closeMobileSidebar">
           <i class="pi pi-folder"></i>
-          <span>分类</span>
+          <span>{{ t('footer.categories') }}</span>
         </router-link>
-        <div class="footer-item" @click="toggleSidebar">
-          <i class="pi pi-bars"></i>
-          <span>菜单</span>
-        </div>
+        <router-link to="/settings" class="footer-item" @click="closeMobileSidebar">
+          <i class="pi pi-cog"></i>
+          <span>{{ t('menu.settings') }}</span>
+        </router-link>
       </footer>
     </div>
   </div>
@@ -170,43 +87,16 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useUserStore } from '@/stores/user/userStore'
-import { useAppStore, type Theme, type Locale } from '@/stores/app/appStore'
-import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
-import Select from 'primevue/select'
-import Popover from 'primevue/popover'
 
 const userStore = useUserStore()
-const appStore = useAppStore()
-const router = useRouter()
-const { t, locale: i18nLocale } = useI18n()
+const { t } = useI18n()
 
 // 响应式状态
 const sidebarCollapsed = ref(false)
 const mobileSidebarOpen = ref(false)
 const windowWidth = ref(window.innerWidth)
-const showSettingsMenu = ref(false)
-
-// 从 appStore 获取主题和语言
-const theme = computed(() => appStore.theme)
-const locale = computed(() => appStore.locale)
-
-// 主题图标
-const themeIcon = computed(() => {
-  if (theme.value === 'light') return 'pi pi-sun'
-  if (theme.value === 'dark') return 'pi pi-moon'
-  return 'pi pi-desktop'
-})
-
-// 当前语言选择
-const currentLocale = ref(locale.value)
-
-// 语言选项
-const localeOptions = computed(() => [
-  { label: t('common.languageZh'), value: 'zh-CN' },
-  { label: t('common.languageEn'), value: 'en' },
-])
 
 // 判断是否为移动端
 const isMobile = computed(() => windowWidth.value < 768)
@@ -217,7 +107,6 @@ function handleResize() {
   // 窗口大小变化时，如果切换到桌面端，关闭移动端侧边栏
   if (!isMobile.value) {
     mobileSidebarOpen.value = false
-    showSettingsMenu.value = false
   }
 }
 
@@ -228,36 +117,6 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
 })
-
-function handleLogout() {
-  userStore.logout()
-  router.push('/login')
-}
-
-// 切换主题
-function toggleTheme() {
-  appStore.toggleTheme()
-}
-
-// 设置主题
-function setTheme(newTheme: Theme) {
-  appStore.setTheme(newTheme)
-  showSettingsMenu.value = false
-}
-
-// 处理语言切换
-function handleLocaleChange() {
-  appStore.setLocale(currentLocale.value as Locale)
-  i18nLocale.value = currentLocale.value as Locale
-}
-
-// 设置语言
-function setLocale(newLocale: Locale) {
-  appStore.setLocale(newLocale)
-  i18nLocale.value = newLocale
-  currentLocale.value = newLocale
-  showSettingsMenu.value = false
-}
 
 // 切换侧边栏（桌面端切换常驻状态，移动端切换抽屉显示）
 function toggleSidebar() {
@@ -328,66 +187,30 @@ function handleMainClick() {
   gap: 12px;
 }
 
-.header-control {
-  display: flex;
-  align-items: center;
-}
-
-.locale-select {
-  width: 100px;
-  font-size: 14px;
-}
-
 .username {
   color: var(--color-text-secondary);
   font-size: 14px;
+  position: relative;
+  transition: color 0.3s ease;
 }
 
-/* 设置弹出菜单 */
-.settings-popover {
-  position: fixed;
-  top: 60px;
-  right: 16px;
-  z-index: 150;
+.username::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--color-primary-500);
+  transition: width 0.3s ease;
 }
 
-.settings-menu {
-  background: var(--color-bg-card);
-  border-radius: 8px;
-  box-shadow: 0 4px 12px var(--color-shadow-lg);
-  padding: 16px;
-  min-width: 200px;
+.username:hover {
+  color: var(--color-primary-500);
 }
 
-.settings-section {
-  margin-bottom: 16px;
-}
-
-.settings-section:last-child {
-  margin-bottom: 0;
-}
-
-.settings-label {
-  display: block;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--color-text-primary);
-  margin-bottom: 8px;
-}
-
-.settings-options {
-  display: flex;
-  gap: 8px;
-}
-
-.settings-options .p-button {
-  flex: 1;
-  justify-content: center;
-}
-
-.settings-options .p-button.active {
-  background: var(--color-primary-50);
-  color: var(--color-primary-600);
+.username:hover::after {
+  width: 100%;
 }
 
 .layout-body {

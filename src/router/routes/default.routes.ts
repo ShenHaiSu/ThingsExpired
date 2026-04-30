@@ -73,6 +73,17 @@ export const defaultRoutes: RouteRecordRaw[] = [
       requiresAuth: true,
     },
   },
+  // 设置页
+  {
+    path: '/settings',
+    name: 'Settings',
+    component: () => import('@/views/setting/SettingView.vue'),
+    meta: {
+      title: '设置',
+      layout: DefaultLayout,
+      requiresAuth: true,
+    },
+  },
   // 404 页面
   {
     path: '/404',
