@@ -695,6 +695,73 @@ POST /api/upload/image         # 上传图片
 POST /api/upload/avatar        # 上传头像
 ```
 
+### 4.6 时间格式规范（强制）
+
+> **重要**: 本规范为强制要求，所有时间相关的存储和传输必须严格遵守。
+
+#### 4.6.1 规范要求
+
+| 场景 | 格式要求 | 示例 |
+|------|----------|------|
+| 数据库存储 | UTC 时间 | `2026-05-02T00:00:00.000Z` |
+| API 响应 | UTC 时间（ISO 8601） | `2026-05-02T00:00:00.000Z` |
+| API 请求 | UTC 时间（ISO 8601） | `2026-05-02T00:00:00.000Z` |
+
+#### 4.6.2 格式说明
+
+- **必须使用 UTC 时间**: 所有时间数据必须以 UTC（协调世界时）格式存储和传输
+- **格式标准**: ISO 8601 格式，即 `YYYY-MM-DDTHH:mm:ss.sssZ`
+- **禁止使用本地时间**: 禁止在数据库或 API 中使用本地时间格式（如 `2026-05-02 08:00:00`）
+- **时区处理**: 时区转换由前端根据用户所在位置自行处理
+
+#### 4.6.3 实现示例
+
+```go
+// ✅ 正确：使用 UTC 时间存储
+type User struct {
+    ID        uint      `gorm:"primaryKey"`
+    CreatedAt time.Time `gorm:"type:datetime"`  // GORM 自动使用 UTC
+}
+
+// ✅ 正确：API 响应使用 UTC 时间格式
+type UserVO struct {
+    UserID    uint   `json:"user_id"`
+    CreatedAt string `json:"created_at"`  // 格式: "2026-05-02T00:00:00.000Z"
+}
+
+// ✅ 正确：时间格式化输出
+func formatTime(t time.Time) string {
+    return t.UTC().Format("2006-01-02T15:04:05.000Z")
+}
+
+// ❌ 错误：使用本地时间格式
+type UserVO struct {
+    CreatedAt string `json:"created_at"`  // 格式: "2026-05-02 08:00:00" - 错误！
+}
+
+// ❌ 错误：不使用 UTC
+func formatTime(t time.Time) string {
+    return t.Format("2006-01-02 15:04:05")  // 缺少 UTC 转换 - 错误！
+}
+```
+
+#### 4.6.4 前端对接说明
+
+前端开发者需要：
+
+1. **接收时间**: 后端返回的时间均为 UTC 格式，前端需要根据用户时区进行转换显示
+2. **发送时间**: 前端向后端发送时间数据时，必须转换为 UTC 格式
+3. **示例转换**（JavaScript）:
+   ```javascript
+   // 接收后端时间，转换为本地显示
+   const utcTime = "2026-05-02T00:00:00.000Z";
+   const localTime = new Date(utcTime).toLocaleString();
+   
+   // 发送时间到后端，转换为 UTC
+   const localDate = new Date();
+   const utcString = localDate.toISOString();  // 输出: "2026-05-02T00:00:00.000Z"
+   ```
+
 ---
 
 ## 5. 目录结构
