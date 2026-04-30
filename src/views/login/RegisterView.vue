@@ -87,7 +87,7 @@ import { useI18n } from 'vue-i18n'
 import InputText from 'primevue/inputtext'
 import Password from 'primevue/password'
 import Button from 'primevue/button'
-import { register as registerApi } from '@/api/user'
+import { register as registerApi } from '@/api'
 import { useToast } from '@/composables'
 import LoginLayout from './LoginLayout.vue'
 

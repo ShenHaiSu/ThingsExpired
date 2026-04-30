@@ -81,11 +81,10 @@ import {
   updateItem,
   deleteItem,
   markItemAsUsed,
-  type Item,
-  type CreateItemParams,
-  type ItemSearchParams,
-} from '@/api/item'
-import { getCategoryList, type Category } from '@/api/category'
+} from '@/api'
+import type { Item, CreateItemParams, ItemSearchParams } from '@/types/api/item'
+import { getCategoryList } from '@/api'
+import type { Category } from '@/types/api/category'
 import { isUtcFormat, toUtcFormat } from '@/utils/date'
 
 const { t } = useI18n()

@@ -6,7 +6,7 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { login as loginApi, logout as logoutApi, getUserInfo as getUserInfoApi } from '@/api'
-import type { LoginParams, User, LoginResponse } from '@/api/user'
+import type { LoginParams, User, LoginResponse } from '@/types/api/user'
 import { localCache } from '@/utils/storage'
 
 export interface UserInfo {

@@ -117,8 +117,8 @@ import Select from 'primevue/select'
 import InputNumber from 'primevue/inputnumber'
 import DatePicker from 'primevue/datepicker'
 import Button from 'primevue/button'
-import type { Category } from '@/api/category'
-import type { ItemSearchParams } from '@/api/item'
+import type { Category } from '@/types/api/category'
+import type { ItemSearchParams } from '@/types/api/item'
 
 const { t } = useI18n()
 

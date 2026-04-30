@@ -115,8 +115,8 @@ import SelectButton from 'primevue/selectbutton'
 import InputGroup from 'primevue/inputgroup'
 
 // 3. 项目内部 - 类型
-import type { Item, CreateItemParams } from '@/api/item'
-import type { Category } from '@/api/category'
+import type { Item, CreateItemParams } from '@/types/api/item'
+import type { Category } from '@/types/api/category'
 
 // 4. 项目内部 - 工具函数
 import { calculateExpiredAt } from '@/utils/date'

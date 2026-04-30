@@ -26,9 +26,17 @@
       </Column>
       <Column field="expired_at" :header="t('items.expiredAt')" sortable>
         <template #body="slotProps">
-          <span :class="getExpiredClass(slotProps.data.expired_at)" class="text-sm">
-            {{ getExpiredDisplay(slotProps.data.expired_at) }}
-          </span>
+          <div class="flex flex-col items-start">
+            <span
+              :class="getExpiredClass(slotProps.data.expired_at)"
+              class="text-sm font-medium text-gray-900"
+            >
+              {{ getDaysUntilExpired(slotProps.data.expired_at) }} {{ t('items.daysUntilExpired') }}
+            </span>
+            <span class="text-xs text-gray-500">
+              {{ formatDate(slotProps.data.expired_at) }}
+            </span>
+          </div>
         </template>
       </Column>
       <Column field="status" :header="t('items.status.title')" align="center">
@@ -40,7 +48,7 @@
           />
         </template>
       </Column>
-      <Column :header="t('common.actions')" align="center">
+      <Column :header="t('common.actions')" headerStyle="text-align: end;">
         <template #body="slotProps">
           <div class="action-buttons">
             <Button
@@ -71,7 +79,7 @@
         </template>
       </Column>
     </DataTable>
-    
+
     <!-- 自定义分页器 -->
     <Pagination
       :total="pagination.total"
@@ -81,7 +89,7 @@
         { label: '5', value: 5 },
         { label: '10', value: 10 },
         { label: '20', value: 20 },
-        { label: '50', value: 50 }
+        { label: '50', value: 50 },
       ]"
       @update:current-page="handlePageChange"
       @update:page-size="handlePageSizeChange"
@@ -95,9 +103,10 @@ import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Tag from 'primevue/tag'
 import Button from 'primevue/button'
-import { formatDateTime } from '@/utils'
-import { type Item, type ItemStatus } from '@/api/item'
-import { type Category } from '@/api/category'
+import { formatDateTime, formatDate } from '@/utils'
+import { getDaysUntilExpired } from '@/utils/date'
+import type { Item, ItemStatus } from '@/types/api/item'
+import type { Category } from '@/types/api/category'
 import Pagination from '@/components/common/Pagination.vue'
 
 const { t } = useI18n()
@@ -140,20 +149,16 @@ function getCategoryName(categoryId: number): string {
 }
 
 function getExpiredClass(expiredAt: string): string {
-  const now = new Date()
-  const expired = new Date(expiredAt)
-  const diffDays = Math.ceil((expired.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+  const diffDays = getDaysUntilExpired(expiredAt)
 
   if (diffDays < 0) return 'expired-text'
   if (diffDays <= 7) return 'warning-text'
   return ''
 }
 
-// 获取过期日期显示文本
+// 获取过期日期显示文本 (保留备用)
 function getExpiredDisplay(expiredAt: string): string {
-  const now = new Date()
-  const expired = new Date(expiredAt)
-  const diffDays = Math.ceil((expired.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+  const diffDays = getDaysUntilExpired(expiredAt)
 
   if (diffDays < 0) {
     return `已过期 ${Math.abs(diffDays)} 天`
@@ -210,7 +215,7 @@ function getStatusText(status: ItemStatus): string {
 /* 操作按钮组 */
 .action-buttons {
   display: flex;
-  justify-content: center;
+  justify-content: start;
   gap: 4px;
 }
 

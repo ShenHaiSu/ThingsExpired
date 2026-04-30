@@ -21,8 +21,8 @@
 import { useI18n } from 'vue-i18n'
 import ItemSearchMobile from './ItemSearchMobile.vue'
 import ItemSearchDesktop from './ItemSearchDesktop.vue'
-import type { Category } from '@/api/category'
-import type { ItemSearchParams } from '@/api/item'
+import type { Category } from '@/types/api/category'
+import type { ItemSearchParams } from '@/types/api/item'
 
 const { t } = useI18n()
 
