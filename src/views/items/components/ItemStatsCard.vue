@@ -1,8 +1,8 @@
 <template>
   <div class="stats-grid">
     <div class="stat-card">
-      <div class="stat-icon bg-green-50">
-        <i class="pi pi-box text-green-500"></i>
+      <div class="stat-icon stat-icon-green">
+        <i class="pi pi-box"></i>
       </div>
       <div class="stat-info">
         <span class="stat-label">{{ t('items.stats.total') }}</span>
@@ -10,30 +10,30 @@
       </div>
     </div>
     <div class="stat-card">
-      <div class="stat-icon bg-orange-50">
-        <i class="pi pi-clock text-orange-500"></i>
+      <div class="stat-icon stat-icon-orange">
+        <i class="pi pi-clock"></i>
       </div>
       <div class="stat-info">
         <span class="stat-label">{{ t('items.stats.expiringSoon') }}</span>
-        <span class="stat-value text-orange-500">{{ stats.expiring_soon }}</span>
+        <span class="stat-value stat-value-warning">{{ stats.expiring_soon }}</span>
       </div>
     </div>
     <div class="stat-card">
-      <div class="stat-icon bg-red-50">
-        <i class="pi pi-exclamation-triangle text-red-500"></i>
+      <div class="stat-icon stat-icon-red">
+        <i class="pi pi-exclamation-triangle"></i>
       </div>
       <div class="stat-info">
         <span class="stat-label">{{ t('items.stats.expired') }}</span>
-        <span class="stat-value text-red-500">{{ stats.expired }}</span>
+        <span class="stat-value stat-value-danger">{{ stats.expired }}</span>
       </div>
     </div>
     <div class="stat-card">
-      <div class="stat-icon bg-teal-50">
-        <i class="pi pi-check-circle text-teal-500"></i>
+      <div class="stat-icon stat-icon-teal">
+        <i class="pi pi-check-circle"></i>
       </div>
       <div class="stat-info">
         <span class="stat-label">{{ t('items.stats.used') }}</span>
-        <span class="stat-value text-teal-500">{{ stats.used }}</span>
+        <span class="stat-value stat-value-info">{{ stats.used }}</span>
       </div>
     </div>
   </div>
@@ -69,15 +69,15 @@ defineProps<Props>()
   align-items: center;
   gap: 16px;
   padding: 20px;
-  background: var(--surface-card, #ffffff);
+  background: var(--color-bg-card);
   border-radius: 10px;
-  border: 1px solid var(--surface-border, #e5e7eb);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 1px 3px var(--color-shadow);
   transition: box-shadow 0.2s ease;
 }
 
 .stat-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 12px var(--color-shadow-lg);
 }
 
 .stat-icon {
@@ -94,6 +94,42 @@ defineProps<Props>()
   font-size: 1.25rem;
 }
 
+/* 绿色图标 - 总数 */
+.stat-icon-green {
+  background: var(--color-success-bg);
+}
+
+.stat-icon-green i {
+  color: var(--color-primary-500);
+}
+
+/* 橙色图标 - 即将过期 */
+.stat-icon-orange {
+  background: var(--color-warning-bg);
+}
+
+.stat-icon-orange i {
+  color: var(--color-warning);
+}
+
+/* 红色图标 - 已过期 */
+.stat-icon-red {
+  background: var(--color-danger-bg);
+}
+
+.stat-icon-red i {
+  color: var(--color-danger);
+}
+
+/* 青色图标 - 已使用 */
+.stat-icon-teal {
+  background: var(--color-info-bg);
+}
+
+.stat-icon-teal i {
+  color: var(--color-info);
+}
+
 .stat-info {
   display: flex;
   flex-direction: column;
@@ -102,14 +138,29 @@ defineProps<Props>()
 
 .stat-label {
   font-size: 13px;
-  color: var(--text-color-secondary, #6b7280);
+  color: var(--color-text-secondary);
 }
 
 .stat-value {
   font-size: 24px;
   font-weight: 700;
-  color: var(--text-color, #1f2937);
+  color: var(--color-text-primary);
   line-height: 1;
+}
+
+/* 橙色数值 - 即将过期 */
+.stat-value-warning {
+  color: var(--color-warning);
+}
+
+/* 红色数值 - 已过期 */
+.stat-value-danger {
+  color: var(--color-danger);
+}
+
+/* 青色数值 - 已使用 */
+.stat-value-info {
+  color: var(--color-info);
 }
 
 /* 移动端适配 */

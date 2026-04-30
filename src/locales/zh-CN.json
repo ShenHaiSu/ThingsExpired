@@ -101,7 +101,23 @@
     "icon": "图标",
     "sortOrder": "排序",
     "id": "ID",
-    "createdAt": "创建时间"
+    "createdAt": "创建时间",
+    "namePlaceholder": "请输入分类名称",
+    "colorPlaceholder": "如：#22c55e",
+    "iconPlaceholder": "如：pi pi-folder",
+    "validation": {
+      "nameRequired": "分类名称不能为空"
+    },
+    "message": {
+      "createSuccess": "分类创建成功",
+      "createFailed": "分类创建失败",
+      "updateSuccess": "分类更新成功",
+      "updateFailed": "分类更新失败",
+      "deleteSuccess": "分类删除成功",
+      "deleteFailed": "分类删除失败",
+      "deleteConfirmTitle": "确认删除",
+      "deleteConfirmMessage": "您确定要删除此分类吗？删除后该分类下的物品将一并删除，此操作不可恢复。"
+    }
   },
   "items": {
     "title": "物品管理",
@@ -118,6 +134,8 @@
     "description": "描述",
     "remindDays": "提前提醒天数",
     "selectCategory": "选择分类",
+    "categoryPlaceholder": "输入或选择分类",
+    "categoryHint": "可输入已有分类名称或新分类名称",
     "markAsUsed": "标记为已使用",
     "timeMode": "时间填写模式",
     "modeProduction": "生产日期模式",
@@ -131,6 +149,23 @@
     "timeUnitMonth": "月",
     "timeUnitYear": "年",
     "daysUntilExpired": "天后过期",
+    "validation": {
+      "nameRequired": "物品名称不能为空",
+      "categoryRequired": "请选择分类",
+      "expiredAtRequired": "请设置过期时间"
+    },
+    "message": {
+      "createSuccess": "物品创建成功",
+      "createFailed": "物品创建失败",
+      "updateSuccess": "物品更新成功",
+      "updateFailed": "物品更新失败",
+      "deleteSuccess": "物品删除成功",
+      "deleteFailed": "物品删除失败",
+      "markUsedSuccess": "已标记为已使用",
+      "markUsedFailed": "标记失败",
+      "categoryCreated": "新分类创建成功",
+      "categoryCreateFailed": "新分类创建失败"
+    },
     "status": {
       "title": "状态",
       "normal": "正常",
@@ -188,5 +223,20 @@
       "confirmMessage": "您确定要退出登录吗？",
       "success": "已成功退出登录"
     }
+  },
+  "error": {
+    "forbidden": {
+      "code": "403",
+      "title": "无权访问",
+      "description": "抱歉，您没有权限访问此页面",
+      "hint": "如需访问权限，请联系管理员"
+    },
+    "notFound": {
+      "code": "404",
+      "title": "页面未找到",
+      "description": "抱歉，您访问的页面不存在"
+    },
+    "backToHome": "返回首页",
+    "goBack": "返回上页"
   }
 }

@@ -29,11 +29,11 @@
           <div class="flex flex-col items-start">
             <span
               :class="getExpiredClass(slotProps.data.expired_at)"
-              class="text-sm font-medium text-gray-900"
+              class="text-sm font-medium expired-days-text"
             >
               {{ getDaysUntilExpired(slotProps.data.expired_at) }} {{ t('items.daysUntilExpired') }}
             </span>
-            <span class="text-xs text-gray-500">
+            <span class="text-xs expired-date-text">
               {{ formatDate(slotProps.data.expired_at) }}
             </span>
           </div>
@@ -194,22 +194,31 @@ function getStatusText(status: ItemStatus): string {
 
 <style scoped>
 .content-card {
-  background: var(--surface-card, #ffffff);
+  background: var(--color-bg-card);
   border-radius: 10px;
-  border: 1px solid var(--surface-border, #e5e7eb);
+  border: 1px solid var(--color-border);
   padding: 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px var(--color-shadow);
 }
 
 /* 过期文本颜色 - 遵循设计规范 */
 .expired-text {
-  color: var(--color-danger, #ef4444);
+  color: var(--color-danger);
   font-weight: 500;
 }
 
 .warning-text {
-  color: var(--color-warning, #f59e0b);
+  color: var(--color-warning);
   font-weight: 500;
+}
+
+/* 过期时间显示文本颜色 - 适配亮色/暗色模式 */
+.expired-days-text {
+  color: var(--color-text-primary);
+}
+
+.expired-date-text {
+  color: var(--color-text-secondary);
 }
 
 /* 操作按钮组 */

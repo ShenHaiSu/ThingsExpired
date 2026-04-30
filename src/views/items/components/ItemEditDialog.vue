@@ -14,14 +14,19 @@
       <label class="form-label"
         >{{ t('items.category') }} <span class="text-red-500">*</span></label
       >
-      <Select
-        v-model="formData.category_id"
-        :options="categoryOptions"
+      <AutoComplete
+        v-model="categoryInput"
+        :suggestions="categorySuggestions"
         optionLabel="name"
-        optionValue="category_id"
-        :placeholder="t('items.selectCategory')"
+        :placeholder="t('items.categoryPlaceholder')"
         class="w-full"
+        :forceSelection="false"
+        :loading="categoryLoading"
+        @complete="searchCategory"
+        @item-select="onCategorySelect"
       />
+      <small v-if="categoryError" class="p-error">{{ categoryError }}</small>
+      <small v-else class="text-gray-500 text-xs">{{ t('items.categoryHint') }}</small>
     </div>
     <div class="form-row">
       <div class="form-field">
@@ -93,7 +98,7 @@
     </div>
     <template #footer>
       <Button :label="t('common.cancel')" severity="secondary" text @click="close" />
-      <Button :label="t('common.save')" icon="pi pi-check" @click="submit" />
+      <Button :label="t('common.save')" icon="pi pi-check" :loading="submitting" @click="submit" />
     </template>
   </Dialog>
 </template>
@@ -107,12 +112,13 @@ import { useI18n } from 'vue-i18n'
 import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
 import InputNumber from 'primevue/inputnumber'
-import Select from 'primevue/select'
+import AutoComplete from 'primevue/autocomplete'
 import Textarea from 'primevue/textarea'
 import DatePicker from 'primevue/datepicker'
 import Button from 'primevue/button'
 import SelectButton from 'primevue/selectbutton'
 import InputGroup from 'primevue/inputgroup'
+import Select from 'primevue/select'
 
 // 3. 项目内部 - 类型
 import type { Item, CreateItemParams } from '@/types/api/item'
@@ -121,7 +127,14 @@ import type { Category } from '@/types/api/category'
 // 4. 项目内部 - 工具函数
 import { calculateExpiredAt } from '@/utils/date'
 
+// 5. 项目内部 - API
+import { createCategory } from '@/api/category'
+
+// 6. 项目内部 - 组合式函数
+import { useToast } from '@/composables'
+
 const { t } = useI18n()
+const toast = useToast()
 
 interface Props {
   visible: boolean
@@ -139,6 +152,7 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   (e: 'update:visible', value: boolean): void
   (e: 'submit', data: CreateItemParams & { item_id?: number }): void
+  (e: 'category-created', category: Category): void
 }>()
 
 const visible = computed({
@@ -155,6 +169,14 @@ const formData = ref<CreateItemParams>({
   description: '',
   remind_days: 3,
 })
+
+// 类别输入相关状态
+// categoryInput 可以是 Category 对象（选择已有类别）或 string（新类别名称）
+const categoryInput = ref<Category | string>('')
+const categorySuggestions = ref<Category[]>([])
+const categoryError = ref<string>('')
+const categoryLoading = ref(false)
+const submitting = ref(false)
 
 // 时间填写模式选项
 const timeModeOptions = computed(() => [
@@ -190,19 +212,54 @@ const expiredAtDate = computed({
   },
 })
 
-const categoryOptions = computed(() =>
-  props.categories.map((c) => ({
-    category_id: c.category_id,
-    name: c.name,
-  })),
-)
+// 搜索类别（用于 AutoComplete 的过滤功能）
+function searchCategory(event: { query: string }) {
+  const query = event.query.toLowerCase().trim()
+  if (query) {
+    categorySuggestions.value = props.categories.filter((c) => c.name.toLowerCase().includes(query))
+  } else {
+    categorySuggestions.value = props.categories
+  }
+}
 
-// 监听生产日期和保质期变化，自动计算过期日期
-watch([productionDate, shelfLife, shelfLifeUnit], ([newProdDate, newShelfLife, newShelfLifeUnit]) => {
-  if (!isDirectExpiryMode.value && newProdDate && newShelfLife) {
-    formData.value.expired_at = calculateExpiredAt(newProdDate, newShelfLife, newShelfLifeUnit)
+// 当用户从下拉列表中选择一个类别时
+function onCategorySelect(event: { value: Category }) {
+  categoryError.value = ''
+  formData.value.category_id = event.value.category_id
+}
+
+// 监听类别输入变化，处理用户直接输入新类别名称的情况
+watch(categoryInput, (newVal) => {
+  // 如果输入的是字符串（新类别名称），清除 category_id
+  if (typeof newVal === 'string') {
+    // 检查是否与已有类别名称匹配
+    const matchedCategory = props.categories.find(
+      (c) => c.name.toLowerCase() === newVal.toLowerCase().trim(),
+    )
+    if (matchedCategory) {
+      // 如果匹配到已有类别，自动设置为该类别
+      formData.value.category_id = matchedCategory.category_id
+      categoryError.value = ''
+    } else {
+      // 新类别名称，category_id 设为 0
+      formData.value.category_id = 0
+      // 如果输入不为空，清除错误提示
+      if (newVal.trim()) {
+        categoryError.value = ''
+      }
+    }
   }
 })
+
+// 监听生产日期和保质期变化，自动计算过期日期
+watch(
+  [productionDate, shelfLife, shelfLifeUnit],
+  ([newProdDate, newShelfLife, newShelfLifeUnit]) => {
+    if (!isDirectExpiryMode.value && newProdDate && newShelfLife) {
+      formData.value.expired_at = calculateExpiredAt(newProdDate, newShelfLife, newShelfLifeUnit)
+    }
+  },
+)
 
 watch(
   () => props.item,
@@ -216,6 +273,11 @@ watch(
         expired_at: newItem.expired_at,
         description: newItem.description || '',
         remind_days: newItem.remind_days,
+      }
+      // 设置类别输入为对应的类别对象
+      const category = props.categories.find((c) => c.category_id === newItem.category_id)
+      if (category) {
+        categoryInput.value = category
       }
       // 如果是编辑模式，默认使用过期日期模式
       if (props.isEdit) {
@@ -236,13 +298,15 @@ watch(
 function resetForm() {
   formData.value = {
     name: '',
-    category_id: props.categories[0]?.category_id || 0,
+    category_id: 0,
     quantity: 1,
     unit: '',
     expired_at: '',
     description: '',
     remind_days: 3,
   }
+  categoryInput.value = ''
+  categoryError.value = ''
   productionDate.value = null
   shelfLife.value = 30
   shelfLifeUnit.value = 'day'
@@ -254,23 +318,114 @@ function close() {
   visible.value = false
 }
 
-function submit() {
-  // 确保过期日期是UTC格式
-  let expiredAt = formData.value.expired_at
-  if (expiredAt) {
-    // 检查是否已经是UTC格式 (包含Z或+00:00)
-    if (!expiredAt.endsWith('Z') && !expiredAt.includes('+00:00')) {
-      // 转换为UTC
-      const date = new Date(expiredAt)
-      expiredAt = date.toISOString()
-    }
+// 验证表单
+function validateForm(): boolean {
+  // 验证物品名称
+  if (!formData.value.name || formData.value.name.trim() === '') {
+    toast.warn(t('items.validation.nameRequired'), t('common.warning'))
+    return false
   }
 
-  const submitData =
-    props.isEdit && props.item
-      ? { ...formData.value, expired_at: expiredAt, item_id: props.item.item_id }
-      : { ...formData.value, expired_at: expiredAt }
-  emit('submit', submitData)
+  // 验证类别
+  const categoryValue = categoryInput.value
+  if (!categoryValue) {
+    categoryError.value = t('items.validation.categoryRequired')
+    toast.warn(t('items.validation.categoryRequired'), t('common.warning'))
+    return false
+  }
+
+  // 如果是字符串且为空
+  if (typeof categoryValue === 'string' && categoryValue.trim() === '') {
+    categoryError.value = t('items.validation.categoryRequired')
+    toast.warn(t('items.validation.categoryRequired'), t('common.warning'))
+    return false
+  }
+
+  // 验证过期时间
+  if (!formData.value.expired_at) {
+    toast.warn(t('items.validation.expiredAtRequired'), t('common.warning'))
+    return false
+  }
+
+  return true
+}
+
+// 创建新类别
+async function createNewCategory(name: string): Promise<number | null> {
+  categoryLoading.value = true
+  try {
+    const res = await createCategory({
+      name: name.trim(),
+      color: '#22c55e', // 默认绿色
+      sort_order: 0,
+    })
+    if (res.data) {
+      toast.success(t('items.message.categoryCreated'))
+      // 通知父组件新类别已创建，以便更新类别列表
+      emit('category-created', res.data)
+      return res.data.category_id
+    }
+    return null
+  } catch (error) {
+    console.error('Failed to create category:', error)
+    toast.error(t('items.message.categoryCreateFailed'))
+    return null
+  } finally {
+    categoryLoading.value = false
+  }
+}
+
+// 提交表单
+async function submit() {
+  // 验证表单
+  if (!validateForm()) {
+    return
+  }
+
+  submitting.value = true
+
+  try {
+    // 处理类别
+    let categoryId = formData.value.category_id
+
+    // 如果 category_id 为 0，说明用户输入了新类别名称
+    if (categoryId === 0 && typeof categoryInput.value === 'string') {
+      const newCategoryName = categoryInput.value.trim()
+      // 先创建新类别
+      const newCategoryId = await createNewCategory(newCategoryName)
+      if (newCategoryId === null) {
+        // 创建类别失败，不继续提交物品
+        submitting.value = false
+        return
+      }
+      categoryId = newCategoryId
+    }
+
+    // 确保过期日期是UTC格式
+    let expiredAt = formData.value.expired_at
+    if (expiredAt) {
+      // 检查是否已经是UTC格式 (包含Z或+00:00)
+      if (!expiredAt.endsWith('Z') && !expiredAt.includes('+00:00')) {
+        // 转换为UTC
+        const date = new Date(expiredAt)
+        expiredAt = date.toISOString()
+      }
+    }
+
+    const submitData =
+      props.isEdit && props.item
+        ? {
+            ...formData.value,
+            category_id: categoryId,
+            expired_at: expiredAt,
+            item_id: props.item.item_id,
+          }
+        : { ...formData.value, category_id: categoryId, expired_at: expiredAt }
+
+    emit('submit', submitData)
+  } finally {
+    submitting.value = false
+  }
 }
 </script>
 
@@ -284,7 +439,7 @@ function submit() {
   margin-bottom: 6px;
   font-size: 14px;
   font-weight: 500;
-  color: var(--text-color, #1f2937);
+  color: var(--color-text-primary);
 }
 
 .form-row {
@@ -293,22 +448,26 @@ function submit() {
   gap: 16px;
 }
 
+:deep(.p-autocomplete-input) {
+  width: 100%;
+}
+
 /* 移动端适配 */
 @media (max-width: 640px) {
   .form-row {
     grid-template-columns: 1fr;
   }
-  
+
   /* InputGroup 在移动端需要特殊处理 */
   :deep(.p-inputgroup) {
     flex-direction: column;
   }
-  
+
   :deep(.p-inputgroup > *:first-child) {
     border-radius: 6px 6px 0 0;
-    border-right: 1px solid var(--surface-border);
+    border-right: 1px solid var(--color-border);
   }
-  
+
   :deep(.p-inputgroup > *:last-child) {
     border-radius: 0 0 6px 6px;
   }
