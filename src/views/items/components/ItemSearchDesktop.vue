@@ -9,12 +9,12 @@
 
     <div class="search-fields">
       <div class="search-grid">
-        <!-- 关键词搜索 -->
+        <!-- 名称搜索 -->
         <div class="field-group">
-          <label>{{ t('items.search.keyword') }}</label>
+          <label>{{ t('items.search.name') }}</label>
           <InputText
             v-model="searchParams.name"
-            :placeholder="t('items.search.keywordPlaceholder')"
+            :placeholder="t('items.search.namePlaceholder')"
             class="w-full"
           />
         </div>
@@ -98,17 +98,17 @@
             class="w-full"
           />
         </div>
-      </div>
 
-      <!-- 操作按钮 -->
-      <div class="search-actions">
-        <Button :label="t('common.search')" icon="pi pi-search" @click="handleSearch" />
-        <Button
-          :label="t('common.reset')"
-          icon="pi pi-refresh"
-          severity="secondary"
-          @click="handleReset"
-        />
+        <!-- 操作按钮 -->
+        <div class="search-actions">
+          <Button :label="t('common.search')" icon="pi pi-search" @click="handleSearch" />
+          <Button
+            :label="t('common.reset')"
+            icon="pi pi-refresh"
+            severity="secondary"
+            @click="handleReset"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -122,8 +122,8 @@ import Select from 'primevue/select'
 import InputNumber from 'primevue/inputnumber'
 import DatePicker from 'primevue/datepicker'
 import Button from 'primevue/button'
-import type { Category } from '@/api/category'
-import type { ItemSearchParams } from '@/api/item'
+import type { Category } from '@/types/api/category'
+import type { ItemSearchParams } from '@/types/api/item'
 
 const { t } = useI18n()
 
@@ -283,8 +283,8 @@ watch(
 .search-actions {
   display: flex;
   gap: 12px;
-  padding-top: 16px;
-  border-top: 1px solid var(--surface-border, #e5e7eb);
+  grid-column: span 2;
+  align-items: flex-end;
 }
 
 .search-actions :deep(.p-button) {
@@ -300,11 +300,19 @@ watch(
   .search-grid {
     grid-template-columns: repeat(3, 1fr);
   }
+  
+  .search-actions {
+    grid-column: span 1;
+  }
 }
 
 @media (min-width: 1024px) {
   .search-grid {
     grid-template-columns: repeat(4, 1fr);
+  }
+  
+  .search-actions {
+    grid-column: span 2;
   }
 }
 </style>

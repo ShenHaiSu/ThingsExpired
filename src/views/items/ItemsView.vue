@@ -27,9 +27,13 @@
         :items="filteredItems"
         :categories="categoryList"
         :loading="loading"
+        :pagination="pagination"
+        :default-mode="'expiry'"
         @edit="openEditDialog"
         @markUsed="handleMarkUsed"
         @delete="handleDelete"
+        @page-change="handlePageChange"
+        @page-size-change="handlePageSizeChange"
       />
     </div>
 
@@ -39,9 +43,13 @@
         :items="filteredItems"
         :categories="categoryList"
         :loading="loading"
+        :pagination="pagination"
+        :default-mode="'expiry'"
         @edit="openEditDialog"
         @markUsed="handleMarkUsed"
         @delete="handleDelete"
+        @page-change="handlePageChange"
+        @page-size-change="handlePageSizeChange"
       />
     </div>
 
@@ -51,6 +59,7 @@
       :is-edit="isEdit"
       :item="editingItem"
       :categories="categoryList"
+      :default-mode="'expiry'"
       @submit="handleSubmit"
     />
   </div>
@@ -72,11 +81,11 @@ import {
   updateItem,
   deleteItem,
   markItemAsUsed,
-  type Item,
-  type CreateItemParams,
-  type ItemSearchParams,
-} from '@/api/item'
-import { getCategoryList, type Category } from '@/api/category'
+} from '@/api'
+import type { Item, CreateItemParams, ItemSearchParams } from '@/types/api/item'
+import { getCategoryList } from '@/api'
+import type { Category } from '@/types/api/category'
+import { isUtcFormat, toUtcFormat } from '@/utils/date'
 
 const { t } = useI18n()
 
@@ -88,6 +97,13 @@ const dialogVisible = ref(false)
 const isEdit = ref(false)
 const editingItem = ref<Item | null>(null)
 const currentSearchParams = ref<ItemSearchParams>({})
+
+// 分页状态
+const pagination = ref({
+  total: 0,
+  page: 1,
+  pageSize: 10,
+})
 
 // 统计数据
 const stats = ref({
@@ -101,8 +117,46 @@ const stats = ref({
 async function loadItemList() {
   loading.value = true
   try {
-    const res = await getItemList()
+    // 构建查询参数
+    const params: any = {
+      page: pagination.value.page,
+      page_size: pagination.value.pageSize,
+    }
+
+    // 复制搜索参数
+    const searchParams = currentSearchParams.value
+
+    // 名称搜索（模糊搜索）
+    if (searchParams.name) params.name = searchParams.name
+
+    // 描述搜索（模糊搜索）
+    if (searchParams.description) params.description = searchParams.description
+
+    // 分类筛选
+    if (searchParams.category_id) params.category_id = searchParams.category_id
+
+    // 状态筛选
+    if (searchParams.status) params.status = searchParams.status as 1 | 2 | 3
+
+    // 数量范围筛选
+    if (searchParams.quantity_min !== undefined) params.quantity_min = searchParams.quantity_min
+    if (searchParams.quantity_max !== undefined) params.quantity_max = searchParams.quantity_max
+
+    // 过期时间范围筛选
+    if (searchParams.expired_at_from) params.expired_at_from = searchParams.expired_at_from
+    if (searchParams.expired_at_to) params.expired_at_to = searchParams.expired_at_to
+
+    // 创建时间范围筛选
+    if (searchParams.created_at_from) params.created_at_from = searchParams.created_at_from
+    if (searchParams.created_at_to) params.created_at_to = searchParams.created_at_to
+
+    // 排序参数
+    if (searchParams.order_by) params.order_by = searchParams.order_by
+    if (searchParams.order) params.order = searchParams.order
+
+    const res = await getItemList(params)
     itemList.value = res.data.list
+    pagination.value.total = res.data.total
   } catch (error) {
     console.error('Failed to load items:', error)
   } finally {
@@ -147,6 +201,12 @@ function openEditDialog(item: Item) {
 // 提交表单
 async function handleSubmit(data: CreateItemParams & { item_id?: number }) {
   try {
+    // 检查并转换过期日期为UTC格式
+    let expiredAt = data.expired_at
+    if (expiredAt && !isUtcFormat(expiredAt)) {
+      expiredAt = toUtcFormat(expiredAt)
+    }
+
     if (isEdit.value && data.item_id) {
       await updateItem({
         item_id: data.item_id,
@@ -155,11 +215,14 @@ async function handleSubmit(data: CreateItemParams & { item_id?: number }) {
         description: data.description,
         quantity: data.quantity,
         unit: data.unit,
-        expired_at: data.expired_at,
+        expired_at: expiredAt,
         remind_days: data.remind_days,
       })
     } else {
-      await createItem(data)
+      await createItem({
+        ...data,
+        expired_at: expiredAt,
+      })
     }
     dialogVisible.value = false
     loadItemList()
@@ -194,89 +257,32 @@ async function handleMarkUsed(itemId: number) {
 // 搜索处理
 function handleSearch(params: ItemSearchParams) {
   currentSearchParams.value = params
+  pagination.value.page = 1 // 重置到第一页
   loadItemList()
 }
 
 function handleReset() {
   currentSearchParams.value = {}
+  pagination.value.page = 1 // 重置到第一页
+  loadItemList()
+}
+
+// 分页处理
+function handlePageChange(page: number) {
+  pagination.value.page = page
+  loadItemList()
+}
+
+function handlePageSizeChange(size: number) {
+  pagination.value.pageSize = size
+  pagination.value.page = 1 // 重置到第一页
   loadItemList()
 }
 
 // 过滤物品列表
 const filteredItems = computed(() => {
-  let items = [...itemList.value]
-  const params = currentSearchParams.value
-
-  // 名称搜索
-  if (params.name) {
-    const query = params.name.toLowerCase()
-    items = items.filter(
-      (item) =>
-        item.name.toLowerCase().includes(query) ||
-        getCategoryName(item.category_id).toLowerCase().includes(query),
-    )
-  }
-
-  // 分类筛选
-  if (params.category_id) {
-    items = items.filter((item) => item.category_id === params.category_id)
-  }
-
-  // 状态筛选
-  if (params.status) {
-    items = items.filter((item) => item.status === params.status)
-  }
-
-  // 数量范围筛选
-  if (params.quantity_min !== undefined) {
-    items = items.filter((item) => item.quantity >= params.quantity_min!)
-  }
-  if (params.quantity_max !== undefined) {
-    items = items.filter((item) => item.quantity <= params.quantity_max!)
-  }
-
-  // 过期时间范围筛选
-  if (params.expired_at_from) {
-    items = items.filter((item) => item.expired_at >= params.expired_at_from!)
-  }
-  if (params.expired_at_to) {
-    items = items.filter((item) => item.expired_at <= params.expired_at_to!)
-  }
-
-  // 排序
-  if (params.order_by) {
-    items.sort((a, b) => {
-      let aValue: any
-      let bValue: any
-
-      switch (params.order_by) {
-        case 'expired_at':
-          aValue = new Date(a.expired_at).getTime()
-          bValue = new Date(b.expired_at).getTime()
-          break
-        case 'created_at':
-          aValue = new Date(a.created_at).getTime()
-          bValue = new Date(b.created_at).getTime()
-          break
-        case 'quantity':
-          aValue = a.quantity
-          bValue = b.quantity
-          break
-        case 'name':
-          aValue = a.name.toLowerCase()
-          bValue = b.name.toLowerCase()
-          break
-        default:
-          return 0
-      }
-
-      if (aValue < bValue) return params.order === 'asc' ? -1 : 1
-      if (aValue > bValue) return params.order === 'asc' ? 1 : -1
-      return 0
-    })
-  }
-
-  return items
+  // 直接返回当前页的数据，因为后端已经处理了分页
+  return itemList.value
 })
 
 function getCategoryName(categoryId: number): string {

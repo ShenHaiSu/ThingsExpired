@@ -14,14 +14,14 @@ export interface PaginatedResponse<T> {
   list: T[]
   total: number
   page: number
-  pageSize: number
 }
 
 /** 分页请求参数 */
 export interface PaginationParams {
   page?: number
-  pageSize?: number
-  keyword?: string
+  page_size?: number
+  name?: string
+  description?: string
 }
 
 /** 基础实体类型 */

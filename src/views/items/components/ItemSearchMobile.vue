@@ -9,12 +9,12 @@
     <Transition name="slide">
       <div v-if="isMobileSearchOpen" class="search-content">
         <div class="search-fields">
-          <!-- 关键词搜索 -->
+          <!-- 名称搜索 -->
           <div class="field-group">
-            <label>{{ t('items.search.keyword') }}</label>
+            <label>{{ t('items.search.name') }}</label>
             <InputText
               v-model="searchParams.name"
-              :placeholder="t('items.search.keywordPlaceholder')"
+              :placeholder="t('items.search.namePlaceholder')"
               class="w-full"
             />
           </div>
@@ -117,8 +117,8 @@ import Select from 'primevue/select'
 import InputNumber from 'primevue/inputnumber'
 import DatePicker from 'primevue/datepicker'
 import Button from 'primevue/button'
-import type { Category } from '@/api/category'
-import type { ItemSearchParams } from '@/api/item'
+import type { Category } from '@/types/api/category'
+import type { ItemSearchParams } from '@/types/api/item'
 
 const { t } = useI18n()
 

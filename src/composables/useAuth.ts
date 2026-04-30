@@ -20,10 +20,10 @@ export function useAuth() {
   const user = computed(() => userStore.userInfo)
 
   // 登录
-  async function login(username: string, password: string) {
+  async function login(email: string, password: string) {
     isLogging.value = true
     try {
-      await userStore.login({ username, password })
+      await userStore.login({ email, password })
       // 登录成功后跳转到首页或之前的页面
       const redirect = router.currentRoute.value.query.redirect as string
       router.push(redirect || '/')

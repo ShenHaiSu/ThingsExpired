@@ -37,12 +37,52 @@
         />
       </div>
     </div>
+
+    <!-- 时间填写模式切换 -->
     <div class="form-field">
+      <label class="form-label">{{ t('items.timeMode') }}</label>
+      <SelectButton
+        v-model="timeMode"
+        :options="timeModeOptions"
+        optionLabel="label"
+        optionValue="value"
+        class="w-full"
+      />
+    </div>
+
+    <!-- 生产日期 + 保质期模式 -->
+    <div v-if="!isDirectExpiryMode" class="form-row">
+      <div class="form-field">
+        <label class="form-label"
+          >{{ t('items.productionDate') }} <span class="text-red-500">*</span></label
+        >
+        <DatePicker v-model="productionDate" :showTime="false" class="w-full" />
+      </div>
+      <div class="form-field">
+        <label class="form-label"
+          >{{ t('items.shelfLife') }} <span class="text-red-500">*</span></label
+        >
+        <InputGroup>
+          <InputNumber v-model="shelfLife" :min="1" class="w-full" />
+          <Select
+            v-model="shelfLifeUnit"
+            :options="shelfLifeUnitOptions"
+            optionLabel="label"
+            optionValue="value"
+            class="w-24"
+          />
+        </InputGroup>
+      </div>
+    </div>
+
+    <!-- 直接过期日期模式 -->
+    <div v-else class="form-field">
       <label class="form-label"
         >{{ t('items.expiredAt') }} <span class="text-red-500">*</span></label
       >
       <DatePicker v-model="expiredAtDate" showTime hourFormat="24" class="w-full" />
     </div>
+
     <div class="form-field">
       <label class="form-label">{{ t('items.description') }}</label>
       <Textarea v-model="formData.description" rows="3" class="w-full" />
@@ -59,8 +99,11 @@
 </template>
 
 <script setup lang="ts">
+// 1. Vue 相关
 import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+
+// 2. 第三方库
 import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
 import InputNumber from 'primevue/inputnumber'
@@ -68,8 +111,15 @@ import Select from 'primevue/select'
 import Textarea from 'primevue/textarea'
 import DatePicker from 'primevue/datepicker'
 import Button from 'primevue/button'
-import type { Item, CreateItemParams } from '@/api/item'
-import type { Category } from '@/api/category'
+import SelectButton from 'primevue/selectbutton'
+import InputGroup from 'primevue/inputgroup'
+
+// 3. 项目内部 - 类型
+import type { Item, CreateItemParams } from '@/types/api/item'
+import type { Category } from '@/types/api/category'
+
+// 4. 项目内部 - 工具函数
+import { calculateExpiredAt } from '@/utils/date'
 
 const { t } = useI18n()
 
@@ -78,10 +128,12 @@ interface Props {
   isEdit: boolean
   item?: Item | null
   categories: Category[]
+  defaultMode?: 'production' | 'expiry' // 外部控制过期模式
 }
 
 const props = withDefaults(defineProps<Props>(), {
   item: null,
+  defaultMode: 'production',
 })
 
 const emit = defineEmits<{
@@ -104,6 +156,31 @@ const formData = ref<CreateItemParams>({
   remind_days: 3,
 })
 
+// 时间填写模式选项
+const timeModeOptions = computed(() => [
+  { label: t('items.modeProduction'), value: false },
+  { label: t('items.modeDirect'), value: true },
+])
+
+// 时间填写模式：false = 生产日期+保质期，true = 直接过期日期
+const timeMode = ref(props.defaultMode === 'expiry')
+const isDirectExpiryMode = computed(() => timeMode.value)
+
+// 生产日期和保质期（用于计算模式）
+const productionDate = ref<Date | null>(null)
+const shelfLife = ref<number>(30)
+const shelfLifeUnit = ref<'hour' | 'day' | 'week' | 'month' | 'year'>('day')
+
+// 保质期单位选项
+const shelfLifeUnitOptions = computed(() => [
+  { label: t('items.timeUnitHour'), value: 'hour' },
+  { label: t('items.timeUnitDay'), value: 'day' },
+  { label: t('items.timeUnitWeek'), value: 'week' },
+  { label: t('items.timeUnitMonth'), value: 'month' },
+  { label: t('items.timeUnitYear'), value: 'year' },
+])
+
+// 直接过期日期模式的日期选择器绑定
 const expiredAtDate = computed({
   get() {
     return formData.value.expired_at ? new Date(formData.value.expired_at) : null
@@ -120,6 +197,13 @@ const categoryOptions = computed(() =>
   })),
 )
 
+// 监听生产日期和保质期变化，自动计算过期日期
+watch([productionDate, shelfLife, shelfLifeUnit], ([newProdDate, newShelfLife, newShelfLifeUnit]) => {
+  if (!isDirectExpiryMode.value && newProdDate && newShelfLife) {
+    formData.value.expired_at = calculateExpiredAt(newProdDate, newShelfLife, newShelfLifeUnit)
+  }
+})
+
 watch(
   () => props.item,
   (newItem) => {
@@ -132,6 +216,15 @@ watch(
         expired_at: newItem.expired_at,
         description: newItem.description || '',
         remind_days: newItem.remind_days,
+      }
+      // 如果是编辑模式，默认使用过期日期模式
+      if (props.isEdit) {
+        timeMode.value = true
+      }
+      // 如果是编辑模式，根据过期日期反推生产日期和保质期
+      if (newItem.expired_at) {
+        productionDate.value = new Date(newItem.expired_at)
+        shelfLife.value = 30 // 默认值，实际应该根据业务逻辑计算
       }
     } else {
       resetForm()
@@ -150,6 +243,11 @@ function resetForm() {
     description: '',
     remind_days: 3,
   }
+  productionDate.value = null
+  shelfLife.value = 30
+  shelfLifeUnit.value = 'day'
+  // 根据外部传入的默认模式设置
+  timeMode.value = props.defaultMode === 'expiry'
 }
 
 function close() {
@@ -157,10 +255,21 @@ function close() {
 }
 
 function submit() {
+  // 确保过期日期是UTC格式
+  let expiredAt = formData.value.expired_at
+  if (expiredAt) {
+    // 检查是否已经是UTC格式 (包含Z或+00:00)
+    if (!expiredAt.endsWith('Z') && !expiredAt.includes('+00:00')) {
+      // 转换为UTC
+      const date = new Date(expiredAt)
+      expiredAt = date.toISOString()
+    }
+  }
+
   const submitData =
     props.isEdit && props.item
-      ? { ...formData.value, item_id: props.item.item_id }
-      : { ...formData.value }
+      ? { ...formData.value, expired_at: expiredAt, item_id: props.item.item_id }
+      : { ...formData.value, expired_at: expiredAt }
   emit('submit', submitData)
 }
 </script>
@@ -188,6 +297,20 @@ function submit() {
 @media (max-width: 640px) {
   .form-row {
     grid-template-columns: 1fr;
+  }
+  
+  /* InputGroup 在移动端需要特殊处理 */
+  :deep(.p-inputgroup) {
+    flex-direction: column;
+  }
+  
+  :deep(.p-inputgroup > *:first-child) {
+    border-radius: 6px 6px 0 0;
+    border-right: 1px solid var(--surface-border);
+  }
+  
+  :deep(.p-inputgroup > *:last-child) {
+    border-radius: 0 0 6px 6px;
   }
 }
 </style>
