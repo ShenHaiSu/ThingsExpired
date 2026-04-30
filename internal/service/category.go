@@ -30,6 +30,15 @@ func NewCategoryService(categoryRepo repository.ICategoryRepository) ICategorySe
 }
 
 func (s *CategoryService) Create(ctx context.Context, userID uint, req *dto.CreateCategoryRequest) (*vo.CategoryVO, error) {
+	// 检查是否已存在同名分类
+	existingCategory, err := s.categoryRepo.GetByUserIDAndName(ctx, userID, req.Name)
+	if err != nil {
+		return nil, err
+	}
+	if existingCategory != nil {
+		return nil, errors.New(errors.CodeCategoryExists, "分类名称已存在")
+	}
+
 	category := &model.Category{
 		UserID:    userID,
 		Name:      req.Name,

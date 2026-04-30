@@ -12,6 +12,9 @@ const (
 	CodeUserExists    = 2002
 	CodePasswordWrong = 2003
 
+	// 分类相关
+	CodeCategoryExists = 3001
+
 	// 系统相关
 	CodeInternalError = 5001
 	CodeDatabaseError = 5002

@@ -11,6 +11,7 @@ import (
 type ICategoryRepository interface {
 	Create(ctx context.Context, category *model.Category) error
 	GetByID(ctx context.Context, id uint) (*model.Category, error)
+	GetByUserIDAndName(ctx context.Context, userID uint, name string) (*model.Category, error)
 	List(ctx context.Context, userID uint, page, pageSize int) ([]*model.Category, int64, error)
 	Update(ctx context.Context, category *model.Category) error
 	Delete(ctx context.Context, id uint) error
@@ -33,6 +34,17 @@ func (r *CategoryRepository) Create(ctx context.Context, category *model.Categor
 func (r *CategoryRepository) GetByID(ctx context.Context, id uint) (*model.Category, error) {
 	var category model.Category
 	if err := r.db.WithContext(ctx).First(&category, id).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &category, nil
+}
+
+func (r *CategoryRepository) GetByUserIDAndName(ctx context.Context, userID uint, name string) (*model.Category, error) {
+	var category model.Category
+	if err := r.db.WithContext(ctx).Where("user_id = ? AND name = ?", userID, name).First(&category).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
 		}
