@@ -39,6 +39,8 @@ app.use(ToastService)
 app.directive('tooltip', Tooltip)
 
 // 使用 PrimeVue UI 组件库
+// 注意：locale 配置必须是直接的 locale 对象，不能是多语言映射
+// 动态切换语言需要在组件中通过 usePrimeVue() 修改 config.locale
 app.use(PrimeVue, {
   theme: {
     preset: Aura,
@@ -48,10 +50,8 @@ app.use(PrimeVue, {
     },
   },
   ripple: true,
-  locale: {
-    en: primevueEn,
-    'zh-CN': primevueZhCN,
-  },
+  // 默认使用中文 locale，后续通过组件动态切换
+  locale: primevueZhCN,
 })
 
 // 使用 PrimeVue Confirm 服务

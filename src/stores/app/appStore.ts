@@ -5,10 +5,8 @@
 
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
+import i18n from '@/locales'
 import { localCache } from '@/utils/storage'
-import { usePrimeVue } from 'primevue/config'
-import primevueEn from '@/locales/primevue-en.json'
-import primevueZhCN from '@/locales/primevue-zh-CN.json'
 
 // ============ 类型定义 ============
 
@@ -88,17 +86,9 @@ export const useAppStore = defineStore('app', () => {
   function setLocale(newLocale: Locale) {
     locale.value = newLocale
     localCache.set('locale', newLocale)
-
-    // 同步 PrimeVue 本地化
-    const primeVue = usePrimeVue()
-    if (primeVue) {
-      // 根据语言类型设置对应的 PrimeVue 语言配置
-      if (newLocale === 'en') {
-        primeVue.config.locale = primevueEn
-      } else if (newLocale === 'zh-CN') {
-        primeVue.config.locale = primevueZhCN
-      }
-    }
+    
+    // 同步更新 vue-i18n 的 locale（legacy: false 模式）
+    i18n.global.locale.value = newLocale
   }
 
   /**

@@ -126,7 +126,7 @@ function handleLocaleChange() {
 <style scoped>
 .login-layout {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
   width: 100%;
   background: var(--color-bg-card);
 }

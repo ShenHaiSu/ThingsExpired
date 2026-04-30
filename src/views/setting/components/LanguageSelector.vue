@@ -35,18 +35,39 @@
 
 <script setup lang="ts">
 import Button from 'primevue/button'
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { usePrimeVue } from 'primevue/config'
 import { useAppStore, type Locale } from '@/stores/app/appStore'
+import primevueEn from '@/locales/primevue-en.json'
+import primevueZhCN from '@/locales/primevue-zh-CN.json'
 
 // i18n
 const { t } = useI18n()
+
+// PrimeVue
+const primeVue = usePrimeVue()
 
 // App Store
 const appStore = useAppStore()
 
 // 当前语言
 const locale = computed(() => appStore.locale)
+
+// 监听语言变化，同步更新 PrimeVue locale
+watch(
+  locale,
+  (newLocale) => {
+    if (primeVue) {
+      if (newLocale === 'en') {
+        primeVue.config.locale = primevueEn
+      } else if (newLocale === 'zh-CN') {
+        primeVue.config.locale = primevueZhCN
+      }
+    }
+  },
+  { immediate: true }
+)
 
 // 处理语言切换
 function handleLanguageChange(newLocale: Locale) {
