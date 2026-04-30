@@ -203,5 +203,20 @@
       "confirmMessage": "您确定要退出登录吗？",
       "success": "已成功退出登录"
     }
+  },
+  "error": {
+    "forbidden": {
+      "code": "403",
+      "title": "无权访问",
+      "description": "抱歉，您没有权限访问此页面",
+      "hint": "如需访问权限，请联系管理员"
+    },
+    "notFound": {
+      "code": "404",
+      "title": "页面未找到",
+      "description": "抱歉，您访问的页面不存在"
+    },
+    "backToHome": "返回首页",
+    "goBack": "返回上页"
   }
 }

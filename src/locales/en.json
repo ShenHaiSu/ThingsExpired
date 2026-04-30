@@ -203,5 +203,20 @@
       "confirmMessage": "Are you sure you want to logout?",
       "success": "Successfully logged out"
     }
+  },
+  "error": {
+    "forbidden": {
+      "code": "403",
+      "title": "Access Denied",
+      "description": "Sorry, you don't have permission to access this page",
+      "hint": "Please contact administrator for access permission"
+    },
+    "notFound": {
+      "code": "404",
+      "title": "Page Not Found",
+      "description": "Sorry, the page you are looking for does not exist"
+    },
+    "backToHome": "Return to Home",
+    "goBack": "Go Back"
   }
 }
