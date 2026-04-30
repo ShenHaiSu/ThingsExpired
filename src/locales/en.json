@@ -103,6 +103,7 @@
     "timeUnitWeek": "Week",
     "timeUnitMonth": "Month",
     "timeUnitYear": "Year",
+    "daysUntilExpired": "days until expired",
     "status": {
       "title": "Status",
       "normal": "Normal",

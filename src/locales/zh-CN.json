@@ -103,6 +103,7 @@
     "timeUnitWeek": "周",
     "timeUnitMonth": "月",
     "timeUnitYear": "年",
+    "daysUntilExpired": "天后过期",
     "status": {
       "title": "状态",
       "normal": "正常",

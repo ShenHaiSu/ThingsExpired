@@ -92,10 +92,8 @@
   "prevPage": "上一页",
   "rowsPerPage": "每页行数",
   "search": "搜索",
-  "selectAll": "全选",
   "filter": "过滤",
   "edit": "编辑",
-  "cancel": "取消",
   "save": "保存",
   "delete": "删除",
   "add": "添加",
@@ -129,6 +127,6 @@
   "invalidDate": "无效日期",
   "invalidNumber": "无效数字",
   "empty": "空",
-  "emptyMessage": "未找到结果",
-  "loading": "加载中..."
+  "loading": "加载中...",
+  "fileSizeTypes": ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
 }
