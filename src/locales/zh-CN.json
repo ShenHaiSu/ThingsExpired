@@ -20,7 +20,27 @@
     "max": "最大",
     "startDate": "开始日期",
     "endDate": "结束日期",
-    "sort": "排序"
+    "sort": "排序",
+    "theme": "主题",
+    "themeLight": "浅色",
+    "themeDark": "深色",
+    "themeAuto": "自动",
+    "language": "语言",
+    "languageZh": "中文",
+    "languageEn": "English"
+  },
+  "home": {
+    "welcomeTitle": "欢迎使用 Things Expired",
+    "welcomeDesc": "轻松管理您的物品过期信息，避免浪费",
+    "quickActions": "快捷操作",
+    "addItem": "添加物品",
+    "addItemDesc": "记录新的物品信息",
+    "manageCategory": "管理分类",
+    "manageCategoryDesc": "整理物品分类",
+    "expiringSoon": "即将过期",
+    "expiringSoonDesc": "查看即将过期的物品",
+    "systemSettings": "系统设置",
+    "systemSettingsDesc": "管理账户和偏好"
   },
   "menu": {
     "home": "首页",
@@ -62,7 +82,10 @@
     "resetPasswordHint": "请输入您的邮箱，我们将发送重置密码链接",
     "fillEmail": "请输入邮箱地址",
     "rememberPassword": "想起密码了？",
-    "backToLogin": "返回登录"
+    "backToLogin": "返回登录",
+    "featureTrack": "追踪物品过期时间",
+    "featureRemind": "智能提醒功能",
+    "featureOrganize": "分类整理物品"
   },
   "category": {
     "title": "分类管理",

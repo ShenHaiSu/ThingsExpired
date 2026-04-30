@@ -20,7 +20,27 @@
     "max": "Max",
     "startDate": "Start Date",
     "endDate": "End Date",
-    "sort": "Sort"
+    "sort": "Sort",
+    "theme": "Theme",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "themeAuto": "Auto",
+    "language": "Language",
+    "languageZh": "简体中文",
+    "languageEn": "English"
+  },
+  "home": {
+    "welcomeTitle": "Welcome to Things Expired",
+    "welcomeDesc": "Easily manage your item expiration information and avoid waste",
+    "quickActions": "Quick Actions",
+    "addItem": "Add Item",
+    "addItemDesc": "Record new item information",
+    "manageCategory": "Manage Categories",
+    "manageCategoryDesc": "Organize item categories",
+    "expiringSoon": "Expiring Soon",
+    "expiringSoonDesc": "View items expiring soon",
+    "systemSettings": "System Settings",
+    "systemSettingsDesc": "Manage account and preferences"
   },
   "menu": {
     "home": "Home",
@@ -62,7 +82,10 @@
     "resetPasswordHint": "Please enter your email, we will send a reset password link",
     "fillEmail": "Please enter your email address",
     "rememberPassword": "Remember your password?",
-    "backToLogin": "Back to Login"
+    "backToLogin": "Back to Login",
+    "featureTrack": "Track item expiration time",
+    "featureRemind": "Smart reminder feature",
+    "featureOrganize": "Organize items by category"
   },
   "category": {
     "title": "Categories",
