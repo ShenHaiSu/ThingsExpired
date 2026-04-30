@@ -134,6 +134,8 @@
     "description": "Description",
     "remindDays": "Remind Days",
     "selectCategory": "Select Category",
+    "categoryPlaceholder": "Enter or select category",
+    "categoryHint": "Enter existing category name or new category name",
     "markAsUsed": "Mark as Used",
     "timeMode": "Time Entry Mode",
     "modeProduction": "Production Date Mode",
@@ -160,7 +162,9 @@
       "deleteSuccess": "Item deleted successfully",
       "deleteFailed": "Failed to delete item",
       "markUsedSuccess": "Marked as used",
-      "markUsedFailed": "Failed to mark as used"
+      "markUsedFailed": "Failed to mark as used",
+      "categoryCreated": "New category created successfully",
+      "categoryCreateFailed": "Failed to create new category"
     },
     "status": {
       "title": "Status",

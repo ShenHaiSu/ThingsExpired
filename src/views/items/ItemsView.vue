@@ -61,6 +61,7 @@
       :categories="categoryList"
       :default-mode="'expiry'"
       @submit="handleSubmit"
+      @category-created="handleCategoryCreated"
     />
   </div>
 </template>
@@ -270,6 +271,12 @@ async function handleSubmit(data: CreateItemParams & { item_id?: number }) {
       toast.error(t('items.message.createFailed') + (errorMessage ? `: ${errorMessage}` : ''))
     }
   }
+}
+
+// 处理新类别创建
+function handleCategoryCreated(category: Category) {
+  // 将新创建的类别添加到列表中
+  categoryList.value.push(category)
 }
 
 // 删除物品

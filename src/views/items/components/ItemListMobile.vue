@@ -39,11 +39,11 @@
             <div class="flex flex-row items-start gap-2">
               <span
                 :class="getExpiredClass(item.expired_at)"
-                class="text-sm font-medium text-gray-900"
+                class="text-sm font-medium expired-days-text"
               >
                 {{ getDaysUntilExpired(item.expired_at) }} {{ t('items.daysUntilExpired') }}
               </span>
-              <span class="text-sm text-gray-500"> {{ formatDate(item.expired_at) }}</span>
+              <span class="text-sm expired-date-text"> {{ formatDate(item.expired_at) }}</span>
             </div>
           </div>
         </div>
@@ -296,6 +296,15 @@ function getStatusText(status: ItemStatus): string {
 .warning-text {
   color: var(--color-warning);
   font-weight: 500;
+}
+
+/* 过期时间显示文本颜色 - 适配亮色/暗色模式 */
+.expired-days-text {
+  color: var(--color-text-primary);
+}
+
+.expired-date-text {
+  color: var(--color-text-secondary);
 }
 
 .card-actions {

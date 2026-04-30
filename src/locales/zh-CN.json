@@ -134,6 +134,8 @@
     "description": "描述",
     "remindDays": "提前提醒天数",
     "selectCategory": "选择分类",
+    "categoryPlaceholder": "输入或选择分类",
+    "categoryHint": "可输入已有分类名称或新分类名称",
     "markAsUsed": "标记为已使用",
     "timeMode": "时间填写模式",
     "modeProduction": "生产日期模式",
@@ -160,7 +162,9 @@
       "deleteSuccess": "物品删除成功",
       "deleteFailed": "物品删除失败",
       "markUsedSuccess": "已标记为已使用",
-      "markUsedFailed": "标记失败"
+      "markUsedFailed": "标记失败",
+      "categoryCreated": "新分类创建成功",
+      "categoryCreateFailed": "新分类创建失败"
     },
     "status": {
       "title": "状态",

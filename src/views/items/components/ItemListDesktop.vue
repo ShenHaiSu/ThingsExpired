@@ -29,11 +29,11 @@
           <div class="flex flex-col items-start">
             <span
               :class="getExpiredClass(slotProps.data.expired_at)"
-              class="text-sm font-medium text-gray-900"
+              class="text-sm font-medium expired-days-text"
             >
               {{ getDaysUntilExpired(slotProps.data.expired_at) }} {{ t('items.daysUntilExpired') }}
             </span>
-            <span class="text-xs text-gray-500">
+            <span class="text-xs expired-date-text">
               {{ formatDate(slotProps.data.expired_at) }}
             </span>
           </div>
@@ -210,6 +210,15 @@ function getStatusText(status: ItemStatus): string {
 .warning-text {
   color: var(--color-warning);
   font-weight: 500;
+}
+
+/* 过期时间显示文本颜色 - 适配亮色/暗色模式 */
+.expired-days-text {
+  color: var(--color-text-primary);
+}
+
+.expired-date-text {
+  color: var(--color-text-secondary);
 }
 
 /* 操作按钮组 */
