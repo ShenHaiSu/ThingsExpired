@@ -41,6 +41,10 @@ app.directive('tooltip', Tooltip)
 app.use(PrimeVue, {
   theme: {
     preset: Aura,
+    options: {
+      // 使用 .dark 作为暗色模式选择器，与自定义组件共用同一个 class
+      darkModeSelector: '.dark',
+    },
   },
   ripple: true,
   locale: {
