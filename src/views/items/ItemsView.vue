@@ -2,7 +2,7 @@
   <div class="items-view">
     <div class="page-header">
       <div class="page-header-left">
-        <i class="pi pi-box text-green-500 text-xl mr-2"></i>
+        <i class="pi pi-box text-xl mr-2" style="color: var(--color-primary-500)"></i>
         <h1 class="page-title">{{ t('items.title') }}</h1>
       </div>
       <div class="header-actions">
@@ -66,14 +66,21 @@
 </template>
 
 <script setup lang="ts">
+// 1. Vue 相关
 import { ref, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+
+// 2. 第三方库
 import Button from 'primevue/button'
+
+// 3. 项目内部 - 组件
 import ItemStatsCard from './components/ItemStatsCard.vue'
 import ItemSearch from './components/ItemSearch.vue'
 import ItemListDesktop from './components/ItemListDesktop.vue'
 import ItemListMobile from './components/ItemListMobile.vue'
 import ItemEditDialog from './components/ItemEditDialog.vue'
+
+// 4. 项目内部 - API
 import {
   getItemList,
   getItemStats,
@@ -82,12 +89,20 @@ import {
   deleteItem,
   markItemAsUsed,
 } from '@/api'
-import type { Item, CreateItemParams, ItemSearchParams } from '@/types/api/item'
 import { getCategoryList } from '@/api'
+
+// 5. 项目内部 - 类型
+import type { Item, CreateItemParams, ItemSearchParams } from '@/types/api/item'
 import type { Category } from '@/types/api/category'
+
+// 6. 项目内部 - 工具函数
 import { isUtcFormat, toUtcFormat } from '@/utils/date'
 
+// 7. 项目内部 - 组合式函数
+import { useToast } from '@/composables'
+
 const { t } = useI18n()
+const toast = useToast()
 
 // 状态
 const itemList = ref<Item[]>([])
@@ -200,6 +215,22 @@ function openEditDialog(item: Item) {
 
 // 提交表单
 async function handleSubmit(data: CreateItemParams & { item_id?: number }) {
+  // 表单验证
+  if (!data.name || data.name.trim() === '') {
+    toast.error(t('items.validation.nameRequired'))
+    return
+  }
+
+  if (!data.category_id || data.category_id === 0) {
+    toast.error(t('items.validation.categoryRequired'))
+    return
+  }
+
+  if (!data.expired_at || data.expired_at.trim() === '') {
+    toast.error(t('items.validation.expiredAtRequired'))
+    return
+  }
+
   try {
     // 检查并转换过期日期为UTC格式
     let expiredAt = data.expired_at
@@ -218,17 +249,26 @@ async function handleSubmit(data: CreateItemParams & { item_id?: number }) {
         expired_at: expiredAt,
         remind_days: data.remind_days,
       })
+      toast.success(t('items.message.updateSuccess'))
     } else {
       await createItem({
         ...data,
         expired_at: expiredAt,
       })
+      toast.success(t('items.message.createSuccess'))
     }
     dialogVisible.value = false
     loadItemList()
     loadStats()
-  } catch (error) {
+  } catch (error: any) {
     console.error('Failed to save item:', error)
+    // 根据错误信息显示对应的提示
+    const errorMessage = error?.response?.data?.message || error?.message || ''
+    if (isEdit.value) {
+      toast.error(t('items.message.updateFailed') + (errorMessage ? `: ${errorMessage}` : ''))
+    } else {
+      toast.error(t('items.message.createFailed') + (errorMessage ? `: ${errorMessage}` : ''))
+    }
   }
 }
 
@@ -236,10 +276,13 @@ async function handleSubmit(data: CreateItemParams & { item_id?: number }) {
 async function handleDelete(itemId: number) {
   try {
     await deleteItem(itemId)
+    toast.success(t('items.message.deleteSuccess'))
     loadItemList()
     loadStats()
-  } catch (error) {
+  } catch (error: any) {
     console.error('Failed to delete item:', error)
+    const errorMessage = error?.response?.data?.message || error?.message || ''
+    toast.error(t('items.message.deleteFailed') + (errorMessage ? `: ${errorMessage}` : ''))
   }
 }
 
@@ -247,10 +290,13 @@ async function handleDelete(itemId: number) {
 async function handleMarkUsed(itemId: number) {
   try {
     await markItemAsUsed(itemId)
+    toast.success(t('items.message.markUsedSuccess'))
     loadItemList()
     loadStats()
-  } catch (error) {
+  } catch (error: any) {
     console.error('Failed to mark item as used:', error)
+    const errorMessage = error?.response?.data?.message || error?.message || ''
+    toast.error(t('items.message.markUsedFailed') + (errorMessage ? `: ${errorMessage}` : ''))
   }
 }
 
@@ -300,7 +346,6 @@ onMounted(() => {
 
 <style scoped>
 .items-view {
-  max-width: 1200px;
   margin: 0 auto;
   padding: 0 16px;
 }
@@ -322,7 +367,7 @@ onMounted(() => {
 .page-title {
   font-size: 22px;
   font-weight: 600;
-  color: var(--text-color, #1f2937);
+  color: var(--color-text-primary);
   margin: 0;
 }
 

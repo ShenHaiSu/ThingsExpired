@@ -131,6 +131,21 @@
     "timeUnitMonth": "Month",
     "timeUnitYear": "Year",
     "daysUntilExpired": "days until expired",
+    "validation": {
+      "nameRequired": "Item name is required",
+      "categoryRequired": "Please select a category",
+      "expiredAtRequired": "Please set expiration time"
+    },
+    "message": {
+      "createSuccess": "Item created successfully",
+      "createFailed": "Failed to create item",
+      "updateSuccess": "Item updated successfully",
+      "updateFailed": "Failed to update item",
+      "deleteSuccess": "Item deleted successfully",
+      "deleteFailed": "Failed to delete item",
+      "markUsedSuccess": "Marked as used",
+      "markUsedFailed": "Failed to mark as used"
+    },
     "status": {
       "title": "Status",
       "normal": "Normal",
