@@ -1,11 +1,12 @@
 package router
 
 import (
-	"github.com/gin-gonic/gin"
 	"things-expired/config"
 	"things-expired/internal/handler"
 	"things-expired/pkg/middleware"
 	"things-expired/pkg/utils"
+
+	"github.com/gin-gonic/gin"
 )
 
 // NewRouter 创建并配置路由
