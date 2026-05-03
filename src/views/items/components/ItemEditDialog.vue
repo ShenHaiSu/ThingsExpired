@@ -56,27 +56,29 @@
     </div>
 
     <!-- 生产日期 + 保质期模式 -->
-    <div v-if="!isDirectExpiryMode" class="form-row">
-      <div class="form-field">
+    <div v-if="!isDirectExpiryMode" class="production-expiry-mode">
+      <!-- 生产日期行 -->
+      <div class="form-field production-date-field">
         <label class="form-label"
           >{{ t('items.productionDate') }} <span class="text-red-500">*</span></label
         >
         <DatePicker v-model="productionDate" :showTime="false" class="w-full" />
       </div>
-      <div class="form-field">
+      <!-- 保质期行 -->
+      <div class="form-field shelf-life-field">
         <label class="form-label"
           >{{ t('items.shelfLife') }} <span class="text-red-500">*</span></label
         >
-        <InputGroup>
-          <InputNumber v-model="shelfLife" :min="1" class="w-full" />
+        <div class="shelf-life-input-wrapper">
+          <InputNumber v-model="shelfLife" :min="1" class="shelf-life-number" />
           <Select
             v-model="shelfLifeUnit"
             :options="shelfLifeUnitOptions"
             optionLabel="label"
             optionValue="value"
-            class="w-24"
+            class="shelf-life-unit"
           />
-        </InputGroup>
+        </div>
       </div>
     </div>
 
@@ -452,10 +454,53 @@ async function submit() {
   width: 100%;
 }
 
+/* 生产日期 + 保质期模式布局 */
+.production-expiry-mode {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* 保质期输入包装器 - 桌面端横向布局 */
+.shelf-life-input-wrapper {
+  display: flex;
+  gap: 8px;
+}
+
+.shelf-life-number {
+  flex: 1;
+}
+
+.shelf-life-unit {
+  width: 96px;
+}
+
 /* 移动端适配 */
 @media (max-width: 640px) {
   .form-row {
     grid-template-columns: 1fr;
+  }
+
+  /* 生产日期 + 保质期模式：移动端两行布局 */
+  .production-expiry-mode {
+    grid-template-columns: 1fr;
+  }
+
+  /* 保质期输入：移动端占满宽度 */
+  .shelf-life-input-wrapper {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+  }
+
+  .shelf-life-number {
+    flex: 1;
+    width: 100%;
+  }
+
+  .shelf-life-unit {
+    flex: 1;
+    width: 100%;
   }
 
   /* InputGroup 在移动端需要特殊处理 */
