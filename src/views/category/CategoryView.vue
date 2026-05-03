@@ -68,49 +68,12 @@
     </div>
 
     <!-- 创建/编辑对话框 -->
-    <Dialog
+    <CategoryFormDialog
       v-model:visible="dialogVisible"
-      :header="isEdit ? t('category.edit') : t('category.create')"
-      modal
-      :style="{ width: '450px' }"
-      :breakpoints="{ '640px': '90vw' }"
-    >
-      <div class="form-field">
-        <label class="form-label"
-          >{{ t('category.name') }} <span class="text-danger">*</span></label
-        >
-        <InputText
-          v-model="formData.name"
-          :placeholder="t('category.namePlaceholder')"
-          :class="{ 'p-invalid': validationErrors.name }"
-        />
-        <small v-if="validationErrors.name" class="p-error">{{ validationErrors.name }}</small>
-      </div>
-      <div class="form-field">
-        <label class="form-label">{{ t('category.color') }}</label>
-        <InputText v-model="formData.color" :placeholder="t('category.colorPlaceholder')" />
-      </div>
-      <div class="form-field">
-        <label class="form-label">{{ t('category.icon') }}</label>
-        <InputText v-model="formData.icon" :placeholder="t('category.iconPlaceholder')" />
-      </div>
-      <div class="form-field">
-        <label class="form-label">{{ t('category.sortOrder') }}</label>
-        <InputNumber v-model="formData.sort_order" :min="0" />
-      </div>
-      <template #footer>
-        <Button
-          :label="t('common.cancel')"
-          severity="secondary"
-          text
-          @click="dialogVisible = false"
-        />
-        <Button :label="t('common.save')" icon="pi pi-check" @click="handleSubmit" />
-      </template>
-    </Dialog>
-
-    <!-- 删除确认对话框 -->
-    <ConfirmDialog />
+      :is-edit="isEdit"
+      v-model:form-data="formData"
+      @submit="handleFormSubmit"
+    />
   </div>
 </template>
 
@@ -121,12 +84,9 @@ import { useConfirm } from 'primevue/useconfirm'
 import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
-import Dialog from 'primevue/dialog'
-import InputText from 'primevue/inputtext'
-import InputNumber from 'primevue/inputnumber'
-import ConfirmDialog from 'primevue/confirmdialog'
 import { formatDateTime } from '@/utils'
 import { useToast } from '@/composables'
+import CategoryFormDialog from './components/CategoryFormDialog.vue'
 import {
   getCategoryList,
   createCategory,
@@ -155,11 +115,6 @@ const formData = ref<CreateCategoryParams>({
   sort_order: 0,
 })
 
-// 校验错误
-const validationErrors = ref<{
-  name?: string
-}>({})
-
 // 加载分类列表
 async function loadCategoryList() {
   loading.value = true
@@ -183,7 +138,6 @@ function openCreateDialog() {
     icon: '',
     sort_order: 0,
   }
-  validationErrors.value = {}
   dialogVisible.value = true
 }
 
@@ -197,39 +151,20 @@ function openEditDialog(category: Category) {
     icon: category.icon,
     sort_order: category.sort_order,
   }
-  validationErrors.value = {}
   dialogVisible.value = true
 }
 
-// 表单校验
-function validateForm(): boolean {
-  validationErrors.value = {}
-
-  if (!formData.value.name || formData.value.name.trim() === '') {
-    validationErrors.value.name = t('category.validation.nameRequired')
-    return false
-  }
-
-  return true
-}
-
-// 提交表单
-async function handleSubmit() {
-  // 校验表单
-  if (!validateForm()) {
-    toast.warn(t('category.validation.nameRequired'), t('common.warning'))
-    return
-  }
-
+// 表单提交处理
+async function handleFormSubmit(formDataSubmit: CreateCategoryParams) {
   try {
     if (isEdit.value && editingId.value) {
       await updateCategory({
         category_id: editingId.value,
-        ...formData.value,
+        ...formDataSubmit,
       })
       toast.success(t('category.message.updateSuccess'))
     } else {
-      await createCategory(formData.value)
+      await createCategory(formDataSubmit)
       toast.success(t('category.message.createSuccess'))
     }
     dialogVisible.value = false
