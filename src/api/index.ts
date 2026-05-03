@@ -35,7 +35,18 @@ apiClient.interceptors.response.use(
   (response: AxiosResponse) => {
     // 统一处理成功响应
     const res = response.data
+
+    // 检查业务层面的错误码
     if (res.code !== undefined && res.code !== 0) {
+      // 处理 token 过期 (code = 1002)
+      if (res.code === 1002) {
+        console.warn('Token expired, redirecting to login')
+        const userStore = useUserStore()
+        userStore.logout()
+        window.location.href = '/login'
+        return Promise.reject(new Error(res.message || 'Token expired'))
+      }
+
       console.error('API Error:', res.message)
       return Promise.reject(new Error(res.message || 'Error'))
     }
@@ -43,7 +54,18 @@ apiClient.interceptors.response.use(
   },
   (error) => {
     // 统一处理错误响应
-    const message = error.response?.data?.message || error.message || '网络错误'
+    const res = error.response?.data
+
+    // 处理 HTTP 状态码 200 但业务 code 为 1002 的情况
+    if (error.response?.status === 200 && res?.code === 1002) {
+      console.warn('Token expired, redirecting to login')
+      const userStore = useUserStore()
+      userStore.logout()
+      window.location.href = '/login'
+      return Promise.reject(error)
+    }
+
+    const message = res?.message || error.message || '网络错误'
     console.error('API Error:', message)
 
     // 处理 401 未授权
