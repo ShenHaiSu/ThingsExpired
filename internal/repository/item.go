@@ -19,6 +19,10 @@ type IItemRepository interface {
 	GetStats(ctx context.Context, userID uint) (total, expiringSoon, expired, used int64, err error)
 	Update(ctx context.Context, item *model.Item) error
 	Delete(ctx context.Context, id uint) error
+
+	// 过期检查相关方法
+	GetExpiredItems(ctx context.Context, limit int) ([]*model.Item, error)  // 获取已过期但状态仍为正常的物品
+	BatchUpdateStatus(ctx context.Context, ids []uint, status int8) error   // 批量更新状态
 }
 
 // ItemRepository 物品仓储实现
@@ -122,4 +126,36 @@ func (r *ItemRepository) GetStats(ctx context.Context, userID uint) (total, expi
 	}
 
 	return total, expiringSoon, expired, used, nil
+}
+
+// GetExpiredItems 获取已过期但状态仍为正常的物品
+// 用于后台定时任务检查
+func (r *ItemRepository) GetExpiredItems(ctx context.Context, limit int) ([]*model.Item, error) {
+	var items []*model.Item
+	now := utils.NowUTC()
+
+	err := r.db.WithContext(ctx).
+		Model(&model.Item{}).
+		Where("status = ?", 1).       // 状态为正常
+		Where("expired_at < ?", now).  // 已过期
+		Limit(limit).                  // 限制数量，防止一次性处理过多
+		Find(&items).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return items, nil
+}
+
+// BatchUpdateStatus 批量更新物品状态
+func (r *ItemRepository) BatchUpdateStatus(ctx context.Context, ids []uint, status int8) error {
+	if len(ids) == 0 {
+		return nil
+	}
+
+	return r.db.WithContext(ctx).
+		Model(&model.Item{}).
+		Where("id IN ?", ids).
+		Update("status", status).Error
 }

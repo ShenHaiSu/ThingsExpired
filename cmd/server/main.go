@@ -92,10 +92,16 @@ func main() {
 			return cfg.Security.AllowMultiLogin, cfg.Security.MaxSessionsPerUser
 		}),
 
+		// 过期检查配置
+		fx.Provide(func(cfg *config.Config) *config.ExpirationConfig {
+			return &cfg.Expiration
+		}),
+
 		// Service
 		fx.Provide(service.NewUserService),
 		fx.Provide(service.NewCategoryService),
 		fx.Provide(service.NewItemService),
+		fx.Provide(service.NewItemExpirationService),
 
 		// Handler
 		fx.Provide(handler.NewUserHandler),
@@ -109,9 +115,28 @@ func main() {
 		// Router
 		fx.Provide(router.NewRouter),
 
-		// 启动服务器
+		// 启动服务器和过期检查任务
 		fx.Invoke(startServer),
+		fx.Invoke(startExpirationChecker),
 	).Run()
+}
+
+// startExpirationChecker 启动过期检查任务
+func startExpirationChecker(
+	lc fx.Lifecycle,
+	expirationSvc service.IItemExpirationService,
+	logger *utils.Logger,
+) {
+	lc.Append(fx.Hook{
+		OnStart: func(ctx context.Context) error {
+			logger.Info("启动过期检查任务")
+			return expirationSvc.Start(ctx)
+		},
+		OnStop: func(ctx context.Context) error {
+			logger.Info("停止过期检查任务")
+			return expirationSvc.Stop()
+		},
+	})
 }
 
 // startServer 启动 HTTP 服务器

@@ -35,3 +35,8 @@ log:
 
 frontend:
   static_path: "./dist"        # 前端静态资源目录路径（存放编译后的 HTML、CSS、JS 等文件）
+
+expiration:
+  enabled: true                # 是否启用自动过期检查
+  interval_sec: 3600           # 检查间隔（秒），默认1小时
+  batch_size: 100              # 每次批量处理数量，防止一次性处理过多
