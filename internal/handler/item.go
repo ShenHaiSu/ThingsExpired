@@ -159,3 +159,20 @@ func (h *ItemHandler) GetExpiringItems(c *gin.Context) {
 
 	Success(c, items)
 }
+
+// GetStats 获取物品统计信息
+func (h *ItemHandler) GetStats(c *gin.Context) {
+	userID, exists := c.Get("user_id")
+	if !exists {
+		FailWithCode(c, errors.CodeUnauthorized, "未授权")
+		return
+	}
+
+	stats, err := h.itemService.GetStats(c.Request.Context(), userID.(uint))
+	if err != nil {
+		Fail(c, err)
+		return
+	}
+
+	Success(c, stats)
+}

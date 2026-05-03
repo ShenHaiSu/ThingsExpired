@@ -1,0 +1,31 @@
+{
+  // Go 语言配置
+  "go.formatTool": "gofmt",
+  "go.useLanguageServer": true,
+
+  // 编辑器配置 - 使用 2 空格缩进
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false,
+
+  // 针对 Go 文件的格式化配置
+  "[go]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": false,
+    "editor.defaultFormatter": "golang.go"
+  },
+
+  // 保存时自动格式化
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit"
+  },
+
+  // 扩展配置
+  "extensions": {
+    "recommendations": [
+      "golang.go"
+    ]
+  }
+}

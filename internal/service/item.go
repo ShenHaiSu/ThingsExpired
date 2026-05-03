@@ -9,6 +9,7 @@ import (
 	"things-expired/internal/model/vo"
 	"things-expired/internal/repository"
 	"things-expired/pkg/errors"
+	"things-expired/pkg/utils"
 )
 
 // IItemService 物品服务接口
@@ -19,19 +20,20 @@ type IItemService interface {
 	Update(ctx context.Context, userID uint, req *dto.UpdateItemRequest) (*vo.ItemVO, error)
 	Delete(ctx context.Context, userID uint, itemID uint) error
 	GetExpiringItems(ctx context.Context, userID uint, days int) ([]vo.ExpiringItemVO, error)
+	GetStats(ctx context.Context, userID uint) (*vo.ItemStatsVO, error)
 }
 
 // ItemService 物品服务实现
 type ItemService struct {
-	itemRepo   repository.IItemRepository
-	validator  *ItemRequestValidator
+	itemRepo  repository.IItemRepository
+	validator *ItemRequestValidator
 }
 
 // NewItemService 创建物品服务
 func NewItemService(itemRepo repository.IItemRepository) IItemService {
 	return &ItemService{
-		itemRepo:   itemRepo,
-		validator:  NewItemRequestValidator(),
+		itemRepo:  itemRepo,
+		validator: NewItemRequestValidator(),
 	}
 }
 
@@ -175,7 +177,8 @@ func (s *ItemService) GetExpiringItems(ctx context.Context, userID uint, days in
 	result := make([]vo.ExpiringItemVO, 0, len(items))
 
 	for _, item := range items {
-		daysUntil := int(time.Until(item.ExpiredAt).Hours() / 24)
+		// 使用 UTC 时间计算距离过期的天数
+		daysUntil := int(time.Until(item.ExpiredAt.UTC()).Hours() / 24)
 		result = append(result, vo.ExpiringItemVO{
 			ItemVO:           *s.toVO(item),
 			DaysUntilExpired: daysUntil,
@@ -183,6 +186,21 @@ func (s *ItemService) GetExpiringItems(ctx context.Context, userID uint, days in
 	}
 
 	return result, nil
+}
+
+// GetStats 获取物品统计数据
+func (s *ItemService) GetStats(ctx context.Context, userID uint) (*vo.ItemStatsVO, error) {
+	total, expiringSoon, expired, used, err := s.itemRepo.GetStats(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &vo.ItemStatsVO{
+		Total:        int(total),
+		ExpiringSoon: int(expiringSoon),
+		Expired:      int(expired),
+		Used:         int(used),
+	}, nil
 }
 
 func (s *ItemService) toVO(item *model.Item) *vo.ItemVO {
@@ -194,9 +212,9 @@ func (s *ItemService) toVO(item *model.Item) *vo.ItemVO {
 		Desc:       item.Description,
 		Quantity:   item.Quantity,
 		Unit:       item.Unit,
-		ExpiredAt:  item.ExpiredAt.Format("2006-01-02 15:04:05"),
+		ExpiredAt:  utils.FormatTimeUTC(item.ExpiredAt),
 		RemindDays: item.RemindDays,
 		Status:     item.Status,
-		CreatedAt:  item.CreatedAt.Format("2006-01-02 15:04:05"),
+		CreatedAt:  utils.FormatTimeUTC(item.CreatedAt),
 	}
 }

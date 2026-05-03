@@ -5,3 +5,4 @@ main.exe
 config/config.yaml
 dist/
 logs/
+.kilo/

@@ -32,8 +32,8 @@ func NewStaticFileMiddleware(staticPath string) *StaticFileMiddleware {
 // 规则：
 // 1. 如果请求路径以 /api 开头，不处理（让后续路由处理）
 // 2. 尝试在静态目录中查找对应文件并返回
-// 3. 如果文件不存在但目录存在，返回 index.html（让 SPA 处理路由）
-// 4. 如果目录也不存在，继续处理（可能返回 404）
+// 3. 如果文件不存在，返回 index.html（让 SPA 处理路由）
+// 4. 如果 index.html 也不存在，返回 404
 func (m *StaticFileMiddleware) Handle() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// 如果是 API 请求，不处理
@@ -58,19 +58,12 @@ func (m *StaticFileMiddleware) Handle() gin.HandlerFunc {
 		info, err := os.Stat(filePath)
 		if err != nil {
 			if os.IsNotExist(err) {
-				// 文件不存在，检查是否是目录请求
-				dirPath := filepath.Join(m.staticPath, path)
-				if _, dirErr := os.Stat(dirPath); dirErr == nil {
-					// 目录存在，返回 index.html（让 SPA 处理）
-					m.serveIndex(c)
-					return
-				}
-				// 文件和目录都不存在，继续处理（让 Gin 处理 404）
-				c.Next()
+				// 文件不存在，返回 index.html（让 SPA 处理路由）
+				m.serveIndex(c)
 				return
 			}
-			// 其他错误，继续处理
-			c.Next()
+			// 其他错误，返回 index.html（让 SPA 处理）
+			m.serveIndex(c)
 			return
 		}
 

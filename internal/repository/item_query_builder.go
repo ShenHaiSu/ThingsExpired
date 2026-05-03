@@ -144,6 +144,7 @@ func (b *ItemQueryBuilder) buildRemindDaysCondition(query *gorm.DB) *gorm.DB {
 }
 
 // buildExpiredAtCondition 构建过期时间范围条件
+// 注意：前端传入的日期字符串格式为 "2006-01-02"，需要转换为 UTC 时间进行比较
 func (b *ItemQueryBuilder) buildExpiredAtCondition(query *gorm.DB) *gorm.DB {
 	if b.req.ExpiredAtFrom != "" {
 		from, err := time.Parse("2006-01-02", b.req.ExpiredAtFrom)
@@ -151,8 +152,8 @@ func (b *ItemQueryBuilder) buildExpiredAtCondition(query *gorm.DB) *gorm.DB {
 			b.buildErr = fmt.Errorf("invalid expired_at_from format: %w", err)
 			return query
 		}
-		// 从当天开始（包含当天）
-		query = query.Where("expired_at >= ?", from)
+		// 从当天开始（包含当天），转换为 UTC 时间
+		query = query.Where("expired_at >= ?", from.UTC())
 	}
 
 	if b.req.ExpiredAtTo != "" {
@@ -161,15 +162,16 @@ func (b *ItemQueryBuilder) buildExpiredAtCondition(query *gorm.DB) *gorm.DB {
 			b.buildErr = fmt.Errorf("invalid expired_at_to format: %w", err)
 			return query
 		}
-		// 到当天结束（包含当天）
+		// 到当天结束（包含当天），转换为 UTC 时间
 		to = to.Add(24*time.Hour - time.Second)
-		query = query.Where("expired_at <= ?", to)
+		query = query.Where("expired_at <= ?", to.UTC())
 	}
 
 	return query
 }
 
 // buildCreatedAtCondition 构建创建时间范围条件
+// 注意：前端传入的日期字符串格式为 "2006-01-02"，需要转换为 UTC 时间进行比较
 func (b *ItemQueryBuilder) buildCreatedAtCondition(query *gorm.DB) *gorm.DB {
 	if b.req.CreatedAtFrom != "" {
 		from, err := time.Parse("2006-01-02", b.req.CreatedAtFrom)
@@ -177,8 +179,8 @@ func (b *ItemQueryBuilder) buildCreatedAtCondition(query *gorm.DB) *gorm.DB {
 			b.buildErr = fmt.Errorf("invalid created_at_from format: %w", err)
 			return query
 		}
-		// 从当天开始（包含当天）
-		query = query.Where("created_at >= ?", from)
+		// 从当天开始（包含当天），转换为 UTC 时间
+		query = query.Where("created_at >= ?", from.UTC())
 	}
 
 	if b.req.CreatedAtTo != "" {
@@ -187,9 +189,9 @@ func (b *ItemQueryBuilder) buildCreatedAtCondition(query *gorm.DB) *gorm.DB {
 			b.buildErr = fmt.Errorf("invalid created_at_to format: %w", err)
 			return query
 		}
-		// 到当天结束（包含当天）
+		// 到当天结束（包含当天），转换为 UTC 时间
 		to = to.Add(24*time.Hour - time.Second)
-		query = query.Where("created_at <= ?", to)
+		query = query.Where("created_at <= ?", to.UTC())
 	}
 
 	return query

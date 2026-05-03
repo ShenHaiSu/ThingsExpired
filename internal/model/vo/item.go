@@ -27,3 +27,11 @@ type ExpiringItemVO struct {
 	ItemVO
 	DaysUntilExpired int `json:"days_until_expired"` // 距离过期的天数，负数表示已过期
 }
+
+// ItemStatsVO 物品统计响应
+type ItemStatsVO struct {
+	Total         int `json:"total"`           // 物品总数（所有状态的物品数量）
+	ExpiringSoon  int `json:"expiring_soon"`    // 即将过期数量（距离过期≤7天且状态为正常的物品）
+	Expired       int `json:"expired"`         // 已过期数量（已超过过期时间且状态为已过期的物品）
+	Used          int `json:"used"`            // 已消耗数量（状态为已消耗的物品）
+}

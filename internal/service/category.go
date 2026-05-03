@@ -8,6 +8,7 @@ import (
 	"things-expired/internal/model/vo"
 	"things-expired/internal/repository"
 	"things-expired/pkg/errors"
+	"things-expired/pkg/utils"
 )
 
 // ICategoryService 分类服务接口
@@ -29,6 +30,15 @@ func NewCategoryService(categoryRepo repository.ICategoryRepository) ICategorySe
 }
 
 func (s *CategoryService) Create(ctx context.Context, userID uint, req *dto.CreateCategoryRequest) (*vo.CategoryVO, error) {
+	// 检查是否已存在同名分类
+	existingCategory, err := s.categoryRepo.GetByUserIDAndName(ctx, userID, req.Name)
+	if err != nil {
+		return nil, err
+	}
+	if existingCategory != nil {
+		return nil, errors.New(errors.CodeCategoryExists, "分类名称已存在")
+	}
+
 	category := &model.Category{
 		UserID:    userID,
 		Name:      req.Name,
@@ -129,6 +139,6 @@ func (s *CategoryService) toVO(category *model.Category) *vo.CategoryVO {
 		Color:      category.Color,
 		Icon:       category.Icon,
 		SortOrder:  category.SortOrder,
-		CreatedAt:  category.CreatedAt.Format("2006-01-02 15:04:05"),
+		CreatedAt:  utils.FormatTimeUTC(category.CreatedAt),
 	}
 }

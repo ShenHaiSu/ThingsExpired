@@ -9,13 +9,14 @@ import (
 
 // Config 应用配置结构
 type Config struct {
-	App      AppConfig      `mapstructure:"app"`
-	Database DatabaseConfig `mapstructure:"database"`
-	JWT      JWTConfig      `mapstructure:"jwt"`
-	Upload   UploadConfig   `mapstructure:"upload"`
-	Security SecurityConfig `mapstructure:"security"`
-	Log      LogConfig      `mapstructure:"log"`
-	Frontend FrontendConfig `mapstructure:"frontend"`
+	App        AppConfig        `mapstructure:"app"`
+	Database   DatabaseConfig   `mapstructure:"database"`
+	JWT        JWTConfig        `mapstructure:"jwt"`
+	Upload     UploadConfig     `mapstructure:"upload"`
+	Security   SecurityConfig   `mapstructure:"security"`
+	Log        LogConfig        `mapstructure:"log"`
+	Frontend   FrontendConfig   `mapstructure:"frontend"`
+	Expiration ExpirationConfig `mapstructure:"expiration"`
 }
 
 // AppConfig 应用配置
@@ -59,12 +60,19 @@ type SecurityConfig struct {
 
 // LogConfig 日志配置
 type LogConfig struct {
-	Level      string `mapstructure:"level"`       // 日志级别: debug, info, warn, error
-	Path       string `mapstructure:"path"`        // 日志文件目录
-	MaxSizeMB  int    `mapstructure:"max_size_mb"` // 单个日志文件最大大小(MB)
-	MaxBackups int    `mapstructure:"max_backups"` // 保留的旧日志文件最大数量
-	MaxAgeDays int    `mapstructure:"max_age_days"`// 保留的旧日志文件最大天数
-	Compress   bool   `mapstructure:"compress"`    // 是否压缩旧日志文件
+	Level      string `mapstructure:"level"`        // 日志级别: debug, info, warn, error
+	Path       string `mapstructure:"path"`         // 日志文件目录
+	MaxSizeMB  int    `mapstructure:"max_size_mb"`  // 单个日志文件最大大小(MB)
+	MaxBackups int    `mapstructure:"max_backups"`  // 保留的旧日志文件最大数量
+	MaxAgeDays int    `mapstructure:"max_age_days"` // 保留的旧日志文件最大天数
+	Compress   bool   `mapstructure:"compress"`     // 是否压缩旧日志文件
+}
+
+// ExpirationConfig 过期检查配置
+type ExpirationConfig struct {
+	Enabled     bool `mapstructure:"enabled"`      // 是否启用自动过期检查
+	IntervalSec int  `mapstructure:"interval_sec"` // 检查间隔（秒）
+	BatchSize   int  `mapstructure:"batch_size"`   // 每次批量处理数量
 }
 
 // Load 加载配置文件

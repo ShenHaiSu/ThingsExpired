@@ -1,11 +1,12 @@
 package router
 
 import (
-	"github.com/gin-gonic/gin"
 	"things-expired/config"
 	"things-expired/internal/handler"
 	"things-expired/pkg/middleware"
 	"things-expired/pkg/utils"
+
+	"github.com/gin-gonic/gin"
 )
 
 // NewRouter 创建并配置路由
@@ -14,6 +15,7 @@ func NewRouter(
 	categoryHandler *handler.CategoryHandler,
 	itemHandler *handler.ItemHandler,
 	authMiddleware *middleware.AuthMiddleware,
+	bodyHandler *middleware.EmptyBodyHandler,
 	logger *utils.Logger,
 	cfg *config.Config,
 ) *gin.Engine {
@@ -27,6 +29,7 @@ func NewRouter(
 
 	// API 路由组（所有 API 必须以 /api 开头）
 	api := r.Group("/api")
+	api.Use(bodyHandler.Handle())
 	{
 		// 用户相关路由（公开）
 		user := api.Group("/user")
@@ -60,6 +63,7 @@ func NewRouter(
 			authenticated.POST("/item/update", itemHandler.Update)
 			authenticated.POST("/item/delete", itemHandler.Delete)
 			authenticated.POST("/item/expiring", itemHandler.GetExpiringItems)
+			authenticated.POST("/item/stats", itemHandler.GetStats)
 		}
 	}
 
