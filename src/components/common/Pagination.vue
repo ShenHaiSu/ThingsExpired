@@ -3,8 +3,8 @@
     <!-- 移动端视图：紧凑布局 -->
     <div v-if="isMobile" class="mobile-pagination">
       <div class="pagination-info">
-        <span class="text-sm text-gray-600">
-          第 {{ currentPage }} 页 / 共 {{ totalPages }} 页
+        <span class="pagination-text">
+          {{ t('common.pagination.page', { current: currentPage, total: totalPages }) }}
         </span>
       </div>
       <div class="pagination-controls">
@@ -17,7 +17,7 @@
           @click="goToPage(currentPage - 1)"
           class="pagination-btn"
         />
-        <span class="page-number text-sm font-medium">
+        <span class="page-number">
           {{ currentPage }}
         </span>
         <Button
@@ -33,10 +33,10 @@
     </div>
 
     <!-- 桌面端视图：完整布局 -->
-    <div v-else class="flex desktop-pagination">
+    <div v-else class="desktop-pagination">
       <!-- 每页条数选择 -->
       <div class="page-size-selector">
-        <span class="text-sm text-gray-600 mr-1">每页</span>
+        <span class="pagination-text">{{ t('common.pagination.pageSize') }} &nbsp;</span>
         <Select
           v-model="pageSize"
           :options="pageSizeOptions"
@@ -46,13 +46,13 @@
           scrollHeight="200px"
           @change="handlePageSizeChange"
         />
-        <span class="text-sm text-gray-600 ml-1">条</span>
+        <span class="pagination-text">&nbsp;{{ t('common.pagination.items') }}</span>
       </div>
 
       <!-- 页码信息 -->
       <div class="pagination-info">
-        <span class="text-sm text-gray-600">
-          显示 {{ startItem }} - {{ endItem }} 条，共 {{ total }} 条
+        <span class="pagination-text">
+          {{ t('common.pagination.showing', { start: startItem, end: endItem, total: total }) }}
         </span>
       </div>
 
@@ -66,7 +66,7 @@
           severity="secondary"
           :disabled="currentPage <= 1"
           @click="goToPage(1)"
-          v-tooltip.top="'首页'"
+          v-tooltip.top="t('common.pagination.firstPage')"
           class="pagination-btn"
         />
 
@@ -78,7 +78,7 @@
           severity="secondary"
           :disabled="currentPage <= 1"
           @click="goToPage(currentPage - 1)"
-          v-tooltip.top="'上一页'"
+          v-tooltip.top="t('common.pagination.prevPage')"
           class="pagination-btn"
         />
 
@@ -103,7 +103,7 @@
           severity="secondary"
           :disabled="currentPage >= totalPages"
           @click="goToPage(currentPage + 1)"
-          v-tooltip.top="'下一页'"
+          v-tooltip.top="t('common.pagination.nextPage')"
           class="pagination-btn"
         />
 
@@ -115,7 +115,7 @@
           severity="secondary"
           :disabled="currentPage >= totalPages"
           @click="goToPage(totalPages)"
-          v-tooltip.top="'末页'"
+          v-tooltip.top="t('common.pagination.lastPage')"
           class="pagination-btn"
         />
       </div>
@@ -125,8 +125,11 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import Select from 'primevue/select'
+
+const { t } = useI18n()
 
 interface PageSizeOption {
   label: string
@@ -270,11 +273,12 @@ watch(
 .mobile-pagination .page-number {
   min-width: 32px;
   text-align: center;
-  color: var(--text-color, #1f2937);
+  color: var(--color-text-primary);
 }
 
 /* 桌面端样式 */
 .desktop-pagination {
+  display: flex;
   justify-content: space-between;
   align-items: center;
   width: 100%;
@@ -292,8 +296,13 @@ watch(
 }
 
 .pagination-info {
-  color: var(--text-color-secondary, #6b7280);
+  color: var(--color-text-secondary);
   white-space: nowrap;
+}
+
+.pagination-text {
+  font-size: 14px;
+  color: var(--color-text-secondary);
 }
 
 .pagination-controls {
@@ -321,15 +330,21 @@ watch(
   height: 30px;
   padding: 0 6px;
   font-size: 13px;
+  color: var(--color-text-primary);
 }
 
 .page-number-btn.active {
-  background-color: var(--primary-500, #16a34a);
+  background-color: var(--color-primary-500);
   color: white;
 }
 
 .page-number-btn:hover:not(.active) {
-  background-color: var(--primary-100, #bbf7d0);
+  background-color: var(--color-primary-100);
+}
+
+/* 深色主题适配 */
+:global(.dark) .page-number-btn:hover:not(.active) {
+  background-color: var(--color-primary-800);
 }
 
 /* 响应式调整 */

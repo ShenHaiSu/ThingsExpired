@@ -27,7 +27,17 @@
     "themeAuto": "Auto",
     "language": "Language",
     "languageZh": "简体中文",
-    "languageEn": "English"
+    "languageEn": "English",
+    "pagination": {
+      "page": "Page {current} of {total}",
+      "pageSize": "per page",
+      "items": "items",
+      "showing": "Showing {start} - {end} of {total} items",
+      "firstPage": "First Page",
+      "prevPage": "Previous Page",
+      "nextPage": "Next Page",
+      "lastPage": "Last Page"
+    }
   },
   "home": {
     "welcomeTitle": "Welcome to Things Expired",
@@ -117,6 +127,11 @@
       "deleteFailed": "Failed to delete category",
       "deleteConfirmTitle": "Confirm Delete",
       "deleteConfirmMessage": "Are you sure you want to delete this category? Items under this category will also be deleted. This action cannot be undone."
+    },
+    "search": {
+      "title": "Search Categories",
+      "keyword": "Keyword",
+      "keywordPlaceholder": "Enter category name keyword"
     }
   },
   "items": {
@@ -149,6 +164,9 @@
     "timeUnitMonth": "Month",
     "timeUnitYear": "Year",
     "daysUntilExpired": "days until expired",
+    "daysAgoExpired": "days ago expired",
+    "hoursUntilExpired": "hours until expired",
+    "hoursAgoExpired": "hours ago expired",
     "validation": {
       "nameRequired": "Item name is required",
       "categoryRequired": "Please select a category",

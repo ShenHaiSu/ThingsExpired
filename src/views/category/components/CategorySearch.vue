@@ -1,16 +1,14 @@
 <template>
   <div class="search-panel">
     <!-- 移动端搜索组件：移动端显示，桌面端隐藏 -->
-    <ItemSearchMobile
+    <CategorySearchMobile
       class="block md:hidden"
-      :categories="categories"
       @search="handleSearch"
       @reset="handleReset"
     />
     <!-- 桌面端搜索组件：移动端隐藏，桌面端显示 -->
-    <ItemSearchDesktop
+    <CategorySearchDesktop
       class="hidden md:block"
-      :categories="categories"
       @search="handleSearch"
       @reset="handleReset"
     />
@@ -18,24 +16,20 @@
 </template>
 
 <script setup lang="ts">
-import ItemSearchMobile from './ItemSearchMobile.vue'
-import ItemSearchDesktop from './ItemSearchDesktop.vue'
-import type { Category } from '@/types/api/category'
-import type { ItemListParams } from '@/types/api/item'
+import { useI18n } from 'vue-i18n'
+import CategorySearchMobile from './CategorySearchMobile.vue'
+import CategorySearchDesktop from './CategorySearchDesktop.vue'
+import type { CategoryListParams } from '@/types/api/category'
 
-interface Props {
-  categories: Category[]
-}
-
-const props = defineProps<Props>()
+const { t } = useI18n()
 
 const emit = defineEmits<{
-  (e: 'search', params: ItemListParams): void
+  (e: 'search', params: CategoryListParams): void
   (e: 'reset'): void
 }>()
 
 // 处理搜索
-function handleSearch(params: ItemListParams) {
+function handleSearch(params: CategoryListParams) {
   emit('search', params)
 }
 
@@ -52,5 +46,12 @@ function handleReset() {
   border: 1px solid var(--color-border);
   box-shadow: 0 1px 3px var(--color-shadow);
   margin-bottom: 24px;
+}
+
+/* 深色主题适配 */
+:global(.dark) .search-panel {
+  background: var(--color-bg-card);
+  border-color: var(--color-border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 </style>

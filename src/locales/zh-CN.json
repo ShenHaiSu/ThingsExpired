@@ -27,7 +27,17 @@
     "themeAuto": "自动",
     "language": "语言",
     "languageZh": "中文",
-    "languageEn": "English"
+    "languageEn": "English",
+    "pagination": {
+      "page": "第 {current} 页 / 共 {total} 页",
+      "pageSize": "每页",
+      "items": "条",
+      "showing": "显示 {start} - {end} 条，共 {total} 条",
+      "firstPage": "首页",
+      "prevPage": "上一页",
+      "nextPage": "下一页",
+      "lastPage": "末页"
+    }
   },
   "home": {
     "welcomeTitle": "欢迎使用 Things Expired",
@@ -117,6 +127,11 @@
       "deleteFailed": "分类删除失败",
       "deleteConfirmTitle": "确认删除",
       "deleteConfirmMessage": "您确定要删除此分类吗？删除后该分类下的物品将一并删除，此操作不可恢复。"
+    },
+    "search": {
+      "title": "搜索分类",
+      "keyword": "关键词",
+      "keywordPlaceholder": "请输入分类名称关键词"
     }
   },
   "items": {
@@ -149,6 +164,9 @@
     "timeUnitMonth": "月",
     "timeUnitYear": "年",
     "daysUntilExpired": "天后过期",
+    "daysAgoExpired": "天前已过期",
+    "hoursUntilExpired": "小时后过期",
+    "hoursAgoExpired": "小时前已过期",
     "validation": {
       "nameRequired": "物品名称不能为空",
       "categoryRequired": "请选择分类",

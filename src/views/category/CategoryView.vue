@@ -5,66 +5,48 @@
         <i class="pi pi-folder text-xl mr-2"></i>
         <h1 class="page-title">{{ t('category.title') }}</h1>
       </div>
-      <Button :label="t('category.add')" icon="pi pi-plus" @click="openCreateDialog" />
+      <Button
+        :label="t('category.add')"
+        icon="pi pi-plus"
+        @click="openCreateDialog"
+        class="w-full sm:w-auto"
+      />
     </div>
 
-    <div class="content-card">
-      <DataTable
-        :value="categoryList"
+    <!-- 搜索组件 -->
+    <CategorySearch
+      @search="handleSearch"
+      @reset="handleSearchReset"
+    />
+
+    <!-- 分类列表 - 桌面端 -->
+    <div class="desktop-only">
+      <CategoryDataListDesktop
+        :categories="categoryList"
         :loading="loading"
-        stripedRows
-        tableStyle="min-width: 50rem"
-        :rows="10"
-        :paginator="categoryList.length > 10"
-      >
-        <Column field="category_id" :header="t('category.id')" />
-        <Column field="name" :header="t('category.name')">
-          <template #body="slotProps">
-            <div class="category-name">
-              <span
-                class="color-dot"
-                :style="{ backgroundColor: slotProps.data.color || '#22c55e' }"
-              ></span>
-              <span class="font-medium">{{ slotProps.data.name }}</span>
-            </div>
-          </template>
-        </Column>
-        <Column field="icon" :header="t('category.icon')">
-          <template #body="slotProps">
-            <span class="text-secondary">{{ slotProps.data.icon || '-' }}</span>
-          </template>
-        </Column>
-        <Column field="sort_order" :header="t('category.sortOrder')" />
-        <Column field="created_at" :header="t('category.createdAt')">
-          <template #body="slotProps">
-            <span class="text-sm text-secondary">
-              {{ formatDateTime(slotProps.data.created_at) }}
-            </span>
-          </template>
-        </Column>
-        <Column :header="t('common.actions')" align="center">
-          <template #body="slotProps">
-            <div class="action-buttons">
-              <Button
-                icon="pi pi-pencil"
-                text
-                rounded
-                severity="secondary"
-                @click="openEditDialog(slotProps.data)"
-                v-tooltip.top="t('common.edit')"
-              />
-              <Button
-                icon="pi pi-trash"
-                text
-                rounded
-                severity="danger"
-                @click="confirmDelete(slotProps.data)"
-                v-tooltip.top="t('common.delete')"
-              />
-            </div>
-          </template>
-        </Column>
-      </DataTable>
+        :total="total"
+        :current-page="currentPage"
+        :page-size="pageSize"
+        @edit="openEditDialog"
+        @delete="confirmDelete"
+        @page-change="handlePageChange"
+        @page-size-change="handlePageSizeChange"
+      />
+    </div>
+
+    <!-- 分类列表 - 移动端 -->
+    <div class="mobile-only">
+      <CategoryDataListMobile
+        :categories="categoryList"
+        :loading="loading"
+        :total="total"
+        :current-page="currentPage"
+        :page-size="pageSize"
+        @edit="openEditDialog"
+        @delete="confirmDelete"
+        @page-change="handlePageChange"
+        @page-size-change="handlePageSizeChange"
+      />
     </div>
 
     <!-- 创建/编辑对话框 -->
@@ -78,15 +60,21 @@
 </template>
 
 <script setup lang="ts">
+// 1. Vue 相关
 import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useConfirm } from 'primevue/useconfirm'
+
+// 2. 第三方库
 import Button from 'primevue/button'
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
-import { formatDateTime } from '@/utils'
-import { useToast } from '@/composables'
+
+// 3. 项目内部 - 组件
+import CategoryDataListDesktop from './components/CategoryDataListDesktop.vue'
+import CategoryDataListMobile from './components/CategoryDataListMobile.vue'
 import CategoryFormDialog from './components/CategoryFormDialog.vue'
+import CategorySearch from './components/CategorySearch.vue'
+
+// 4. 项目内部 - API
 import {
   getCategoryList,
   createCategory,
@@ -95,6 +83,10 @@ import {
   type Category,
   type CreateCategoryParams,
 } from '@/api/category'
+import type { CategoryListParams } from '@/types/api/category'
+
+// 5. 项目内部 - 组合式函数
+import { useToast } from '@/composables'
 
 const { t } = useI18n()
 const toast = useToast()
@@ -106,6 +98,14 @@ const loading = ref(false)
 const dialogVisible = ref(false)
 const isEdit = ref(false)
 const editingId = ref<number | null>(null)
+
+// 分页状态
+const total = ref(0)
+const currentPage = ref(1)
+const pageSize = ref(10)
+
+// 搜索参数
+const searchParams = ref<CategoryListParams>({})
 
 // 表单数据
 const formData = ref<CreateCategoryParams>({
@@ -119,14 +119,49 @@ const formData = ref<CreateCategoryParams>({
 async function loadCategoryList() {
   loading.value = true
   try {
-    const res = await getCategoryList()
+    const params: CategoryListParams = {
+      page: currentPage.value,
+      page_size: pageSize.value,
+      ...searchParams.value,
+    }
+    const res = await getCategoryList(params)
     categoryList.value = res.data.list
+    total.value = res.data.total
+    currentPage.value = res.data.page
   } catch (error) {
     console.error('Failed to load categories:', error)
     toast.error(t('category.message.createFailed'))
   } finally {
     loading.value = false
   }
+}
+
+// 处理搜索
+function handleSearch(params: CategoryListParams) {
+  searchParams.value = params
+  currentPage.value = 1 // 搜索时重置到第一页
+  loadCategoryList()
+}
+
+// 处理搜索重置
+function handleSearchReset() {
+  searchParams.value = {}
+  currentPage.value = 1
+  pageSize.value = 10
+  loadCategoryList()
+}
+
+// 处理分页变化
+function handlePageChange(page: number) {
+  currentPage.value = page
+  loadCategoryList()
+}
+
+// 处理每页数量变化
+function handlePageSizeChange(size: number) {
+  pageSize.value = size
+  currentPage.value = 1 // 改变每页数量时重置到第一页
+  loadCategoryList()
 }
 
 // 打开创建对话框
@@ -221,6 +256,7 @@ onMounted(() => {
 <style scoped>
 .category-view {
   margin: 0 auto;
+  padding: 0 16px;
 }
 
 .page-header {
@@ -228,6 +264,8 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .page-header-left {
@@ -246,73 +284,38 @@ onMounted(() => {
   margin: 0;
 }
 
-.content-card {
-  background: var(--color-bg-card);
-  border-radius: 10px;
-  border: 1px solid var(--color-border);
-  padding: 16px;
-  box-shadow: 0 1px 3px var(--color-shadow);
-}
-
-.category-name {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.color-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  display: inline-block;
-  flex-shrink: 0;
-}
-
-.action-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 4px;
-}
-
-.form-field {
-  margin-bottom: 20px;
-}
-
-.form-label {
+/* 桌面端显示 */
+.desktop-only {
   display: block;
-  margin-bottom: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--color-text-primary);
 }
 
-.text-danger {
-  color: var(--color-danger);
+/* 移动端隐藏 */
+.mobile-only {
+  display: none;
 }
 
-.text-secondary {
-  color: var(--color-text-secondary);
-}
-
-.form-field :deep(.p-inputtext),
-.form-field :deep(.p-inputnumber) {
-  width: 100%;
-}
-
-/* 响应式适配 */
+/* 移动端适配 */
 @media (max-width: 768px) {
+  .category-view {
+    padding: 0 12px;
+  }
+
   .page-header {
-    flex-direction: column;
-    gap: 16px;
-    align-items: flex-start;
+    margin-bottom: 16px;
   }
 
   .page-title {
     font-size: 18px;
   }
 
-  .content-card {
-    padding: 12px;
+  /* 移动端隐藏桌面端组件 */
+  .desktop-only {
+    display: none;
+  }
+
+  /* 移动端显示移动端组件 */
+  .mobile-only {
+    display: block;
   }
 }
 </style>

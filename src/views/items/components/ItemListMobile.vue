@@ -38,12 +38,14 @@
             <span class="info-label">{{ t('items.expiredAt') }}:</span>
             <div class="flex flex-row items-start gap-2">
               <span
-                :class="getExpiredClass(item.expired_at)"
-                class="text-sm font-medium expired-days-text"
+                :class="getExpiredTextClass(item.expired_at)"
+                class="text-sm font-medium"
               >
-                {{ getDaysUntilExpired(item.expired_at) }} {{ t('items.daysUntilExpired') }}
+                {{ getExpiredDisplayText(item.expired_at) }}
               </span>
-              <span class="text-sm expired-date-text"> {{ formatDate(item.expired_at) }}</span>
+              <span :class="getExpiredDateClass(item.expired_at)" class="text-sm">
+                {{ formatDate(item.expired_at) }}
+              </span>
             </div>
           </div>
         </div>
@@ -106,7 +108,8 @@ import { useI18n } from 'vue-i18n'
 import Tag from 'primevue/tag'
 import Button from 'primevue/button'
 import { formatDateTime, formatDate } from '@/utils'
-import { getDaysUntilExpired } from '@/utils/date'
+import { getExpireDisplayInfo, getExpireStatus, getHoursUntilExpired } from '@/utils/date'
+import type { ExpireStatus } from '@/utils/date'
 import type { Item, ItemStatus } from '@/types/api/item'
 import type { Category } from '@/types/api/category'
 import Pagination from '@/components/common/Pagination.vue'
@@ -150,35 +153,64 @@ function getCategoryName(categoryId: number): string {
   return category ? category.name : 'Unknown'
 }
 
-// 获取过期日期显示文本 (保留备用)
-function getExpiredDisplay(expiredAt: string): string {
-  const diffDays = getDaysUntilExpired(expiredAt)
-
-  if (diffDays < 0) {
-    return `已过期 ${Math.abs(diffDays)} 天`
-  } else if (diffDays === 0) {
-    return '今天过期'
-  } else if (diffDays === 1) {
-    return '明天过期'
-  } else {
-    return `还有 ${diffDays} 天过期`
+// 获取过期时间文本样式类
+function getExpiredTextClass(expiredAt: string): string {
+  const status = getExpireStatus(expiredAt)
+  
+  switch (status) {
+    case 'expired':
+      return 'expire-expired-text'
+    case 'expiring':
+      return 'expire-expiring-text'
+    default:
+      return 'expire-normal-text'
   }
 }
 
-function getExpiredClass(expiredAt: string): string {
-  const diffDays = getDaysUntilExpired(expiredAt)
+// 获取过期日期样式类
+function getExpiredDateClass(expiredAt: string): string {
+  const status = getExpireStatus(expiredAt)
+  
+  switch (status) {
+    case 'expired':
+      return 'expire-expired-date'
+    case 'expiring':
+      return 'expire-expiring-date'
+    default:
+      return 'expire-normal-date'
+  }
+}
 
-  if (diffDays < 0) return 'expired-text'
-  if (diffDays <= 7) return 'warning-text'
-  return ''
+// 获取过期时间显示文本（支持i18n）
+function getExpiredDisplayText(expiredAt: string): string {
+  const info = getExpireDisplayInfo(expiredAt)
+  
+  // 根据不同的文本类型，使用i18n进行翻译
+  switch (info.text) {
+    case 'daysAgoExpired':
+      return `${info.days} ${t('items.daysAgoExpired')}`
+    case 'hoursAgoExpired':
+      return `${info.hours} ${t('items.hoursAgoExpired')}`
+    case 'hoursUntilExpired':
+      return `${info.hours} ${t('items.hoursUntilExpired')}`
+    case 'daysUntilExpired':
+      return `${info.days} ${t('items.daysUntilExpired')}`
+    default:
+      return ''
+  }
 }
 
 function getCardClass(expiredAt: string): string {
-  const diffDays = getDaysUntilExpired(expiredAt)
-
-  if (diffDays < 0) return 'card-expired'
-  if (diffDays <= 7) return 'card-warning'
-  return ''
+  const status = getExpireStatus(expiredAt)
+  
+  switch (status) {
+    case 'expired':
+      return 'card-expired'
+    case 'expiring':
+      return 'card-warning'
+    default:
+      return ''
+  }
 }
 
 function getStatusSeverity(
@@ -287,25 +319,7 @@ function getStatusText(status: ItemStatus): string {
   padding: 2px 6px;
 }
 
-/* 过期文本颜色 */
-.expired-text {
-  color: var(--color-danger);
-  font-weight: 500;
-}
-
-.warning-text {
-  color: var(--color-warning);
-  font-weight: 500;
-}
-
-/* 过期时间显示文本颜色 - 适配亮色/暗色模式 */
-.expired-days-text {
-  color: var(--color-text-primary);
-}
-
-.expired-date-text {
-  color: var(--color-text-secondary);
-}
+/* 过期时间显示文本颜色 - 使用 variables.css 中定义的样式类 */
 
 .card-actions {
   display: flex;
