@@ -39,6 +39,15 @@ func NewItemService(itemRepo repository.IItemRepository) IItemService {
 }
 
 func (s *ItemService) Create(ctx context.Context, userID uint, req *dto.CreateItemRequest) (*vo.ItemVO, error) {
+	// 根据过期时间判断初始状态
+	// 如果当前时间已经超过过期时间，直接标记为已过期（status = 2）
+	// 否则标记为正常状态（status = 1）
+	now := time.Now()
+	initialStatus := int8(1) // 默认正常状态
+	if now.After(req.ExpiredAt) {
+		initialStatus = 2 // 已过期状态
+	}
+
 	item := &model.Item{
 		UserID:      userID,
 		CategoryID:  req.CategoryID,
@@ -48,7 +57,7 @@ func (s *ItemService) Create(ctx context.Context, userID uint, req *dto.CreateIt
 		Unit:        req.Unit,
 		ExpiredAt:   req.ExpiredAt,
 		RemindDays:  req.RemindDays,
-		Status:      1,
+		Status:      initialStatus,
 	}
 
 	if item.Quantity <= 0 {
@@ -134,8 +143,18 @@ func (s *ItemService) Update(ctx context.Context, userID uint, req *dto.UpdateIt
 	if req.Unit != "" {
 		item.Unit = req.Unit
 	}
+	// 更新过期时间时，需要重新判断状态
+	// 如果当前时间已经超过新的过期时间，直接标记为已过期（status = 2）
+	// 注意：只有物品当前处于正常状态（status = 1）时才自动更新过期状态
+	// 已消耗状态（status = 3）的物品不应被自动改为过期状态
 	if !req.ExpiredAt.IsZero() {
 		item.ExpiredAt = req.ExpiredAt
+		if item.Status == 1 {
+			now := time.Now()
+			if now.After(item.ExpiredAt) {
+				item.Status = 2 // 已过期状态
+			}
+		}
 	}
 	if req.RemindDays > 0 {
 		item.RemindDays = req.RemindDays
