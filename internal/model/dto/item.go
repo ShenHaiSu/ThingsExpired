@@ -120,3 +120,8 @@ func (r *ItemListRequest) GetOrder() string {
 type ExpiringItemsRequest struct {
 	Days int `json:"days" binding:"omitempty,min=1,max=365"`
 }
+
+// MarkUsedRequest 标记物品已使用请求
+type MarkUsedRequest struct {
+	ItemID uint `json:"item_id" binding:"required,min=1"`
+}

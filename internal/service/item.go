@@ -19,6 +19,7 @@ type IItemService interface {
 	Detail(ctx context.Context, userID uint, itemID uint) (*vo.ItemVO, error)
 	Update(ctx context.Context, userID uint, req *dto.UpdateItemRequest) (*vo.ItemVO, error)
 	Delete(ctx context.Context, userID uint, itemID uint) error
+	MarkUsed(ctx context.Context, userID uint, itemID uint) (*vo.ItemVO, error) // 标记物品已消耗
 	GetExpiringItems(ctx context.Context, userID uint, days int) ([]vo.ExpiringItemVO, error)
 	GetStats(ctx context.Context, userID uint) (*vo.ItemStatsVO, error)
 }
@@ -162,6 +163,37 @@ func (s *ItemService) Delete(ctx context.Context, userID uint, itemID uint) erro
 	}
 
 	return s.itemRepo.Delete(ctx, itemID)
+}
+
+// MarkUsed 标记物品已消耗
+// 业务逻辑：
+// 1. 检查物品是否存在
+// 2. 检查物品是否属于当前用户（防止越权操作）
+// 3. 更新物品状态为已消耗（status = 3）
+// 4. 返回更新后的物品信息
+func (s *ItemService) MarkUsed(ctx context.Context, userID uint, itemID uint) (*vo.ItemVO, error) {
+	// 1. 获取物品信息
+	item, err := s.itemRepo.GetByID(ctx, itemID)
+	if err != nil {
+		return nil, err
+	}
+	if item == nil {
+		return nil, errors.New(errors.CodeParamInvalid, "物品不存在")
+	}
+
+	// 2. 检查权限（防止越权操作其他用户的物品）
+	if item.UserID != userID {
+		return nil, errors.New(errors.CodeForbidden, "无权限操作此物品")
+	}
+
+	// 3. 更新状态为已消耗（status = 3）
+	if err := s.itemRepo.MarkUsed(ctx, itemID); err != nil {
+		return nil, err
+	}
+
+	// 4. 获取更新后的物品信息并返回
+	item.Status = 3
+	return s.toVO(item), nil
 }
 
 func (s *ItemService) GetExpiringItems(ctx context.Context, userID uint, days int) ([]vo.ExpiringItemVO, error) {

@@ -176,3 +176,26 @@ func (h *ItemHandler) GetStats(c *gin.Context) {
 
 	Success(c, stats)
 }
+
+// MarkUsed 标记物品已使用（已消耗）
+func (h *ItemHandler) MarkUsed(c *gin.Context) {
+	userID, exists := c.Get("user_id")
+	if !exists {
+		FailWithCode(c, errors.CodeUnauthorized, "未授权")
+		return
+	}
+
+	var req dto.MarkUsedRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		FailWithCode(c, errors.CodeParamInvalid, err.Error())
+		return
+	}
+
+	item, err := h.itemService.MarkUsed(c.Request.Context(), userID.(uint), req.ItemID)
+	if err != nil {
+		Fail(c, err)
+		return
+	}
+
+	Success(c, item)
+}
