@@ -12,7 +12,7 @@ type ICategoryRepository interface {
 	Create(ctx context.Context, category *model.Category) error
 	GetByID(ctx context.Context, id uint) (*model.Category, error)
 	GetByUserIDAndName(ctx context.Context, userID uint, name string) (*model.Category, error)
-	List(ctx context.Context, userID uint, page, pageSize int) ([]*model.Category, int64, error)
+	List(ctx context.Context, userID uint, page, pageSize int, keyword string) ([]*model.Category, int64, error)
 	Update(ctx context.Context, category *model.Category) error
 	Delete(ctx context.Context, id uint) error
 }
@@ -53,11 +53,16 @@ func (r *CategoryRepository) GetByUserIDAndName(ctx context.Context, userID uint
 	return &category, nil
 }
 
-func (r *CategoryRepository) List(ctx context.Context, userID uint, page, pageSize int) ([]*model.Category, int64, error) {
+func (r *CategoryRepository) List(ctx context.Context, userID uint, page, pageSize int, keyword string) ([]*model.Category, int64, error) {
 	var categories []*model.Category
 	var total int64
 
 	query := r.db.WithContext(ctx).Model(&model.Category{}).Where("user_id = ?", userID)
+
+	// 关键词搜索（模糊匹配名称）
+	if keyword != "" {
+		query = query.Where("name LIKE ?", "%"+keyword+"%")
+	}
 
 	if err := query.Count(&total).Error; err != nil {
 		return nil, 0, err

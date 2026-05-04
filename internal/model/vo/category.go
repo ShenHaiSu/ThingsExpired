@@ -15,4 +15,5 @@ type CategoryVO struct {
 type CategoryListVO struct {
 	List  []CategoryVO `json:"list"`
 	Total int64        `json:"total"`
+	Page  int          `json:"page"`
 }
