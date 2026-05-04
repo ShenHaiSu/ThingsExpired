@@ -244,3 +244,74 @@ a:hover {
   background-color: var(--color-warning-bg);
   color: var(--color-warning-text);
 }
+
+/* ========================================
+   过期时间显示颜色 - 亮色/暗色适配
+   ======================================== */
+
+/* 亮色主题 - 过期时间文本颜色 */
+:root {
+  /* 未过期（正常） - 绿色系 */
+  --color-expire-normal-text: #16a34a;
+  --color-expire-normal-text-light: #22c55e;
+  --color-expire-normal-date: #6b7280;
+  
+  /* 即将过期（7天内） - 橙色/黄色系 */
+  --color-expire-expiring-text: #f59e0b;
+  --color-expire-expiring-text-light: #fbbf24;
+  --color-expire-expiring-date: #9ca3af;
+  
+  /* 已过期 - 红色系 */
+  --color-expire-expired-text: #ef4444;
+  --color-expire-expired-text-light: #f87171;
+  --color-expire-expired-date: #9ca3af;
+}
+
+/* 深色主题 - 过期时间文本颜色 */
+.dark {
+  /* 未过期（正常） - 绿色系（深色适配） */
+  --color-expire-normal-text: #22c55e;
+  --color-expire-normal-text-light: #4ade80;
+  --color-expire-normal-date: #9ca3af;
+  
+  /* 即将过期（7天内） - 橙色/黄色系（深色适配） */
+  --color-expire-expiring-text: #f59e0b;
+  --color-expire-expiring-text-light: #fbbf24;
+  --color-expire-expiring-date: #6b7280;
+  
+  /* 已过期 - 红色系（深色适配） */
+  --color-expire-expired-text: #ef4444;
+  --color-expire-expired-text-light: #f87171;
+  --color-expire-expired-date: #6b7280;
+}
+
+/* 过期时间状态样式类 */
+/* 未过期 - 正常状态 */
+.expire-normal-text {
+  color: var(--color-expire-normal-text);
+  font-weight: 500;
+}
+
+.expire-normal-date {
+  color: var(--color-expire-normal-date);
+}
+
+/* 即将过期 - 警告状态 */
+.expire-expiring-text {
+  color: var(--color-expire-expiring-text);
+  font-weight: 500;
+}
+
+.expire-expiring-date {
+  color: var(--color-expire-expiring-date);
+}
+
+/* 已过期 - 危险状态 */
+.expire-expired-text {
+  color: var(--color-expire-expired-text);
+  font-weight: 500;
+}
+
+.expire-expired-date {
+  color: var(--color-expire-expired-date);
+}

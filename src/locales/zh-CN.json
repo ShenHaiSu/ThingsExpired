@@ -154,6 +154,9 @@
     "timeUnitMonth": "月",
     "timeUnitYear": "年",
     "daysUntilExpired": "天后过期",
+    "daysAgoExpired": "天前已过期",
+    "hoursUntilExpired": "小时后过期",
+    "hoursAgoExpired": "小时前已过期",
     "validation": {
       "nameRequired": "物品名称不能为空",
       "categoryRequired": "请选择分类",
