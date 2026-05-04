@@ -21,3 +21,10 @@ type UpdateCategoryRequest struct {
 type DeleteCategoryRequest struct {
 	CategoryID uint `json:"category_id" binding:"required,min=1"`
 }
+
+// ListCategoryRequest 分类列表请求
+type ListCategoryRequest struct {
+	Page     int    `json:"page" binding:"omitempty,min=1"`
+	PageSize int    `json:"page_size" binding:"omitempty,min=1,max=100"`
+	Keyword  string `json:"keyword" binding:"omitempty,max=100"`
+}

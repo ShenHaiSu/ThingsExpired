@@ -62,6 +62,7 @@ func NewRouter(
 			authenticated.POST("/item/detail", itemHandler.Detail)
 			authenticated.POST("/item/update", itemHandler.Update)
 			authenticated.POST("/item/delete", itemHandler.Delete)
+			authenticated.POST("/item/mark_used", itemHandler.MarkUsed)
 			authenticated.POST("/item/expiring", itemHandler.GetExpiringItems)
 			authenticated.POST("/item/stats", itemHandler.GetStats)
 		}

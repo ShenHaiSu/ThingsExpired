@@ -14,7 +14,7 @@ import (
 // ICategoryService 分类服务接口
 type ICategoryService interface {
 	Create(ctx context.Context, userID uint, req *dto.CreateCategoryRequest) (*vo.CategoryVO, error)
-	List(ctx context.Context, userID uint, page, pageSize int) (*vo.CategoryListVO, error)
+	List(ctx context.Context, userID uint, req *dto.ListCategoryRequest) (*vo.CategoryListVO, error)
 	Update(ctx context.Context, userID uint, req *dto.UpdateCategoryRequest) (*vo.CategoryVO, error)
 	Delete(ctx context.Context, userID uint, categoryID uint) error
 }
@@ -58,15 +58,17 @@ func (s *CategoryService) Create(ctx context.Context, userID uint, req *dto.Crea
 	return s.toVO(category), nil
 }
 
-func (s *CategoryService) List(ctx context.Context, userID uint, page, pageSize int) (*vo.CategoryListVO, error) {
+func (s *CategoryService) List(ctx context.Context, userID uint, req *dto.ListCategoryRequest) (*vo.CategoryListVO, error) {
+	page := req.Page
 	if page <= 0 {
 		page = 1
 	}
+	pageSize := req.PageSize
 	if pageSize <= 0 {
 		pageSize = 10
 	}
 
-	categories, total, err := s.categoryRepo.List(ctx, userID, page, pageSize)
+	categories, total, err := s.categoryRepo.List(ctx, userID, page, pageSize, req.Keyword)
 	if err != nil {
 		return nil, err
 	}
@@ -79,6 +81,7 @@ func (s *CategoryService) List(ctx context.Context, userID uint, page, pageSize 
 	return &vo.CategoryListVO{
 		List:  list,
 		Total: total,
+		Page:  page,
 	}, nil
 }
 

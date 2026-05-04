@@ -19,6 +19,7 @@ type IItemRepository interface {
 	GetStats(ctx context.Context, userID uint) (total, expiringSoon, expired, used int64, err error)
 	Update(ctx context.Context, item *model.Item) error
 	Delete(ctx context.Context, id uint) error
+	MarkUsed(ctx context.Context, id uint) error // 标记物品已消耗
 
 	// 过期检查相关方法
 	GetExpiredItems(ctx context.Context, limit int) ([]*model.Item, error)  // 获取已过期但状态仍为正常的物品
@@ -158,4 +159,12 @@ func (r *ItemRepository) BatchUpdateStatus(ctx context.Context, ids []uint, stat
 		Model(&model.Item{}).
 		Where("id IN ?", ids).
 		Update("status", status).Error
+}
+
+// MarkUsed 标记物品已消耗（状态更新为3）
+func (r *ItemRepository) MarkUsed(ctx context.Context, id uint) error {
+	return r.db.WithContext(ctx).
+		Model(&model.Item{}).
+		Where("id = ?", id).
+		Update("status", 3).Error
 }

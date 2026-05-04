@@ -19,6 +19,7 @@ type IItemService interface {
 	Detail(ctx context.Context, userID uint, itemID uint) (*vo.ItemVO, error)
 	Update(ctx context.Context, userID uint, req *dto.UpdateItemRequest) (*vo.ItemVO, error)
 	Delete(ctx context.Context, userID uint, itemID uint) error
+	MarkUsed(ctx context.Context, userID uint, itemID uint) (*vo.ItemVO, error) // 标记物品已消耗
 	GetExpiringItems(ctx context.Context, userID uint, days int) ([]vo.ExpiringItemVO, error)
 	GetStats(ctx context.Context, userID uint) (*vo.ItemStatsVO, error)
 }
@@ -38,6 +39,15 @@ func NewItemService(itemRepo repository.IItemRepository) IItemService {
 }
 
 func (s *ItemService) Create(ctx context.Context, userID uint, req *dto.CreateItemRequest) (*vo.ItemVO, error) {
+	// 根据过期时间判断初始状态
+	// 如果当前时间已经超过过期时间，直接标记为已过期（status = 2）
+	// 否则标记为正常状态（status = 1）
+	now := time.Now()
+	initialStatus := int8(1) // 默认正常状态
+	if now.After(req.ExpiredAt) {
+		initialStatus = 2 // 已过期状态
+	}
+
 	item := &model.Item{
 		UserID:      userID,
 		CategoryID:  req.CategoryID,
@@ -47,7 +57,7 @@ func (s *ItemService) Create(ctx context.Context, userID uint, req *dto.CreateIt
 		Unit:        req.Unit,
 		ExpiredAt:   req.ExpiredAt,
 		RemindDays:  req.RemindDays,
-		Status:      1,
+		Status:      initialStatus,
 	}
 
 	if item.Quantity <= 0 {
@@ -133,8 +143,18 @@ func (s *ItemService) Update(ctx context.Context, userID uint, req *dto.UpdateIt
 	if req.Unit != "" {
 		item.Unit = req.Unit
 	}
+	// 更新过期时间时，需要重新判断状态
+	// 如果当前时间已经超过新的过期时间，直接标记为已过期（status = 2）
+	// 注意：只有物品当前处于正常状态（status = 1）时才自动更新过期状态
+	// 已消耗状态（status = 3）的物品不应被自动改为过期状态
 	if !req.ExpiredAt.IsZero() {
 		item.ExpiredAt = req.ExpiredAt
+		if item.Status == 1 {
+			now := time.Now()
+			if now.After(item.ExpiredAt) {
+				item.Status = 2 // 已过期状态
+			}
+		}
 	}
 	if req.RemindDays > 0 {
 		item.RemindDays = req.RemindDays
@@ -162,6 +182,37 @@ func (s *ItemService) Delete(ctx context.Context, userID uint, itemID uint) erro
 	}
 
 	return s.itemRepo.Delete(ctx, itemID)
+}
+
+// MarkUsed 标记物品已消耗
+// 业务逻辑：
+// 1. 检查物品是否存在
+// 2. 检查物品是否属于当前用户（防止越权操作）
+// 3. 更新物品状态为已消耗（status = 3）
+// 4. 返回更新后的物品信息
+func (s *ItemService) MarkUsed(ctx context.Context, userID uint, itemID uint) (*vo.ItemVO, error) {
+	// 1. 获取物品信息
+	item, err := s.itemRepo.GetByID(ctx, itemID)
+	if err != nil {
+		return nil, err
+	}
+	if item == nil {
+		return nil, errors.New(errors.CodeParamInvalid, "物品不存在")
+	}
+
+	// 2. 检查权限（防止越权操作其他用户的物品）
+	if item.UserID != userID {
+		return nil, errors.New(errors.CodeForbidden, "无权限操作此物品")
+	}
+
+	// 3. 更新状态为已消耗（status = 3）
+	if err := s.itemRepo.MarkUsed(ctx, itemID); err != nil {
+		return nil, err
+	}
+
+	// 4. 获取更新后的物品信息并返回
+	item.Status = 3
+	return s.toVO(item), nil
 }
 
 func (s *ItemService) GetExpiringItems(ctx context.Context, userID uint, days int) ([]vo.ExpiringItemVO, error) {

@@ -48,10 +48,13 @@ func (h *CategoryHandler) List(c *gin.Context) {
 		return
 	}
 
-	page := 1
-	pageSize := 10
+	var req dto.ListCategoryRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		FailWithCode(c, errors.CodeParamInvalid, err.Error())
+		return
+	}
 
-	list, err := h.categoryService.List(c.Request.Context(), userID.(uint), page, pageSize)
+	list, err := h.categoryService.List(c.Request.Context(), userID.(uint), &req)
 	if err != nil {
 		Fail(c, err)
 		return
