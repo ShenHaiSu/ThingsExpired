@@ -27,7 +27,17 @@
     "themeAuto": "Auto",
     "language": "Language",
     "languageZh": "简体中文",
-    "languageEn": "English"
+    "languageEn": "English",
+    "pagination": {
+      "page": "Page {current} of {total}",
+      "pageSize": "per page",
+      "items": "items",
+      "showing": "Showing {start} - {end} of {total} items",
+      "firstPage": "First Page",
+      "prevPage": "Previous Page",
+      "nextPage": "Next Page",
+      "lastPage": "Last Page"
+    }
   },
   "home": {
     "welcomeTitle": "Welcome to Things Expired",

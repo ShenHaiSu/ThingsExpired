@@ -24,8 +24,13 @@
       <CategoryDataListDesktop
         :categories="categoryList"
         :loading="loading"
+        :total="total"
+        :current-page="currentPage"
+        :page-size="pageSize"
         @edit="openEditDialog"
         @delete="confirmDelete"
+        @page-change="handlePageChange"
+        @page-size-change="handlePageSizeChange"
       />
     </div>
 
@@ -34,19 +39,15 @@
       <CategoryDataListMobile
         :categories="categoryList"
         :loading="loading"
+        :total="total"
+        :current-page="currentPage"
+        :page-size="pageSize"
         @edit="openEditDialog"
         @delete="confirmDelete"
+        @page-change="handlePageChange"
+        @page-size-change="handlePageSizeChange"
       />
     </div>
-
-    <!-- 分页组件 -->
-    <Pagination
-      :total="total"
-      :current-page="currentPage"
-      :page-size="pageSize"
-      @page-change="handlePageChange"
-      @page-size-change="handlePageSizeChange"
-    />
 
     <!-- 创建/编辑对话框 -->
     <CategoryFormDialog
@@ -72,7 +73,6 @@ import CategoryDataListDesktop from './components/CategoryDataListDesktop.vue'
 import CategoryDataListMobile from './components/CategoryDataListMobile.vue'
 import CategoryFormDialog from './components/CategoryFormDialog.vue'
 import CategorySearch from './components/CategorySearch.vue'
-import Pagination from '@/components/common/Pagination.vue'
 
 // 4. 项目内部 - API
 import {

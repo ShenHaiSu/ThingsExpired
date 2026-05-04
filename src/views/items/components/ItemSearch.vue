@@ -18,13 +18,10 @@
 </template>
 
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
 import ItemSearchMobile from './ItemSearchMobile.vue'
 import ItemSearchDesktop from './ItemSearchDesktop.vue'
 import type { Category } from '@/types/api/category'
-import type { ItemSearchParams } from '@/types/api/item'
-
-const { t } = useI18n()
+import type { ItemListParams } from '@/types/api/item'
 
 interface Props {
   categories: Category[]
@@ -33,12 +30,12 @@ interface Props {
 const props = defineProps<Props>()
 
 const emit = defineEmits<{
-  (e: 'search', params: ItemSearchParams): void
+  (e: 'search', params: ItemListParams): void
   (e: 'reset'): void
 }>()
 
 // 处理搜索
-function handleSearch(params: ItemSearchParams) {
+function handleSearch(params: ItemListParams) {
   emit('search', params)
 }
 

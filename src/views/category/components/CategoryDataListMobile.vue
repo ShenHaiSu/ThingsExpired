@@ -67,6 +67,15 @@
         <p>{{ t('common.loading') }}</p>
       </div>
     </div>
+
+    <!-- 分页组件 - 放在组件末尾 -->
+    <Pagination
+      :total="total"
+      :current-page="currentPage"
+      :page-size="pageSize"
+      @page-change="handlePageChange"
+      @page-size-change="handlePageSizeChange"
+    />
   </div>
 </template>
 
@@ -75,20 +84,36 @@ import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import { formatDateTime } from '@/utils'
 import type { Category } from '@/api/category'
+import Pagination from '@/components/common/Pagination.vue'
 
 const { t } = useI18n()
 
 interface Props {
   categories: Category[]
   loading: boolean
+  total: number
+  currentPage: number
+  pageSize: number
 }
 
 const props = defineProps<Props>()
 
 const emit = defineEmits<{
-  edit: [category: Category]
-  delete: [category: Category]
+  (e: 'edit', category: Category): void
+  (e: 'delete', category: Category): void
+  (e: 'page-change', page: number): void
+  (e: 'page-size-change', size: number): void
 }>()
+
+// 处理分页变化
+function handlePageChange(page: number) {
+  emit('page-change', page)
+}
+
+// 处理每页数量变化
+function handlePageSizeChange(size: number) {
+  emit('page-size-change', size)
+}
 </script>
 
 <style scoped>
