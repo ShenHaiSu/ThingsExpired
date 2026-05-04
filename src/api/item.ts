@@ -15,6 +15,7 @@ import type {
   ItemSearchParams,
   ExpiringItem,
   ItemStats,
+  MarkItemAsUsedParams,
 } from '@/types/api/item'
 import { isUtcFormat, toUtcFormat } from '@/utils/date'
 
@@ -185,42 +186,6 @@ export function deleteItem(itemId: number) {
 }
 
 /**
- * 批量删除物品
- * @description 批量删除多个物品记录
- * @param {number[]} itemIds - 物品ID数组，必填
- * @returns {Promise<ApiResponse<null>>} 成功返回null
- * @throws {Error} code=1002 未授权
- * @throws {Error} code=1001 参数无效
- *
- * @example
- * ```typescript
- * const response = await batchDeleteItems([1, 2, 3])
- * // 响应: { code: 0, message: 'success', data: null }
- * ```
- */
-export function batchDeleteItems(itemIds: number[]) {
-  return post<ApiResponse<null>>('/item/batch_delete', { item_ids: itemIds })
-}
-
-/**
- * 标记物品为已使用
- * @description 将物品状态标记为已消耗，用于记录物品已被使用
- * @param {number} itemId - 物品ID，必填
- * @returns {Promise<ApiResponse<Item>>} 成功返回更新后的物品信息
- * @throws {Error} code=1002 未授权
- * @throws {Error} code=1001 参数无效
- *
- * @example
- * ```typescript
- * const response = await markItemAsUsed(1)
- * // 响应: { code: 0, message: 'success', data: { item_id: 1, status: 3, ... } }
- * ```
- */
-export function markItemAsUsed(itemId: number) {
-  return post<ApiResponse<Item>>('/item/mark_used', { item_id: itemId })
-}
-
-/**
  * 获取即将过期的物品
  * @description 获取指定天数内即将过期的物品列表，用于提醒用户
  * @see {@link https://github.com/things-expired/docs#86-获取即将过期物品 API文档}
@@ -247,22 +212,6 @@ export function getExpiringItems(days: number = 7) {
 }
 
 /**
- * 获取已过期的物品
- * @description 获取所有已过期的物品列表
- * @returns {Promise<ApiResponse<PaginatedResponse<Item>>>} 成功返回已过期物品列表
- * @throws {Error} code=1002 未授权
- *
- * @example
- * ```typescript
- * const response = await getExpiredItems()
- * // 响应: { code: 0, message: 'success', data: { list: [...], total: 1, page: 1 } }
- * ```
- */
-export function getExpiredItems() {
-  return post<ApiResponse<PaginatedResponse<Item>>>('/item/expired')
-}
-
-/**
  * 获取物品统计信息
  * @description 获取物品的统计信息，包括总数、即将过期数量、已过期数量、已使用数量
  * @returns {Promise<ApiResponse<ItemStats>>} 成功返回统计信息
@@ -278,6 +227,32 @@ export function getItemStats() {
   return post<ApiResponse<ItemStats>>('/item/stats')
 }
 
+/**
+ * 标记物品已使用
+ * @description 将物品状态标记为"已消耗"（status = 3），用于记录物品已被使用完毕
+ * @see {@link https://github.com/things-expired/docs#88-标记物品已使用 API文档}
+ * @requires 认证 - 需要在请求头中携带Token: Authorization: Bearer {token}
+ * @param {number} itemId - 物品ID，最小值为1，必填
+ * @returns {Promise<ApiResponse<Item>>} 成功返回更新后的物品信息，状态为已消耗（status = 3）
+ * @throws {Error} code=1002 未授权
+ * @throws {Error} code=1001 参数无效
+ *
+ * @example
+ * ```typescript
+ * const response = await markItemAsUsed(1)
+ * // 响应: { code: 0, message: 'success', data: { item_id: 1, name: '牛奶', status: 3, ... } }
+ * ```
+ *
+ * @remarks
+ * - 只有物品所属用户才能标记物品为已使用
+ * - 标记后物品状态变为 3（已消耗）
+ * - 已消耗的物品不会再出现在"即将过期"统计中
+ * - 此操作不可逆，无法将已消耗状态改回其他状态
+ */
+export function markItemAsUsed(itemId: number) {
+  return post<ApiResponse<Item>>('/item/mark_used', { item_id: itemId })
+}
+
 // 导出类型供外部使用
 export type {
   Item,
@@ -288,4 +263,5 @@ export type {
   ItemSearchParams,
   ExpiringItem,
   ItemStats,
+  MarkItemAsUsedParams,
 }

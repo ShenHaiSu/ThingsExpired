@@ -11,6 +11,7 @@ import type {
   CreateCategoryParams,
   UpdateCategoryParams,
   DeleteCategoryParams,
+  CategoryListParams,
 } from '@/types/api/category'
 
 // ============ API 接口 ============
@@ -46,24 +47,33 @@ export function createCategory(data: CreateCategoryParams) {
 
 /**
  * 获取分类列表
- * @description 获取当前用户的所有分类列表
+ * @description 获取当前用户的所有分类列表，支持分页和搜索
  * @see {@link https://github.com/things-expired/docs#72-获取分类列表 API文档}
  * @requires 认证 - 需要在请求头中携带Token: Authorization: Bearer {token}
- * @returns {Promise<ApiResponse<PaginatedResponse<Category>>>} 成功返回分类列表和总数
+ * @param {CategoryListParams} [params] - 查询参数
+ * @param {number} [params.page] - 页码，最小值为1，默认为1
+ * @param {number} [params.page_size] - 每页数量，1-100，默认为10
+ * @param {string} [params.keyword] - 搜索关键词，模糊匹配分类名称
+ * @returns {Promise<ApiResponse<PaginatedResponse<Category>>>} 成功返回分类列表、总数量和当前页码
  * @throws {Error} code=1002 未授权
  *
  * @example
  * ```typescript
+ * // 获取所有分类（默认分页）
  * const response = await getCategoryList()
- * // 响应: { code: 0, message: 'success', data: { list: [{ category_id: 1, name: '食品', ... }], total: 1 } }
+ * // 响应: { code: 0, message: 'success', data: { list: [{ category_id: 1, name: '食品', ... }], total: 1, page: 1 } }
+ *
+ * // 分页搜索
+ * const response = await getCategoryList({ page: 1, page_size: 10, keyword: '食品' })
+ * // 响应: { code: 0, message: 'success', data: { list: [...], total: 1, page: 1 } }
  * ```
  *
  * @remarks
- * - 分页参数固定为 page=1, pageSize=10
  * - 返回的列表按 sort_order 字段排序
+ * - keyword 参数支持模糊匹配分类名称
  */
-export function getCategoryList() {
-  return post<ApiResponse<PaginatedResponse<Category>>>('/category/list')
+export function getCategoryList(params?: CategoryListParams) {
+  return post<ApiResponse<PaginatedResponse<Category>>>('/category/list', params)
 }
 
 /**
@@ -120,4 +130,4 @@ export function deleteCategory(categoryId: number) {
 }
 
 // 导出类型供外部使用
-export type { Category, CreateCategoryParams, UpdateCategoryParams, DeleteCategoryParams }
+export type { Category, CreateCategoryParams, UpdateCategoryParams, DeleteCategoryParams, CategoryListParams }

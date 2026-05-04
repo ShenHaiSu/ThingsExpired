@@ -64,3 +64,16 @@ export interface DeleteCategoryParams {
   /** 分类ID，必填 */
   category_id: number
 }
+
+/**
+ * 分类列表查询参数
+ * @description 获取分类列表时支持的查询参数，支持分页和搜索
+ */
+export interface CategoryListParams {
+  /** 页码，最小值为1，默认为1 */
+  page?: number
+  /** 每页数量，1-100，默认为10 */
+  page_size?: number
+  /** 搜索关键词，模糊匹配分类名称，最多100字符 */
+  keyword?: string
+}
