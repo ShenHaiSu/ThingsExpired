@@ -13,6 +13,12 @@
       />
     </div>
 
+    <!-- 搜索组件 -->
+    <CategorySearch
+      @search="handleSearch"
+      @reset="handleSearchReset"
+    />
+
     <!-- 分类列表 - 桌面端 -->
     <div class="desktop-only">
       <CategoryDataListDesktop
@@ -32,6 +38,15 @@
         @delete="confirmDelete"
       />
     </div>
+
+    <!-- 分页组件 -->
+    <Pagination
+      :total="total"
+      :current-page="currentPage"
+      :page-size="pageSize"
+      @page-change="handlePageChange"
+      @page-size-change="handlePageSizeChange"
+    />
 
     <!-- 创建/编辑对话框 -->
     <CategoryFormDialog
@@ -56,6 +71,8 @@ import Button from 'primevue/button'
 import CategoryDataListDesktop from './components/CategoryDataListDesktop.vue'
 import CategoryDataListMobile from './components/CategoryDataListMobile.vue'
 import CategoryFormDialog from './components/CategoryFormDialog.vue'
+import CategorySearch from './components/CategorySearch.vue'
+import Pagination from '@/components/common/Pagination.vue'
 
 // 4. 项目内部 - API
 import {
@@ -66,6 +83,7 @@ import {
   type Category,
   type CreateCategoryParams,
 } from '@/api/category'
+import type { CategoryListParams } from '@/types/api/category'
 
 // 5. 项目内部 - 组合式函数
 import { useToast } from '@/composables'
@@ -81,6 +99,14 @@ const dialogVisible = ref(false)
 const isEdit = ref(false)
 const editingId = ref<number | null>(null)
 
+// 分页状态
+const total = ref(0)
+const currentPage = ref(1)
+const pageSize = ref(10)
+
+// 搜索参数
+const searchParams = ref<CategoryListParams>({})
+
 // 表单数据
 const formData = ref<CreateCategoryParams>({
   name: '',
@@ -93,14 +119,49 @@ const formData = ref<CreateCategoryParams>({
 async function loadCategoryList() {
   loading.value = true
   try {
-    const res = await getCategoryList()
+    const params: CategoryListParams = {
+      page: currentPage.value,
+      page_size: pageSize.value,
+      ...searchParams.value,
+    }
+    const res = await getCategoryList(params)
     categoryList.value = res.data.list
+    total.value = res.data.total
+    currentPage.value = res.data.page
   } catch (error) {
     console.error('Failed to load categories:', error)
     toast.error(t('category.message.createFailed'))
   } finally {
     loading.value = false
   }
+}
+
+// 处理搜索
+function handleSearch(params: CategoryListParams) {
+  searchParams.value = params
+  currentPage.value = 1 // 搜索时重置到第一页
+  loadCategoryList()
+}
+
+// 处理搜索重置
+function handleSearchReset() {
+  searchParams.value = {}
+  currentPage.value = 1
+  pageSize.value = 10
+  loadCategoryList()
+}
+
+// 处理分页变化
+function handlePageChange(page: number) {
+  currentPage.value = page
+  loadCategoryList()
+}
+
+// 处理每页数量变化
+function handlePageSizeChange(size: number) {
+  pageSize.value = size
+  currentPage.value = 1 // 改变每页数量时重置到第一页
+  loadCategoryList()
 }
 
 // 打开创建对话框
