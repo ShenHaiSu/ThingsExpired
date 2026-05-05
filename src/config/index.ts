@@ -31,6 +31,11 @@ export interface LogConfig {
   maxFiles: number;
 }
 
+export interface SPAConfig {
+  enabled: boolean;
+  distPath: string;
+}
+
 export interface Config {
   app: AppConfig;
   database: DatabaseConfig;
@@ -38,6 +43,7 @@ export interface Config {
   session: SessionConfig;
   expiration: ExpirationConfig;
   log: LogConfig;
+  spa: SPAConfig;
 }
 
 export function loadConfig(): Config {
@@ -68,6 +74,10 @@ export function loadConfig(): Config {
       path: process.env.LOG_PATH || "./logs",
       level: (process.env.LOG_LEVEL || "info") as "debug" | "info" | "warn" | "error",
       maxFiles: parseInt(process.env.LOG_MAX_FILES || "7", 10),
+    },
+    spa: {
+      enabled: process.env.SPA_ENABLED !== "false",
+      distPath: process.env.SPA_DIST_PATH || "./frontend-dist",
     },
   };
 }

@@ -68,6 +68,7 @@ async function main() {
     itemHandler,
     authMiddleware,
     loggerMiddleware,
+    config,
   );
 
   // 10. 启动定时任务
