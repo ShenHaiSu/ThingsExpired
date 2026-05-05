@@ -1,8 +1,8 @@
 import { eq, and, sql } from "drizzle-orm";
-import type { DBInstance } from "./db";
-import { sessions } from "../model/session";
-import type { ISessionRepository } from "./interfaces";
-import type { InsertSession, Session } from "../model/session";
+import type { DBInstance } from "@/repository/db";
+import { sessions } from "@/model/session";
+import type { ISessionRepository } from "@/repository/interfaces";
+import type { InsertSession, Session } from "@/model/session";
 
 export class SessionRepository implements ISessionRepository {
   constructor(private db: DBInstance) {}

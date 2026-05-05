@@ -1,18 +1,18 @@
-import type { IItemRepository } from "../repository/interfaces";
-import type { IItemService } from "./interfaces";
-import type { ItemVO, ExpiringItemVO, ItemStatsVO } from "../model/vo/item";
+import type { IItemRepository } from "@/repository/interfaces";
+import type { IItemService } from "@/service/interfaces";
+import type { ItemVO, ExpiringItemVO, ItemStatsVO } from "@/model/vo/item";
 import type {
   CreateItemRequest,
   UpdateItemRequest,
-} from "../model/dto/item";
-import { toItemVO, toExpiringItemVO, toItemStatsVO } from "../model/vo/item";
-import { AppError } from "../errors";
+} from "@/model/dto/item";
+import { toItemVO, toExpiringItemVO, toItemStatsVO } from "@/model/vo/item";
+import { AppError } from "@/errors";
 import {
   CodeItemNotFound,
   CodeDatabaseError,
   CodeForbidden,
-} from "../errors/code";
-import { nowUTC, daysUntil } from "../utils/time";
+} from "@/errors/code";
+import { nowUTC, daysUntil } from "@/utils/time";
 
 export class ItemService implements IItemService {
   constructor(private itemRepo: IItemRepository) {}

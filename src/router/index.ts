@@ -1,12 +1,12 @@
 import { Hono } from "hono";
 import { serveStatic } from "hono/bun";
-import type { UserHandler } from "../handler/user";
-import type { CategoryHandler } from "../handler/category";
-import type { ItemHandler } from "../handler/item";
-import type { AuthMiddleware } from "../middleware/auth";
-import { corsMiddleware } from "../middleware/cors";
+import type { UserHandler } from "@/handler/user";
+import type { CategoryHandler } from "@/handler/category";
+import type { ItemHandler } from "@/handler/item";
+import type { AuthMiddleware } from "@/middleware/auth";
+import { corsMiddleware } from "@/middleware/cors";
 import type { MiddlewareHandler } from "hono";
-import type { Config } from "../config";
+import type { Config } from "@/config";
 
 export function createRouter(
   userHandler: UserHandler,

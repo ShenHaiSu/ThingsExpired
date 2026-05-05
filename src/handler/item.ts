@@ -1,7 +1,7 @@
 import type { Context } from "hono";
-import type { IItemService } from "../service/interfaces";
-import { success, failWithCode, fail } from "../utils/response";
-import { CodeParamInvalid } from "../errors/code";
+import type { IItemService } from "@/service/interfaces";
+import { success, failWithCode, fail } from "@/utils/response";
+import { CodeParamInvalid } from "@/errors/code";
 import {
   CreateItemRequestSchema,
   ItemListRequestSchema,
@@ -10,7 +10,7 @@ import {
   DeleteItemRequestSchema,
   ExpiringItemsRequestSchema,
   MarkUsedRequestSchema,
-} from "../model/dto/item";
+} from "@/model/dto/item";
 
 export class ItemHandler {
   constructor(private itemService: IItemService) {}

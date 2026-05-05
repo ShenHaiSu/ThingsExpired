@@ -1,7 +1,7 @@
 import type { Context, Next } from "hono";
-import { failWithCode } from "../utils/response";
-import { CodeUnauthorized } from "../errors/code";
-import type { ISessionRepository } from "../repository/interfaces";
+import { failWithCode } from "@/utils/response";
+import { CodeUnauthorized } from "@/errors/code";
+import type { ISessionRepository } from "@/repository/interfaces";
 import jwt from "jsonwebtoken";
 
 interface JWTConfig {

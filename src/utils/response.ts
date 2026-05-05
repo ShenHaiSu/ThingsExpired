@@ -1,6 +1,6 @@
 import type { Context } from "hono";
-import { CodeSuccess, CodeInternalError } from "../errors/code";
-import { AppError } from "../errors";
+import { CodeSuccess, CodeInternalError } from "@/errors/code";
+import { AppError } from "@/errors";
 
 interface ResponseBody {
   code: number;

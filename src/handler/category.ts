@@ -1,13 +1,13 @@
 import type { Context } from "hono";
-import type { ICategoryService } from "../service/interfaces";
-import { success, failWithCode, fail } from "../utils/response";
-import { CodeParamInvalid } from "../errors/code";
+import type { ICategoryService } from "@/service/interfaces";
+import { success, failWithCode, fail } from "@/utils/response";
+import { CodeParamInvalid } from "@/errors/code";
 import {
   CreateCategoryRequestSchema,
   CategoryListRequestSchema,
   UpdateCategoryRequestSchema,
   DeleteCategoryRequestSchema,
-} from "../model/dto/category";
+} from "@/model/dto/category";
 
 export class CategoryHandler {
   constructor(private categoryService: ICategoryService) {}

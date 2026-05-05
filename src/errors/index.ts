@@ -4,7 +4,7 @@ import {
   CodeUnauthorized,
   CodeCategoryNotFound,
   CodeItemNotFound,
-} from "./code";
+} from "@/errors/code";
 
 export class AppError extends Error {
   constructor(

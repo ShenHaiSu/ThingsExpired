@@ -1,20 +1,20 @@
-import { loadConfig } from "./config";
-import { createDB, initDB } from "./repository/db";
-import { UserRepository } from "./repository/user";
-import { CategoryRepository } from "./repository/category";
-import { ItemRepository } from "./repository/item";
-import { SessionRepository } from "./repository/session";
-import { UserService } from "./service/user";
-import { CategoryService } from "./service/category";
-import { ItemService } from "./service/item";
-import { ItemExpirationService } from "./service/item_expiration";
-import { UserHandler } from "./handler/user";
-import { CategoryHandler } from "./handler/category";
-import { ItemHandler } from "./handler/item";
-import { AuthMiddleware } from "./middleware/auth";
-import { createRouter } from "./router";
-import { createLogger } from "./utils/logger";
-import { createLoggerMiddleware } from "./middleware/logger";
+import { loadConfig } from "@/config";
+import { createDB, initDB } from "@/repository/db";
+import { UserRepository } from "@/repository/user";
+import { CategoryRepository } from "@/repository/category";
+import { ItemRepository } from "@/repository/item";
+import { SessionRepository } from "@/repository/session";
+import { UserService } from "@/service/user";
+import { CategoryService } from "@/service/category";
+import { ItemService } from "@/service/item";
+import { ItemExpirationService } from "@/service/item_expiration";
+import { UserHandler } from "@/handler/user";
+import { CategoryHandler } from "@/handler/category";
+import { ItemHandler } from "@/handler/item";
+import { AuthMiddleware } from "@/middleware/auth";
+import { createRouter } from "@/router";
+import { createLogger } from "@/utils/logger";
+import { createLoggerMiddleware } from "@/middleware/logger";
 
 async function main() {
   // 1. 加载配置

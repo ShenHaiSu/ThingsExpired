@@ -1,7 +1,7 @@
-import type { IItemRepository } from "../repository/interfaces";
-import type { IItemExpirationService } from "./interfaces";
-import type { ExpirationConfig } from "../config";
-import type { SimpleLogger } from "../utils/logger";
+import type { IItemRepository } from "@/repository/interfaces";
+import type { IItemExpirationService } from "@/service/interfaces";
+import type { ExpirationConfig } from "@/config";
+import type { SimpleLogger } from "@/utils/logger";
 
 // 物品状态常量
 export const ItemStatus = {

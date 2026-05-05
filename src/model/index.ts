@@ -1,4 +1,4 @@
-export { users } from "./user";
-export { categories } from "./category";
-export { items } from "./item";
-export { sessions } from "./session";
+export { users } from "@/model/user";
+export { categories } from "@/model/category";
+export { items } from "@/model/item";
+export { sessions } from "@/model/session";

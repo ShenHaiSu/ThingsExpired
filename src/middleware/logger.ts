@@ -1,5 +1,5 @@
 import type { Context, Next } from "hono";
-import type { SimpleLogger } from "../utils/logger";
+import type { SimpleLogger } from "@/utils/logger";
 
 export function createLoggerMiddleware(logger: SimpleLogger) {
   return async function loggerMiddleware(

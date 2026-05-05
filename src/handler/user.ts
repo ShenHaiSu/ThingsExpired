@@ -1,13 +1,13 @@
 import type { Context } from "hono";
-import type { IUserService } from "../service/interfaces";
-import { success, failWithCode, fail } from "../utils/response";
-import { CodeParamInvalid } from "../errors/code";
+import type { IUserService } from "@/service/interfaces";
+import { success, failWithCode, fail } from "@/utils/response";
+import { CodeParamInvalid } from "@/errors/code";
 import {
   RegisterRequestSchema,
   LoginRequestSchema,
   UpdateUserRequestSchema,
   RevokeSessionRequestSchema,
-} from "../model/dto/user";
+} from "@/model/dto/user";
 
 export class UserHandler {
   constructor(private userService: IUserService) {}

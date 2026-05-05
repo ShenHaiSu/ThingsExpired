@@ -1,7 +1,7 @@
 import { drizzle, type BunSQLiteDatabase } from "drizzle-orm/bun-sqlite";
 import { Database } from "bun:sqlite";
-import type { DatabaseConfig } from "../config";
-import * as schema from "../model";
+import type { DatabaseConfig } from "@/config";
+import * as schema from "@/model";
 
 export type DBInstance = BunSQLiteDatabase<typeof schema>;
 

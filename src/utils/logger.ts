@@ -1,6 +1,6 @@
 import { mkdir } from "fs/promises";
 import { existsSync, createWriteStream, unlinkSync, readdirSync } from "fs";
-import type { LogConfig } from "../config";
+import type { LogConfig } from "@/config";
 import path from "path";
 
 /**

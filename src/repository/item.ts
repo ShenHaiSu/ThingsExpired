@@ -1,8 +1,8 @@
 import { eq, and, like, gt, lt, gte, lte, sql, inArray } from "drizzle-orm";
-import type { DBInstance } from "./db";
-import { items } from "../model/item";
-import type { IItemRepository } from "./interfaces";
-import type { InsertItem, Item } from "../model/item";
+import type { DBInstance } from "@/repository/db";
+import { items } from "@/model/item";
+import type { IItemRepository } from "@/repository/interfaces";
+import type { InsertItem, Item } from "@/model/item";
 
 export class ItemRepository implements IItemRepository {
   constructor(private db: DBInstance) {}

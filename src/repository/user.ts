@@ -1,8 +1,8 @@
 import { eq } from "drizzle-orm";
-import type { DBInstance } from "./db";
-import { users } from "../model/user";
-import type { IUserRepository } from "./interfaces";
-import type { InsertUser, User } from "../model/user";
+import type { DBInstance } from "@/repository/db";
+import { users } from "@/model/user";
+import type { IUserRepository } from "@/repository/interfaces";
+import type { InsertUser, User } from "@/model/user";
 
 export class UserRepository implements IUserRepository {
   constructor(private db: DBInstance) {}

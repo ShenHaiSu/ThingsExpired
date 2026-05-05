@@ -1,7 +1,7 @@
-import type { User, InsertUser } from "../model/user";
-import type { Category, InsertCategory } from "../model/category";
-import type { Item, InsertItem } from "../model/item";
-import type { Session, InsertSession } from "../model/session";
+import type { User, InsertUser } from "@/model/user";
+import type { Category, InsertCategory } from "@/model/category";
+import type { Item, InsertItem } from "@/model/item";
+import type { Session, InsertSession } from "@/model/session";
 
 // ===== 用户 Repository 接口 =====
 export interface IUserRepository {

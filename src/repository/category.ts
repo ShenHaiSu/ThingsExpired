@@ -1,8 +1,8 @@
 import { eq, and, like, sql } from "drizzle-orm";
-import type { DBInstance } from "./db";
-import { categories } from "../model/category";
-import type { ICategoryRepository } from "./interfaces";
-import type { InsertCategory, Category } from "../model/category";
+import type { DBInstance } from "@/repository/db";
+import { categories } from "@/model/category";
+import type { ICategoryRepository } from "@/repository/interfaces";
+import type { InsertCategory, Category } from "@/model/category";
 
 export class CategoryRepository implements ICategoryRepository {
   constructor(private db: DBInstance) {}

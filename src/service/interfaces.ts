@@ -1,19 +1,19 @@
-import type { UserVO } from "../model/vo/user";
-import type { CategoryVO } from "../model/vo/category";
-import type { ItemVO, ExpiringItemVO, ItemStatsVO } from "../model/vo/item";
+import type { UserVO } from "@/model/vo/user";
+import type { CategoryVO } from "@/model/vo/category";
+import type { ItemVO, ExpiringItemVO, ItemStatsVO } from "@/model/vo/item";
 import type {
   RegisterRequest,
   LoginRequest,
   UpdateUserRequest,
-} from "../model/dto/user";
+} from "@/model/dto/user";
 import type {
   CreateCategoryRequest,
   UpdateCategoryRequest,
-} from "../model/dto/category";
+} from "@/model/dto/category";
 import type {
   CreateItemRequest,
   UpdateItemRequest,
-} from "../model/dto/item";
+} from "@/model/dto/item";
 
 // 物品列表查询参数
 export interface ItemListParams {

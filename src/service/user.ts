@@ -1,21 +1,21 @@
-import type { IUserRepository, ISessionRepository } from "../repository/interfaces";
-import type { IUserService } from "./interfaces";
-import type { UserVO } from "../model/vo/user";
+import type { IUserRepository, ISessionRepository } from "@/repository/interfaces";
+import type { IUserService } from "@/service/interfaces";
+import type { UserVO } from "@/model/vo/user";
 import type {
   RegisterRequest,
   LoginRequest,
   UpdateUserRequest,
-} from "../model/dto/user";
-import { toUserVO } from "../model/vo/user";
-import { AppError } from "../errors";
+} from "@/model/dto/user";
+import { toUserVO } from "@/model/vo/user";
+import { AppError } from "@/errors";
 import {
   CodeUserNotFound,
   CodeUserExists,
   CodePasswordWrong,
   CodeForbidden,
   CodeDatabaseError,
-} from "../errors/code";
-import { nowUTC, formatTime } from "../utils/time";
+} from "@/errors/code";
+import { nowUTC, formatTime } from "@/utils/time";
 import jwt from "jsonwebtoken";
 
 interface JWTConfig {

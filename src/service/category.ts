@@ -1,19 +1,19 @@
-import type { ICategoryRepository, IItemRepository } from "../repository/interfaces";
-import type { ICategoryService } from "./interfaces";
-import type { CategoryVO } from "../model/vo/category";
+import type { ICategoryRepository, IItemRepository } from "@/repository/interfaces";
+import type { ICategoryService } from "@/service/interfaces";
+import type { CategoryVO } from "@/model/vo/category";
 import type {
   CreateCategoryRequest,
   UpdateCategoryRequest,
-} from "../model/dto/category";
-import { toCategoryVO } from "../model/vo/category";
-import { AppError } from "../errors";
+} from "@/model/dto/category";
+import { toCategoryVO } from "@/model/vo/category";
+import { AppError } from "@/errors";
 import {
   CodeCategoryNotFound,
   CodeDatabaseError,
   CodeForbidden,
   CodeUserExists,
-} from "../errors/code";
-import { nowUTC } from "../utils/time";
+} from "@/errors/code";
+import { nowUTC } from "@/utils/time";
 
 export class CategoryService implements ICategoryService {
   constructor(
