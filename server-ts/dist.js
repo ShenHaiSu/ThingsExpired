@@ -25336,9 +25336,23 @@ class DailyFileWriter {
     }
   }
 }
+function parseTitle(msg) {
+  const match2 = msg.match(/^\[(.+?)\]\s*(.*)/);
+  if (match2) {
+    return { title: match2[1] ?? "", content: match2[2] ?? "" };
+  }
+  return { title: "", content: msg };
+}
 function formatLogLine(level, msg, meta3) {
   const timestamp = new Date().toISOString();
-  let line = `${timestamp} [${level.toUpperCase()}] ${msg}`;
+  const levelUpper = level.toUpperCase();
+  const { title, content } = parseTitle(msg);
+  let line;
+  if (title) {
+    line = `${timestamp} [${levelUpper}] [${title}] [${content}]`;
+  } else {
+    line = `${timestamp} [${levelUpper}] [${content}]`;
+  }
   if (meta3 && Object.keys(meta3).length > 0) {
     line += ` ${JSON.stringify(meta3)}`;
   }
@@ -25376,7 +25390,7 @@ class SimpleLoggerImpl {
       };
     }
   }
-  formatConsole(level, msg) {
+  formatConsole(level, formattedLine) {
     const colorMap = {
       debug: "\x1B[36m",
       info: "\x1B[32m",
@@ -25386,7 +25400,7 @@ class SimpleLoggerImpl {
     };
     const reset = "\x1B[0m";
     const color = this.useColor ? colorMap[level] || "" : "";
-    return `${color}${formatLogLine(level, msg)}${reset}`;
+    return `${color}${formattedLine}${reset}`;
   }
   log(level, msgOrMeta, metaOrMsg) {
     if (!this.shouldLog(level))
@@ -25394,7 +25408,7 @@ class SimpleLoggerImpl {
     const { msg, meta: meta3 } = this.parseArgs(msgOrMeta, metaOrMsg);
     const line = formatLogLine(level, msg, meta3);
     this.fileWriter.write(line);
-    console.log(this.formatConsole(level, msg));
+    console.log(this.formatConsole(level, line));
   }
   debug(msgOrMeta, metaOrMsg) {
     this.log("debug", msgOrMeta, metaOrMsg);
@@ -25491,5 +25505,5 @@ main().catch((err) => {
   process.exit(1);
 });
 
-//# debugId=5576B0743E762BFB64756E2164756E21
+//# debugId=3EB1C324A3855EAD64756E2164756E21
 //# sourceMappingURL=dist.js.map
