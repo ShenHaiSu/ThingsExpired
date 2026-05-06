@@ -106,18 +106,41 @@ class DailyFileWriter {
 }
 
 /**
+ * 解析日志消息中的 [Title] 前缀
+ * @example "[Expiration] 任务已启动" => { title: "Expiration", content: "任务已启动" }
+ * @example "服务器已启动" => { title: "", content: "服务器已启动" }
+ */
+function parseTitle(msg: string): { title: string; content: string } {
+  const match = msg.match(/^\[(.+?)\]\s*(.*)/);
+  if (match) {
+    return { title: match[1] ?? "", content: match[2] ?? "" };
+  }
+  return { title: "", content: msg };
+}
+
+/**
  * 创建格式化日志文本
+ * 统一格式: 时间戳 [LEVEL] [title] [content] [metaJSON]
+ * 当 title 为空时: 时间戳 [LEVEL] [content] [metaJSON]
  * @param level 日志级别
  * @param msg 消息内容
  * @param meta 元数据
  * @returns 格式化后的日志行
  */
 function formatLogLine(level: string, msg: string, meta?: Record<string, unknown>): string {
-  // 时间戳: UTC ISO 8601 格式
   const timestamp = new Date().toISOString();
+  const levelUpper = level.toUpperCase();
+  const { title, content } = parseTitle(msg);
 
-  // 基本格式: 时间戳 [级别] 消息
-  let line = `${timestamp} [${level.toUpperCase()}] ${msg}`;
+  let line: string;
+
+  if (title) {
+    // 时间戳 [LEVEL] [Title] [content]
+    line = `${timestamp} [${levelUpper}] [${title}] [${content}]`;
+  } else {
+    // 时间戳 [LEVEL] [content]
+    line = `${timestamp} [${levelUpper}] [${content}]`;
+  }
 
   // 如果有额外元数据，追加 JSON 格式
   if (meta && Object.keys(meta).length > 0) {
@@ -187,7 +210,7 @@ class SimpleLoggerImpl implements SimpleLogger {
     }
   }
 
-  private formatConsole(level: string, msg: string): string {
+  private formatConsole(level: string, formattedLine: string): string {
     // 根据日志级别添加颜色
     const colorMap: Record<string, string> = {
       debug: "\x1b[36m", // 青色
@@ -198,20 +221,21 @@ class SimpleLoggerImpl implements SimpleLogger {
     };
     const reset = "\x1b[0m";
     const color = this.useColor ? (colorMap[level] || "") : "";
-    return `${color}${formatLogLine(level, msg)}${reset}`;
+    return `${color}${formattedLine}${reset}`;
   }
 
   private log(level: string, msgOrMeta: string | Record<string, unknown>, metaOrMsg?: string | Record<string, unknown>): void {
     if (!this.shouldLog(level)) return;
 
     const { msg, meta } = this.parseArgs(msgOrMeta, metaOrMsg);
+    // 统一格式化: 时间戳 [LEVEL] [title] [content] [meta]
     const line = formatLogLine(level, msg, meta);
 
-    // 写入文件
+    // 写入文件（纯文本）
     this.fileWriter.write(line);
 
-    // 输出到控制台
-    console.log(this.formatConsole(level, msg));
+    // 输出到控制台（带颜色格式，内容与文件完全一致）
+    console.log(this.formatConsole(level, line));
   }
 
   debug(msgOrMeta: string | Record<string, unknown>, metaOrMsg?: string | Record<string, unknown>): void {
