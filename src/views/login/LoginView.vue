@@ -33,7 +33,7 @@
       </div>
 
       <!-- 记住我 & 忘记密码 -->
-      <div class="form-options">
+      <!-- <div class="form-options">
         <div class="remember-me">
           <Checkbox v-model="form.rememberMe" :binary="true" inputId="rememberMe" />
           <label for="rememberMe">{{ t('auth.rememberMe') }}</label>
@@ -44,7 +44,7 @@
         >
           {{ t('auth.forgotPassword') }}
         </router-link>
-      </div>
+      </div> -->
 
       <!-- 登录按钮 -->
       <Button
